@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "/Users/bonczbence/.config/herd-lite/bin/php",
+            "args": [
+                "/Users/bonczbence/Desktop/Github/DailyTaxCalculator/artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}

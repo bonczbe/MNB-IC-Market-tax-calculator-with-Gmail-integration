@@ -16,6 +16,8 @@ return new class extends Migration
             $table->text('broker_name');
             $table->text('account_number');
             $table->decimal('starting_balance', 15, 2)->default(0.00);
+            $table->text('filter_number');
+            $table->text('filter_balance');
             $table->timestamps();
         });
     }

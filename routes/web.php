@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Rate;
 use Carbon\Carbon;
+use DirectoryTree\ImapEngine\Mailbox;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -17,30 +17,36 @@ require __DIR__.'/settings.php';
 
 Route::get('/teszt', function () {
 
-    $html = file_get_contents('https://www.mnb.hu/en/arfolyamok');
+    $mailbox = new Mailbox(config('imap.default'));
 
-    $dom = new DOMDocument;
-    @$dom->loadHTML($html);
-    $xpath = new DOMXPath($dom);
-    $caption = $xpath->query('//caption[@class="ttl ttl-s"]');
-    $rows = $xpath->query('//tr[td[@class="fw-b"]]');
-    $date = Carbon::createFromFormat('d F Y', explode(': ', $caption->item(0)->nodeValue)[1])->format('Y-m-d');
+    $inbox = $mailbox->inbox();
+    $messages = $inbox->messages()
+        ->since(Carbon::now()->subDays(3))
+        ->from('support@icmarkets.eu')
+        ->subject('Daily Confirmation')
+        ->withBody()
+        ->withBodyStructure()
+        ->get();
 
-    $upsertData = [];
-    foreach ($rows as $row) {
-        $cells = $xpath->query('.//td', $row);
-        if ($cells->length >= 4) {
+    foreach ($messages as $message) {
+        $raw = $message->bodyPart('1');
+        $html = base64_decode($raw);
 
-            $upsertData[] = [
-                'base_currency' => env('BASE_CURRENCY', 'HUF'),
-                'for_currency' => trim($cells->item(1)->nodeValue),
-                'date' => $date,
-                'unit' => trim($cells->item(2)->nodeValue),
-                'rate' => trim($cells->item(3)->nodeValue),
-            ];
+        $dom = new DOMDocument;
+        @$dom->loadHTML($html);
+        $xpath = new DOMXPath($dom);
+
+        $filterNumber = $xpath->query('//b[text()="52776665"]');
+        if ($filterNumber->length > 0) {
+            $query = '//tr/td[b[normalize-space(text())="Total:"]]/following-sibling::td[1]/b';
+            $nodeList = $xpath->query($query);
+            $rawTotal = $nodeList->item(0)->nodeValue;
+            $total = floatval(preg_replace('/\s+/u', '', trim($rawTotal)));
+
+            dd($total);
         }
+
     }
-    Rate::upsert($upsertData, ['base_currency', 'for_currency', 'date']);
 
     return 'ok';
 })->name('home');

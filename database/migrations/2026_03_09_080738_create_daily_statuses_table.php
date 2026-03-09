@@ -18,7 +18,6 @@ return new class extends Migration
             $table->double('balance', 15, 2);
             $table->timestamps();
 
-
             $table->foreign('broker_account_id')
                 ->references('id')
                 ->on('broker_accounts')

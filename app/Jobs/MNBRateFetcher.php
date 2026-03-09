@@ -55,6 +55,6 @@ class MNBRateFetcher implements ShouldQueue
             }
         }
 
-        Rate::upsert($upsertData, uniqueBy:['base_currency', 'for_currency', 'date']);
+        Rate::upsert($upsertData, uniqueBy: ['base_currency', 'for_currency', 'date']);
     }
 }

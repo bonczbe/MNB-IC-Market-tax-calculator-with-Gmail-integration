@@ -21,7 +21,8 @@ Route::get('/teszt', function () {
 
     $inbox = $mailbox->inbox();
     $messages = $inbox->messages()
-        ->since(Carbon::now()->startOfDay())
+        ->since(Carbon::now()->subDays(3))
+        ->before(today()->addDay())
         ->from('support@icmarkets.eu')
         ->subject('Daily Confirmation')
         ->withBody()
@@ -37,11 +38,13 @@ Route::get('/teszt', function () {
         $xpath = new DOMXPath($dom);
 
         $filterNumber = $xpath->query('//b[text()="52776665"]');
+
         if ($filterNumber->length > 0) {
+
             $query = '//tr/td[b[normalize-space(text())="Total:"]]/following-sibling::td[1]/b';
             $nodeList = $xpath->query($query);
             $rawTotal = $nodeList->item(0)->nodeValue;
-            $total = floatval(preg_replace(' ', '', trim($rawTotal)));
+            $total = floatval(str_replace(' ', '', trim($rawTotal)));
 
             dd($total);
         }

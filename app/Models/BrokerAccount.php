@@ -10,5 +10,6 @@ class BrokerAccount extends Model
     protected $fillable = [
         'broker_name',
         'account_number',
+        'starting_balance',
     ];
 }

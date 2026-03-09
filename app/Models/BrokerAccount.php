@@ -11,5 +11,8 @@ class BrokerAccount extends Model
         'broker_name',
         'account_number',
         'starting_balance',
+        'filter_number',
+        'filter_balance',
+        'broker_currency',
     ];
 }

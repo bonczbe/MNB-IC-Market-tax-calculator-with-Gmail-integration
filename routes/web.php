@@ -21,7 +21,7 @@ Route::get('/teszt', function () {
 
     $inbox = $mailbox->inbox();
     $messages = $inbox->messages()
-        ->since(Carbon::now()->subDays(3))
+        ->since(Carbon::now()->startOfDay())
         ->from('support@icmarkets.eu')
         ->subject('Daily Confirmation')
         ->withBody()
@@ -41,7 +41,7 @@ Route::get('/teszt', function () {
             $query = '//tr/td[b[normalize-space(text())="Total:"]]/following-sibling::td[1]/b';
             $nodeList = $xpath->query($query);
             $rawTotal = $nodeList->item(0)->nodeValue;
-            $total = floatval(preg_replace('/\s+/u', '', trim($rawTotal)));
+            $total = floatval(preg_replace(' ', '', trim($rawTotal)));
 
             dd($total);
         }

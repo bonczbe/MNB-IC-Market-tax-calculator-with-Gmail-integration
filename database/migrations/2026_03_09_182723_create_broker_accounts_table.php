@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('starting_balance', 15, 2)->default(0.00);
             $table->text('filter_number');
             $table->text('filter_balance');
+            $table->text('broker_currency');
             $table->timestamps();
         });
     }

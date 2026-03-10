@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->date('date');
             $table->text('currency');
+            $table->double('previous_ledger_balance', 15, 2);
             $table->double('balance', 15, 2);
             $table->timestamps();
 

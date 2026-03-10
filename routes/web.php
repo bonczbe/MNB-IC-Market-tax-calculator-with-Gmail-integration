@@ -21,13 +21,18 @@ Route::get('/teszt', function () {
 
     $inbox = $mailbox->inbox();
     $messages = $inbox->messages()
-        ->since(Carbon::now()->subDays(3))
+        ->since(Carbon::now()->subDays(1))
         ->before(today()->addDay())
         ->from('support@icmarkets.eu')
         ->subject('Daily Confirmation')
         ->withBody()
         ->withBodyStructure()
         ->get();
+
+    $emails = [];
+    $dailyStatuses = [];
+
+
 
     foreach ($messages as $message) {
         $raw = $message->bodyPart('1');
@@ -40,13 +45,19 @@ Route::get('/teszt', function () {
         $filterNumber = $xpath->query('//b[text()="52776665"]');
 
         if ($filterNumber->length > 0) {
+            $emails[] = [
+                'date' => Carbon::create($message->date())->format('Y-m-d'),
+                'content' => $html,
+            ];
 
-            $query = '//tr/td[b[normalize-space(text())="Total:"]]/following-sibling::td[1]/b';
+            $query = '//tr[td[normalize-space()="Previous Ledger Balance:"]]/td[@class="mspt"][last()]';
             $nodeList = $xpath->query($query);
-            $rawTotal = $nodeList->item(0)->nodeValue;
-            $total = floatval(str_replace(' ', '', trim($rawTotal)));
+            $previousLedgerBalance = $nodeList->item(0)->nodeValue;
 
-            dd($total);
+            $query = '//tr[td[normalize-space()="Balance:"]]/td[@class="mspt"][last()]';
+            $nodeList = $xpath->query($query);
+            $balance=$nodeList->item(0)->nodeValue;
+
         }
 
     }

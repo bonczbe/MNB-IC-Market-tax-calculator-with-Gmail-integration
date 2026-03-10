@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BrokerAccount extends Model
 {
@@ -17,4 +18,14 @@ class BrokerAccount extends Model
         'filter_balance',
         'broker_currency',
     ];
+
+    public function dailyStatuses(): HasMany
+    {
+        return $this->hasMany(DailyStatus::class, 'broker_account_id');
+    }
+
+    public function emailExtracts(): HasMany
+    {
+        return $this->hasMany(EmailExtract::class, 'broker_account_id');
+    }
 }

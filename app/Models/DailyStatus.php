@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DailyStatus extends Model
 {
@@ -12,4 +13,9 @@ class DailyStatus extends Model
         'balance',
         'broker_account_id',
     ];
+
+    public function broker(): BelongsTo
+    {
+        return $this->belongsTo(BrokerAccount::class, 'broker_account_id');
+    }
 }

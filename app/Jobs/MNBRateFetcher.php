@@ -48,8 +48,8 @@ class MNBRateFetcher implements ShouldQueue
             if ($cells->length >= 4) {
 
                 $upsertData[] = [
-                    'base_currency' => env('BASE_CURRENCY', 'HUF'),
-                    'for_currency' => trim($cells->item(0)->nodeValue),
+                    'for_currency' => env('BASE_CURRENCY', 'HUF'),
+                    'base_currency' => trim($cells->item(0)->nodeValue),
                     'date' => $date,
                     'unit' => trim($cells->item(2)->nodeValue),
                     'rate' => trim($cells->item(3)->nodeValue),

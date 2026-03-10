@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Filament\Resources\Rates\Schemas;
+
+use App\Models\Rate;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
+
+class RateForm
+{
+    public static function configure(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Select::make('base_currency')
+                    ->options(function () {
+                        return Rate::query()->get()->pluck('base_currency', 'base_currency');
+                    })
+                    ->required(),
+                TextInput::make('unit')
+                    ->required()
+                    ->numeric(),
+                TextInput::make('rate')
+                    ->required()
+                    ->numeric(),
+                TextInput::make('for_currency')
+                    ->disabled()
+                    ->default(env('BASE_CURRENCY', 'HUF'))
+                    ->required(),
+                DatePicker::make('date')
+                    ->required(),
+            ]);
+    }
+}

@@ -17,7 +17,7 @@ class EmailExtractResource extends Resource
 {
     protected static ?string $model = EmailExtract::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::EnvelopeOpen;
 
     protected static ?string $recordTitleAttribute = 'EmailExtract';
 

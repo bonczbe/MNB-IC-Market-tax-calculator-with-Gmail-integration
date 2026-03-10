@@ -18,7 +18,7 @@ class RateResource extends Resource
 {
     protected static ?string $model = Rate::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::PresentationChartBar;
 
     protected static ?string $recordTitleAttribute = 'Rate';
 

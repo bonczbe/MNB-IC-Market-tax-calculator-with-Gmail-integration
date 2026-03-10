@@ -18,7 +18,7 @@ class DailyStatusResource extends Resource
 {
     protected static ?string $model = DailyStatus::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::ChartPie;
 
     protected static ?string $recordTitleAttribute = 'DailyStatus';
 

@@ -1,7 +1,5 @@
 <?php
 
-use Carbon\Carbon;
-use DirectoryTree\ImapEngine\Mailbox;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -16,51 +14,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
 require __DIR__.'/settings.php';
 
 Route::get('/teszt', function () {
-
-    $mailbox = new Mailbox(config('imap.default'));
-
-    $inbox = $mailbox->inbox();
-    $messages = $inbox->messages()
-        ->since(Carbon::now()->subDays(1))
-        ->before(today()->addDay())
-        ->from('support@icmarkets.eu')
-        ->subject('Daily Confirmation')
-        ->withBody()
-        ->withBodyStructure()
-        ->get();
-
-    $emails = [];
-    $dailyStatuses = [];
-
-
-
-    foreach ($messages as $message) {
-        $raw = $message->bodyPart('1');
-        $html = base64_decode($raw);
-
-        $dom = new DOMDocument;
-        @$dom->loadHTML($html);
-        $xpath = new DOMXPath($dom);
-
-        $filterNumber = $xpath->query('//b[text()="52776665"]');
-
-        if ($filterNumber->length > 0) {
-            $emails[] = [
-                'date' => Carbon::create($message->date())->format('Y-m-d'),
-                'content' => $html,
-            ];
-
-            $query = '//tr[td[normalize-space()="Previous Ledger Balance:"]]/td[@class="mspt"][last()]';
-            $nodeList = $xpath->query($query);
-            $previousLedgerBalance = $nodeList->item(0)->nodeValue;
-
-            $query = '//tr[td[normalize-space()="Balance:"]]/td[@class="mspt"][last()]';
-            $nodeList = $xpath->query($query);
-            $balance=$nodeList->item(0)->nodeValue;
-
-        }
-
-    }
-
     return 'ok';
 })->name('home');

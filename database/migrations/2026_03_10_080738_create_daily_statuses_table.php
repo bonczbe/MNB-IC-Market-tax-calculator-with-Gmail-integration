@@ -15,14 +15,15 @@ return new class extends Migration
             $table->id();
             $table->date('date');
             $table->text('currency');
-            $table->double('previous_ledger_balance', 15, 2);
             $table->double('balance', 15, 2);
+            $table->unsignedBigInteger('broker_account_id');
             $table->timestamps();
 
             $table->foreign('broker_account_id')
                 ->references('id')
                 ->on('broker_accounts')
                 ->onDelete('cascade');
+            $table->unique(['date', 'broker_account_id']);
         });
     }
 

@@ -9,6 +9,8 @@ class BrokerAccount extends Model
     //
     protected $fillable = [
         'broker_name',
+        'email',
+        'email_subject',
         'account_number',
         'starting_balance',
         'filter_number',

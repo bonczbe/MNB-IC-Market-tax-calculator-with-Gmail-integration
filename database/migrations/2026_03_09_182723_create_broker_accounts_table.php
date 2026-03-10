@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('broker_accounts', function (Blueprint $table) {
             $table->id();
             $table->text('broker_name');
+            $table->text('email');
+            $table->text('email_subject');
             $table->text('account_number');
             $table->decimal('starting_balance', 15, 2)->default(0.00);
             $table->text('filter_number');

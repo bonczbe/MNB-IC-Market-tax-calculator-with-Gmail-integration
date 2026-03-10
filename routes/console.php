@@ -10,6 +10,12 @@ Artisan::command('inspire', function () {
 
 app(Schedule::class)
     ->command('app:fetch-mnb-rate')
-    ->dailyAt('23:10')
+    ->dailyAt('13:00')
+    ->weekdays()
+    ->timezone('Europe/Budapest');
+
+app(Schedule::class)
+    ->command('app:email-extract')
+    ->dailyAt('23:40')
     ->weekdays()
     ->timezone('Europe/Budapest');

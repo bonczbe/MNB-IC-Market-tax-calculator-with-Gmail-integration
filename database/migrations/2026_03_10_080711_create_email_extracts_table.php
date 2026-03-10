@@ -13,9 +13,15 @@ return new class extends Migration
     {
         Schema::create('email_extracts', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('broker_account_id');
             $table->date('date');
             $table->text('content');
             $table->timestamps();
+
+            $table->foreign('broker_account_id')
+                ->references('id')
+                ->on('broker_accounts');
+            $table->unique(['date', 'broker_account_id']);
         });
     }
 

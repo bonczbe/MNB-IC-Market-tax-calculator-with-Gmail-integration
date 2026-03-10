@@ -13,6 +13,8 @@ class MNBRateFetcher implements ShouldQueue
 {
     use Queueable;
 
+    public $tries = 3;
+
     /**
      * Create a new job instance.
      */
@@ -47,7 +49,7 @@ class MNBRateFetcher implements ShouldQueue
 
                 $upsertData[] = [
                     'base_currency' => env('BASE_CURRENCY', 'HUF'),
-                    'for_currency' => trim($cells->item(1)->nodeValue),
+                    'for_currency' => trim($cells->item(0)->nodeValue),
                     'date' => $date,
                     'unit' => trim($cells->item(2)->nodeValue),
                     'rate' => trim($cells->item(3)->nodeValue),

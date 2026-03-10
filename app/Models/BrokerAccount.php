@@ -17,6 +17,7 @@ class BrokerAccount extends Model
         'filter_number',
         'filter_balance',
         'broker_currency',
+        'previous_year_minus',
     ];
 
     public function dailyStatuses(): HasMany

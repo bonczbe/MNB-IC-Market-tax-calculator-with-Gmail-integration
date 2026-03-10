@@ -26,6 +26,9 @@ class BrokerAccountsTable
                 TextColumn::make('starting_balance')
                     ->numeric()
                     ->sortable(),
+                TextColumn::make('previous_year_minus')
+                    ->numeric()
+                    ->sortable(),
                 TextColumn::make('broker_currency')
                     ->numeric()
                     ->sortable(),

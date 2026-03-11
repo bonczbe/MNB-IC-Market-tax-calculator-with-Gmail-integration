@@ -17,7 +17,6 @@ class BrokerAccount extends Model
         'filter_number',
         'filter_balance',
         'broker_currency',
-        'previous_year_minus',
     ];
 
     public function dailyStatuses(): HasMany
@@ -28,5 +27,15 @@ class BrokerAccount extends Model
     public function emailExtracts(): HasMany
     {
         return $this->hasMany(EmailExtract::class, 'broker_account_id');
+    }
+
+    public function accountTransactions(): HasMany
+    {
+        return $this->hasMany(AccountTransaction::class, 'broker_account_id');
+    }
+
+    public function yearlyTaxCalculations(): HasMany
+    {
+        return $this->hasMany(YearlyTaxCalculation::class, 'broker_account_id');
     }
 }

@@ -14,6 +14,9 @@ class RatesTable
     {
         return $table
             ->columns([
+                TextColumn::make('date')
+                    ->date('Y.m.d')
+                    ->sortable(),
                 TextColumn::make('base_currency')
                     ->sortable(),
                 TextColumn::make('unit')
@@ -23,9 +26,6 @@ class RatesTable
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('for_currency')
-                    ->sortable(),
-                TextColumn::make('date')
-                    ->date('Y.m.d')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
@@ -40,6 +40,11 @@ class RatesTable
                 SelectFilter::make('base_currency')
                     ->options(function () {
                         return Rate::query()->get()->pluck('base_currency', 'base_currency');
+                    })
+                    ->default('EUR'),
+                SelectFilter::make('date')
+                    ->options(function () {
+                        return Rate::query()->get()->pluck('date', 'date');
                     }),
             ])
             ->recordActions([

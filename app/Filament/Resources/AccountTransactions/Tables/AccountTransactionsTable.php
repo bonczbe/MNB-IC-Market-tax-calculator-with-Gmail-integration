@@ -1,34 +1,40 @@
 <?php
 
-namespace App\Filament\Resources\BrokerAccounts\Tables;
+namespace App\Filament\Resources\AccountTransactions\Tables;
 
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class BrokerAccountsTable
+class AccountTransactionsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('broker_name')
+                TextColumn::make('broker.broker_name')
+                    ->label('Broker Name')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('email')
+                TextColumn::make('broker.account_number')
+                    ->label('Account Number')
+                    ->sortable(),
+                TextColumn::make('date')
+                    ->date()
+                    ->sortable(),
+                TextColumn::make('type')
+                    ->color(fn ($state) => match ($state) {
+                        'deposit' => 'success',
+                        'withdrawal' => 'warning',
+                        default => null,
+                    })
+                    ->badge(),
+                TextColumn::make('amount')
                     ->numeric()
+                    ->suffix(fn ($record) => ' '.$record->broker->broker_currency)
                     ->sortable(),
-                TextColumn::make('email_subject')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('account_number')
-                    ->sortable(),
-                TextColumn::make('starting_balance')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('broker_currency')
-                    ->numeric()
-                    ->sortable(),
+                TextColumn::make('note')
+                    ->wrap(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

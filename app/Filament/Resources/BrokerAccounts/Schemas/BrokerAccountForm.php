@@ -28,10 +28,6 @@ class BrokerAccountForm
                     ->required()
                     ->numeric()
                     ->default(0.0),
-                TextInput::make('previous_year_minus')
-                    ->required()
-                    ->numeric()
-                    ->default(0.0),
                 Textarea::make('filter_number')
                     ->required(),
                 Textarea::make('filter_balance')

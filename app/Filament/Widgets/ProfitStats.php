@@ -12,7 +12,7 @@ class ProfitStats extends StatsOverviewWidget
     protected function getStats(): array
     {
         $previousYear = Carbon::now()
-        ->subYear();
+            ->subYear();
         $currentYear = Carbon::now();
 
         return [

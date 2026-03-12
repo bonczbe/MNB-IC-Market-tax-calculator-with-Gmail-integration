@@ -9,6 +9,7 @@ use App\Models\YearlyTaxCalculation;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 
 class ProfitStats extends StatsOverviewWidget
 {
@@ -31,22 +32,23 @@ class ProfitStats extends StatsOverviewWidget
     {
         $previouseCards = [];
 
-        $previouseYears = YearlyTaxCalculation::query()
+        $previouseYears = Cache::remember('previouseYears',3600 ,fn()=>YearlyTaxCalculation::query()
             ->where('tax_year', '<>', $currentYear->copy()->format('Y'))
             ->orderBy('tax_year', 'desc')
             ->distinct()
-            ->pluck('tax_year');
+            ->pluck('tax_year'));
 
         foreach ($previouseYears as $prevYear) {
             $yearTax = 0;
-            $yearDatas = YearlyTaxCalculation::query()
+            $yearDatas = Cache::remember('yearDatas'.$prevYear,3600 ,fn()=>YearlyTaxCalculation::query()
                 ->where('tax_year', $prevYear)
                 ->with('broker')
-                ->get();
+                ->get());
 
             foreach ($yearDatas as $yd) {
                 $yearTax += $yd->tax_amount;
             }
+
             $previouseCards[] =
             Stat::make(
                 "{$prevYear} Tax",
@@ -63,7 +65,7 @@ class ProfitStats extends StatsOverviewWidget
         return
             Stat::make(
                 "{$currentYear->copy()->format('Y')} Tax",
-                function () use ($currentYear) {
+                Cache::remember('calculateCurrentYear',3600 , function () use ($currentYear) {
                     $startOfYear = $currentYear->copy()->startOfYear();
                     $endOfYear = $currentYear->copy()->endOfYear();
                     $tax = 0;
@@ -142,7 +144,7 @@ class ProfitStats extends StatsOverviewWidget
                     }
 
                     return number_format(ceil($tax)).' '.env('BASE_CURRENCY', 'HUF');
-                }
+                })
             );
     }
 }

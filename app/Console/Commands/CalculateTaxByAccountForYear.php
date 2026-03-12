@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\CalculateTaxByAccountForYearJob;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class CalculateTaxByAccountForYear extends Command
 {
@@ -28,5 +29,6 @@ class CalculateTaxByAccountForYear extends Command
     {
         CalculateTaxByAccountForYearJob::dispatch();
         $this->info('Tax calculation for the year!');
+        Cache::forget('calculateCurrentYear');
     }
 }

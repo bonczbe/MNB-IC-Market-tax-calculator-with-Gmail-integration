@@ -8,6 +8,7 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Cache;
 
 class DailyStatusesTable
 {
@@ -37,10 +38,10 @@ class DailyStatusesTable
                     ->getStateUsing(function ($record) {
                         $depositAndWithdrawSum = 0;
 
-                        $prevBalance = DailyStatus::query()
+                        $prevBalance = Cache::remember('DailyStatus'.$record->date.$record->broker->broker_name.$record->broker->account_number,86400 ,fn()=>DailyStatus::query()
                             ->where('date', '<', $record->date)
                             ->orderByDesc('date')
-                            ->first();
+                            ->first());
 
                         $transactions = $record->broker->accountTransactions->filter(fn ($act) => $act->date == $record->date);
 

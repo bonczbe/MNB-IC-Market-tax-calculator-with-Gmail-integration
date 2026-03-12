@@ -143,7 +143,7 @@ class ProfitStats extends StatsOverviewWidget
 
                     }
 
-                    return number_format(ceil($tax)).' '.env('BASE_CURRENCY', 'HUF');
+                    return number_format($tax).' '.env('BASE_CURRENCY', 'HUF');
                 })
             );
     }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Rates\Schemas;
 
 use App\Models\Rate;
+use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -30,6 +31,7 @@ class RateForm
                     ->default(env('BASE_CURRENCY', 'HUF'))
                     ->required(),
                 DatePicker::make('date')
+                    ->maxDate(fn () => Carbon::now())
                     ->required(),
             ]);
     }

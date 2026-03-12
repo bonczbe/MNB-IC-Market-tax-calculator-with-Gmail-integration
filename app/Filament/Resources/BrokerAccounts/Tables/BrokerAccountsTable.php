@@ -2,8 +2,11 @@
 
 namespace App\Filament\Resources\BrokerAccounts\Tables;
 
+use App\Models\BrokerAccount;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class BrokerAccountsTable
@@ -39,10 +42,14 @@ class BrokerAccountsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('broker_currency')
+                    ->options(function () {
+                        return BrokerAccount::query()->get()->pluck('broker_currency', 'broker_currency');
+                    }),
             ])
             ->recordActions([
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
             ]);

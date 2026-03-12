@@ -2,8 +2,11 @@
 
 namespace App\Filament\Resources\EmailExtracts\Tables;
 
+use App\Models\EmailExtract;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class EmailExtractsTable
@@ -38,11 +41,25 @@ class EmailExtractsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('date')
+                    ->options(function () {
+                        return EmailExtract::query()->get()->pluck('date', 'date');
+                    })
+                    ->searchable(),
+                SelectFilter::make('broker')
+                    ->label('Broker')
+                    ->relationship('broker', 'broker_name')
+                    ->searchable()
+                    ->preload(),
+                SelectFilter::make('account_number')
+                    ->label('Account Number')
+                    ->relationship('broker', 'account_number')
+                    ->searchable()
+                    ->preload(),
             ])
             ->recordActions([
-                ViewAction::make()
-                    ->label('View'),
+                ViewAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
             ]);

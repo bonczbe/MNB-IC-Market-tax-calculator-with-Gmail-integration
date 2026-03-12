@@ -26,6 +26,8 @@ class YearlyTaxCalculationForm
                     })
                     ->searchable(),
                 TextInput::make('tax_year')
+                    ->numeric()
+                    ->maxValue(fn () => Carbon::now()->format('Y'))
                     ->default(fn () => Carbon::now()->subYear()->format('Y'))
                     ->required(),
                 TextInput::make('gross_profit')

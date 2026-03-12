@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Rates\Tables;
 
 use App\Models\Rate;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -45,10 +46,12 @@ class RatesTable
                 SelectFilter::make('date')
                     ->options(function () {
                         return Rate::query()->get()->pluck('date', 'date');
-                    }),
+                    })
+                    ->searchable(),
             ])
             ->recordActions([
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
             ]);

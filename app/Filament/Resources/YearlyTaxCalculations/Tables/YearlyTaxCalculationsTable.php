@@ -2,8 +2,11 @@
 
 namespace App\Filament\Resources\YearlyTaxCalculations\Tables;
 
+use App\Models\YearlyTaxCalculation;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class YearlyTaxCalculationsTable
@@ -53,10 +56,25 @@ class YearlyTaxCalculationsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('tax_year')
+                    ->options(function () {
+                        return YearlyTaxCalculation::query()->get()->pluck('tax_year', 'tax_year');
+                    })
+                    ->searchable(),
+                SelectFilter::make('broker')
+                    ->label('Broker')
+                    ->relationship('broker', 'broker_name')
+                    ->searchable()
+                    ->preload(),
+                SelectFilter::make('account_number')
+                    ->label('Account Number')
+                    ->relationship('broker', 'account_number')
+                    ->searchable()
+                    ->preload(),
             ])
             ->recordActions([
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
             ]);

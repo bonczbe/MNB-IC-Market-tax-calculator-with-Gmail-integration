@@ -2,8 +2,11 @@
 
 namespace App\Filament\Resources\AccountTransactions\Tables;
 
+use App\Models\AccountTransaction;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class AccountTransactionsTable
@@ -45,10 +48,30 @@ class AccountTransactionsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('date')
+                    ->options(function () {
+                        return AccountTransaction::query()->get()->pluck('date', 'date');
+                    })
+                    ->searchable(),
+                SelectFilter::make('type')
+                    ->options([
+                        'deposit' => 'deposit',
+                        'withdrawal' => 'withdrawal',
+                    ]),
+                SelectFilter::make('broker')
+                    ->label('Broker')
+                    ->relationship('broker', 'broker_name')
+                    ->searchable()
+                    ->preload(),
+                SelectFilter::make('account_number')
+                    ->label('Account Number')
+                    ->relationship('broker', 'account_number')
+                    ->searchable()
+                    ->preload(),
             ])
             ->recordActions([
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
             ]);

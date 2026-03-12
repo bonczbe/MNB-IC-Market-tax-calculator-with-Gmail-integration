@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('loss_carried_forward', 15, 2)->default(0); // felhasznált korábbi veszteség
             $table->decimal('taxable_income', 15, 2);  // adóalap
             $table->decimal('tax_amount', 15, 2);       // 15% adó
-            $table->decimal('unused_loss', 15, 2)->default(0);  //fel nem használt veszteség görgetése, fel nem használt összegek öszessége (utolsó 2 éve)
+            $table->decimal('unused_loss', 15, 2)->default(0);  // fel nem használt veszteség görgetése, fel nem használt összegek öszessége (utolsó 2 éve)
             $table->timestamps();
 
             $table->foreign('broker_account_id')

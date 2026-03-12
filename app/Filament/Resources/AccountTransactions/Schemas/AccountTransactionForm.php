@@ -28,6 +28,7 @@ class AccountTransactionForm
                     })
                     ->searchable(),
                 DatePicker::make('date')
+                    ->maxDate(fn () => Carbon::now())
                     ->default(fn () => Carbon::now())
                     ->required(),
                 Select::make('type')

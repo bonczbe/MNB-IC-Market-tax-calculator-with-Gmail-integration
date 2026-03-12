@@ -4,6 +4,7 @@ namespace App\Filament\Resources\DailyStatuses\Schemas;
 
 use App\Models\BrokerAccount;
 use App\Models\Rate;
+use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -16,6 +17,7 @@ class DailyStatusForm
         return $schema
             ->components([
                 DatePicker::make('date')
+                    ->maxDate(fn () => Carbon::now())
                     ->required(),
                 Select::make('currency')
                     ->options(function () {

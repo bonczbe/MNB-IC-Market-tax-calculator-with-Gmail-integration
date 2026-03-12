@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use DirectoryTree\ImapEngine\Mailbox;
 use DOMDocument;
 use DOMXPath;
+use Illuminate\Support\Facades\Cache;
 
 class EmailExtractorService
 {
@@ -57,6 +58,7 @@ class EmailExtractorService
 
             $this->daily_status_repository->chunkedUpsert($dailyStatuses, uniqueBy: ['date', 'broker_account_id']);
 
+            Cache::forget('calculateCurrentYear');
         }
     }
 
@@ -75,8 +77,8 @@ class EmailExtractorService
 
         if ($filterNumber->length > 0) {
             $date = Carbon::now()
-                ->subDays(1)
                 ->format('Y-m-d');
+
             $email = [
                 'date' => $date,
                 'content' => $html,

@@ -32,7 +32,7 @@ class ProfitStats extends StatsOverviewWidget
     {
         $previouseCards = [];
 
-        $previouseYears = Cache::remember('previouseYears',3600 ,fn()=>YearlyTaxCalculation::query()
+        $previouseYears = Cache::remember('previouseYears', 3600, fn () => YearlyTaxCalculation::query()
             ->where('tax_year', '<>', $currentYear->copy()->format('Y'))
             ->orderBy('tax_year', 'desc')
             ->distinct()
@@ -40,7 +40,7 @@ class ProfitStats extends StatsOverviewWidget
 
         foreach ($previouseYears as $prevYear) {
             $yearTax = 0;
-            $yearDatas = Cache::remember('yearDatas'.$prevYear,3600 ,fn()=>YearlyTaxCalculation::query()
+            $yearDatas = Cache::remember('yearDatas'.$prevYear, 3600, fn () => YearlyTaxCalculation::query()
                 ->where('tax_year', $prevYear)
                 ->with('broker')
                 ->get());
@@ -65,7 +65,7 @@ class ProfitStats extends StatsOverviewWidget
         return
             Stat::make(
                 "{$currentYear->copy()->format('Y')} Tax",
-                Cache::remember('calculateCurrentYear',3600 , function () use ($currentYear) {
+                Cache::remember('calculateCurrentYear', 3600, function () use ($currentYear) {
                     $startOfYear = $currentYear->copy()->startOfYear();
                     $endOfYear = $currentYear->copy()->endOfYear();
                     $tax = 0;
@@ -139,7 +139,7 @@ class ProfitStats extends StatsOverviewWidget
                             $allProfitInExchangedCurrency -= $previouseYear->unused_loss;
                         }
 
-                        $tax += ceil($allProfitInExchangedCurrency * 0.15);
+                        $tax += ceil($allProfitInExchangedCurrency * env('TAX_VOLUME', 0));
 
                     }
 

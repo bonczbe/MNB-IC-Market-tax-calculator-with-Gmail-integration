@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Models\DailyStatus;
+use Carbon\Carbon;
+
+class DailyStatusRepository
+{
+    public function __construct() {}
+
+    public function firstSallerDatedStatus(int $brokerId, Carbon $date)
+    {
+        return DailyStatus::query()
+            ->where('broker_account_id', $brokerId)
+            ->where('date', '<', $date)
+            ->orderByDesc('date')
+            ->first();
+    }
+
+    public function chunkedUpsert(array $multipleDatas, array $uniqueBy)
+    {
+        return DailyStatus::upsert($multipleDatas, uniqueBy: $uniqueBy);
+    }
+}

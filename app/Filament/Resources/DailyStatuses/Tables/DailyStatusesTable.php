@@ -38,7 +38,7 @@ class DailyStatusesTable
                     ->getStateUsing(function ($record) {
                         $depositAndWithdrawSum = 0;
 
-                        $prevBalance = Cache::remember('DailyStatus'.$record->date.$record->broker->broker_name.$record->broker->account_number,86400 ,fn()=>DailyStatus::query()
+                        $prevBalance = Cache::remember('DailyStatus'.$record->date.$record->broker->broker_name.$record->broker->account_number, 86400, fn () => DailyStatus::query()
                             ->where('date', '<', $record->date)
                             ->orderByDesc('date')
                             ->first());

@@ -61,7 +61,7 @@ class DailyStatusesTable
                         return $record->balance - $prevBalance->balance - $depositAndWithdrawSum;
                     })
                     ->suffix(fn ($record) => ' '.$record->broker->broker_currency)
-                    ->color(fn ($state) => ((double) $state > 0) ? Color::Green : Color::Red)
+                    ->color(fn ($state) => ((float) $state > 0) ? Color::Green : Color::Red)
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('updated_at')

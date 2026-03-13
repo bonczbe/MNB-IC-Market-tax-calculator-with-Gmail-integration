@@ -18,7 +18,8 @@ class RateForm
                 Select::make('base_currency')
                     ->options(function () {
                         $rates = Rate::query()->get()->pluck('base_currency', 'base_currency');
-                        return $rates->count()==0?["EUR"=>"EUR"]:$rates;
+
+                        return $rates->count() == 0 ? ['EUR' => 'EUR'] : $rates;
                     })
                     ->required(),
                 TextInput::make('unit')

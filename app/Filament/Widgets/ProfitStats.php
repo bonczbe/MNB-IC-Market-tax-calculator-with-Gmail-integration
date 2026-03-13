@@ -59,6 +59,7 @@ class ProfitStats extends StatsOverviewWidget
                 })
             );
     }
+
     private function calculateCurrentYearProfit($currentDate)
     {
         $taxService = app(TaxCalculatorService::class);

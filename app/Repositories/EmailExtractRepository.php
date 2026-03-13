@@ -8,7 +8,7 @@ class EmailExtractRepository
 {
     public function __construct() {}
 
-    public function chunkedUpsert(array $multipleDatas, array $uniqueBy)
+    public function upsert(array $multipleDatas, array $uniqueBy)
     {
         return EmailExtract::upsert($multipleDatas, uniqueBy: $uniqueBy);
     }

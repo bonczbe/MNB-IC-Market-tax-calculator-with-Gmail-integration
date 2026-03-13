@@ -16,7 +16,7 @@ class RateRepository
             ->get();
     }
 
-    public function chunkedUpsert(array $multipleDatas, array $uniqueBy)
+    public function upsert(array $multipleDatas, array $uniqueBy)
     {
         return Rate::upsert($multipleDatas, uniqueBy: $uniqueBy);
     }

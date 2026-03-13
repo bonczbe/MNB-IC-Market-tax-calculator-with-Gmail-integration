@@ -18,7 +18,7 @@ class DailyStatusRepository
             ->first();
     }
 
-    public function chunkedUpsert(array $multipleDatas, array $uniqueBy)
+    public function upsert(array $multipleDatas, array $uniqueBy)
     {
         return DailyStatus::upsert($multipleDatas, uniqueBy: $uniqueBy);
     }

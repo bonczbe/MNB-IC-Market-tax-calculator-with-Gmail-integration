@@ -41,6 +41,6 @@ class RateService
                 ];
             }
         }
-        $this->rate_repository->chunkedUpsert($upsertData, ['base_currency', 'for_currency', 'date']);
+        $this->rate_repository->upsert($upsertData, ['base_currency', 'for_currency', 'date']);
     }
 }

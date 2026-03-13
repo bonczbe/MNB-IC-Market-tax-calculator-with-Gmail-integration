@@ -53,9 +53,9 @@ class EmailExtractorService
                 }
             }
 
-            $this->email_extract_repository->chunkedUpsert($emails, uniqueBy: ['date', 'broker_account_id']);
+            $this->email_extract_repository->upsert($emails, uniqueBy: ['date', 'broker_account_id']);
 
-            $this->daily_status_repository->chunkedUpsert($dailyStatuses, uniqueBy: ['date', 'broker_account_id']);
+            $this->daily_status_repository->upsert($dailyStatuses, uniqueBy: ['date', 'broker_account_id']);
 
         }
     }

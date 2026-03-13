@@ -20,7 +20,7 @@ class BrokerAccountsSeeder extends Seeder
             'starting_balance' => '3000.00',
             'filter_number' => '//b[text()="'.env('IC_MARKET_ACCOUNT_NUMBER', '1234').'"]',
             'filter_balance' => '//tr[td[normalize-space()="Balance:"]]/td[@class="mspt"][last()]',
-            'broker_currency' => 'EUR',
+            'broker_currency' => env('BASE_BROKER_CURRENCY'),
         ]);
     }
 }

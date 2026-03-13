@@ -34,7 +34,9 @@ class BrokerAccountForm
                     ->required(),
                 Select::make('broker_currency')
                     ->options(function () {
-                        return Rate::query()->get()->pluck('base_currency', 'base_currency');
+                        $rates = Rate::query()->get()->pluck('base_currency', 'base_currency');
+
+                        return $rates->count() == 0 ? [env('BASE_BROKER_CURRENCY') => env('BASE_BROKER_CURRENCY')] : $rates;
                     })
                     ->required(),
             ]);

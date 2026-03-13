@@ -17,7 +17,8 @@ class RateForm
             ->components([
                 Select::make('base_currency')
                     ->options(function () {
-                        return Rate::query()->get()->pluck('base_currency', 'base_currency');
+                        $rates = Rate::query()->get()->pluck('base_currency', 'base_currency');
+                        return $rates->count()==0?["EUR"=>"EUR"]:$rates;
                     })
                     ->required(),
                 TextInput::make('unit')
@@ -27,8 +28,9 @@ class RateForm
                     ->required()
                     ->numeric(),
                 TextInput::make('for_currency')
-                    ->disabled()
+                    ->readOnly()
                     ->default(config('tax.base_currency'))
+
                     ->required(),
                 DatePicker::make('date')
                     ->maxDate(fn () => Carbon::now())

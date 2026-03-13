@@ -193,4 +193,16 @@ class TaxCalculatorService
             }
             return $sum;
     }
+
+    public function calculateCurrentWeekProfit(Carbon $currentDate)
+    {
+
+    return 'test';
+    }
+
+    public function calculateCurrentYearProfit(Carbon $currentDate)
+    {
+
+    return 'test 2';
+    }
 }

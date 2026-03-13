@@ -16,9 +16,9 @@ class BrokerAccountsSeeder extends Seeder
             'broker_name' => 'IC Markets',
             'email' => 'support@icmarkets.eu',
             'email_subject' => 'Daily Confirmation',
-            'account_number' => '52776665',
+            'account_number' => env('IC_MARKET_ACCOUNT_NUMBER','1234'),
             'starting_balance' => '3000.00',
-            'filter_number' => '//b[text()="52776665"]',
+            'filter_number' => '//b[text()="'.env('IC_MARKET_ACCOUNT_NUMBER','1234').'"]',
             'filter_balance' => '//tr[td[normalize-space()="Balance:"]]/td[@class="mspt"][last()]',
             'broker_currency' => 'EUR',
         ]);

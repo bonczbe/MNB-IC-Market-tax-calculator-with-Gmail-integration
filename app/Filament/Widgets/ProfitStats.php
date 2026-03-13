@@ -13,34 +13,61 @@ class ProfitStats extends StatsOverviewWidget
     protected function getStats(): array
     {
 
-        $currentYear = Carbon::now();
+        $currentDate = Carbon::now();
         $cards = [];
 
         $cards = [
-            $this->calculateCurrentYear($currentYear),
-            ...$this->calculatePreviouseYears($currentYear),
+            $this->calculateCurrentYearProfit($currentDate),
+            $this->calculateCurrentWeekProfit($currentDate),
+            $this->calculatecurrentDate($currentDate),
+            ...$this->calculatePreviouseYears($currentDate),
         ];
 
         return $cards;
 
     }
 
-    private function calculatePreviouseYears($currentYear)
+    private function calculatePreviouseYears($currentDate)
     {
         $taxService = app(TaxCalculatorService::class);
 
-        return $taxService->calculateTaxForPreviouseYears($currentYear);
+        return $taxService->calculateTaxForPreviouseYears($currentDate);
     }
 
-    private function calculateCurrentYear($currentYear)
+    private function calculatecurrentDate($currentDate)
     {
         $taxService = app(TaxCalculatorService::class);
 
         return
             Stat::make(
-                "{$currentYear->copy()->format('Y')} Tax",
-                Cache::remember('calculateCurrentYear', 3600, function () use ($taxService, $currentYear) {
-                    return $taxService->calculateAllBrokerAccountTaxForActualYear($currentYear);
+                "{$currentDate->copy()->format('Y')} Tax",
+                Cache::remember('calculatecurrentDate', 3600, function () use ($taxService, $currentDate) {
+                    return $taxService->calculateAllBrokerAccountTaxForActualYear($currentDate);
+                })
+            );
+    }
+
+    private function calculateCurrentWeekProfit($currentDate)
+    {
+        $taxService = app(TaxCalculatorService::class);
+
+        return
+            Stat::make(
+                "{$currentDate->copy()->format('Y')}'s {$currentDate->copy()->format('w')} Week Profit",
+                Cache::remember('profitForTheWeek', 3600, function () use ($taxService, $currentDate) {
+                    return $taxService->calculateCurrentWeekProfit($currentDate);
+                })
+            );
+    }
+    private function calculateCurrentYearProfit($currentDate)
+    {
+        $taxService = app(TaxCalculatorService::class);
+
+        return
+            Stat::make(
+                "{$currentDate->copy()->format('Y')}'s Profit",
+                Cache::remember('profitForTheWeek', 3600, function () use ($taxService, $currentDate) {
+                    return $taxService->calculateCurrentWeekProfit($currentDate);
                 })
             );
     }

@@ -19,13 +19,13 @@ class TaxCalculatorService
         private readonly YearlyTaxCalculationRepository $yearly_tax_calculation_repository
     ) {}
 
-    public function calculateAllBrokerAccountTaxForYear(Carbon $currentYear)
+    public function calculateAllBrokerAccountTaxForYear(Carbon $currentDate)
     {
-        $startOfYear = $currentYear->copy()->startOfYear();
-        $endOfYear = $currentYear->copy()->endOfYear();
+        $startOfYear = $currentDate->copy()->startOfYear();
+        $endOfYear = $currentDate->copy()->endOfYear();
 
         $brokers = $this->broker_account_repository
-            ->getAccountsWithYearlyTransactionsStatusesAndTax($currentYear, $startOfYear, $endOfYear);
+            ->getAccountsWithYearlyTransactionsStatusesAndTax($currentDate, $startOfYear, $endOfYear);
 
         $ratesOfTheYear = $this->rate_repository
             ->getRatesBetweenDates($startOfYear, $endOfYear);
@@ -60,7 +60,7 @@ class TaxCalculatorService
 
             $upsertData = [
                 'broker_account_id' => $broker->id,
-                'tax_year' => $currentYear->copy()->format('Y'),
+                'tax_year' => $currentDate->copy()->format('Y'),
                 'gross_profit' => $grossProfit,
                 'loss_carried_forward' => $previouseYear->unused_loss ?? 0,
                 'taxable_income' => $allProfitInExchangedCurrency,
@@ -73,14 +73,14 @@ class TaxCalculatorService
         }
     }
 
-    public function calculateAllBrokerAccountTaxForActualYear(Carbon $currentYear)
+    public function calculateAllBrokerAccountTaxForActualYear(Carbon $currentDate)
     {
-        $startOfYear = $currentYear->copy()->startOfYear();
-        $endOfYear = $currentYear->copy()->endOfYear();
+        $startOfYear = $currentDate->copy()->startOfYear();
+        $endOfYear = $currentDate->copy()->endOfYear();
         $tax = 0;
 
         $brokers = $this->broker_account_repository
-            ->getAccountsWithYearlyTransactionsStatusesAndTax($currentYear, $startOfYear, $endOfYear);
+            ->getAccountsWithYearlyTransactionsStatusesAndTax($currentDate, $startOfYear, $endOfYear);
 
         $ratesOfTheYear = $this->rate_repository
             ->getRatesBetweenDates($startOfYear, $endOfYear);
@@ -184,25 +184,113 @@ class TaxCalculatorService
     private function calculateSumOfTransactions($transactions)
     {
         $sum = 0;
-            foreach ($transactions as $transaction) {
-                $value = $transaction->amount;
-                if ($transaction->type == 'withdrawal') {
-                    $value *= -1;
-                }
-                $sum += $value;
+        foreach ($transactions as $transaction) {
+            $value = $transaction->amount;
+            if ($transaction->type == 'withdrawal') {
+                $value *= -1;
             }
-            return $sum;
+            $sum += $value;
+        }
+
+        return $sum;
     }
 
-    public function calculateCurrentWeekProfit(Carbon $currentDate)
+    public function calculateCurrentWeekNetProfit(Carbon $currentDate)
     {
+        $startOfWeek = $currentDate->copy()->startOfWeek();
+        $endOfWeek = $currentDate->copy()->endOfWeek();
 
-    return 'test';
+        return $this->calculateNetProfitForDatesBetween($startOfWeek,$endOfWeek,$currentDate);
+    }
+
+    public function calculateGrossProfitOfYear(Carbon $currentDate)
+    {
+        $startOfYear = $currentDate->copy()->startOfYear();
+        $endOfYear = $currentDate->copy()->endOfYear();
+
+        $tax = 0;
+
+        $brokers = $this->broker_account_repository
+            ->getAccountsWithYearlyTransactionsStatusesAndTax($currentDate, $startOfYear, $endOfYear);
+
+        $ratesOfTheYear = $this->rate_repository
+            ->getRatesBetweenDates($startOfYear, $endOfYear);
+
+        foreach ($brokers as $broker) {
+            $allProfitInExchangedCurrency = 0;
+            $starterBalance = $broker->starting_balance;
+
+            $ratesForBroker = $ratesOfTheYear
+                ->filter(fn ($rate) => $rate->base_currency == $broker->broker_currency);
+
+            $lastBeforeTheYear = $this->daily_status_repository
+                ->firstSmallerDatedStatus($broker->id, $startOfYear);
+
+            $allProfitInExchangedCurrency += $this->calculateYearlyProfitInBaseCurrency(
+                $broker,
+                $ratesForBroker,
+                $lastBeforeTheYear,
+                $starterBalance);
+
+
+            $previouseYear = $broker->yearlyTaxCalculations->first();
+
+            if ($previouseYear !== null) {
+                $allProfitInExchangedCurrency -= $previouseYear->unused_loss;
+            }
+
+            $tax += ceil($allProfitInExchangedCurrency );
+
+        }
+
+        return number_format(ceil($tax)).' '.config('tax.base_currency');
     }
 
     public function calculateCurrentYearProfit(Carbon $currentDate)
     {
+        $startOfYear = $currentDate->copy()->startOfYear();
+        $endOfYear = $currentDate->copy()->endOfYear();
 
-    return 'test 2';
+        return $this->calculateNetProfitForDatesBetween($startOfYear,$endOfYear,$currentDate);
+
+
+    }
+
+    private function calculateNetProfitForDatesBetween(Carbon $start, Carbon $end, Carbon $currentDate){
+        $tax = 0;
+
+        $brokers = $this->broker_account_repository
+            ->getAccountsWithYearlyTransactionsStatusesAndTax($currentDate, $start, $end);
+
+        $ratesOfTheYear = $this->rate_repository
+            ->getRatesBetweenDates($start, $end);
+
+        foreach ($brokers as $broker) {
+            $allProfitInExchangedCurrency = 0;
+            $starterBalance = $broker->starting_balance;
+
+            $ratesForBroker = $ratesOfTheYear
+                ->filter(fn ($rate) => $rate->base_currency == $broker->broker_currency);
+
+            $lastBeforeTheYear = $this->daily_status_repository
+                ->firstSmallerDatedStatus($broker->id, $start);
+
+            $allProfitInExchangedCurrency += $this->calculateYearlyProfitInBaseCurrency(
+                $broker,
+                $ratesForBroker,
+                $lastBeforeTheYear,
+                $starterBalance);
+
+            $previouseYear = $broker->yearlyTaxCalculations->first();
+
+            if ($previouseYear !== null) {
+                $allProfitInExchangedCurrency -= $previouseYear->unused_loss;
+            }
+
+            $tax += ceil($allProfitInExchangedCurrency * (1-config('tax.volume')));
+
+        }
+
+        return number_format(ceil($tax)).' '.config('tax.base_currency');
     }
 }

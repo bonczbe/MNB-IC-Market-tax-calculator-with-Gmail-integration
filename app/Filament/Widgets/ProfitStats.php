@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Cache;
 
 class ProfitStats extends StatsOverviewWidget
 {
+    protected function getColumns(): int
+{
+    return 4;
+}
+
     protected function getStats(): array
     {
 
@@ -17,8 +22,9 @@ class ProfitStats extends StatsOverviewWidget
         $cards = [];
 
         $cards = [
+            $this->calculateCurrentWeekNetProfit($currentDate),
+            $this->calculateGrossProfit($currentDate),
             $this->calculateCurrentYearProfit($currentDate),
-            $this->calculateCurrentWeekProfit($currentDate),
             $this->calculatecurrentDate($currentDate),
             ...$this->calculatePreviouseYears($currentDate),
         ];
@@ -44,20 +50,33 @@ class ProfitStats extends StatsOverviewWidget
                 Cache::remember('calculatecurrentDate', 3600, function () use ($taxService, $currentDate) {
                     return $taxService->calculateAllBrokerAccountTaxForActualYear($currentDate);
                 })
-            );
+            )->columnSpan(2);
     }
 
-    private function calculateCurrentWeekProfit($currentDate)
+    private function calculateCurrentWeekNetProfit($currentDate)
     {
         $taxService = app(TaxCalculatorService::class);
 
         return
             Stat::make(
-                "{$currentDate->copy()->format('Y')}'s {$currentDate->copy()->format('w')} Week Profit",
+                "{$currentDate->copy()->format('Y')}'s {$currentDate->copy()->format('w')}'s Week Net Profit",
                 Cache::remember('profitForTheWeek', 3600, function () use ($taxService, $currentDate) {
-                    return $taxService->calculateCurrentWeekProfit($currentDate);
+                    return $taxService->calculateCurrentWeekNetProfit($currentDate);
                 })
-            );
+            )->columnSpan(2);;
+    }
+
+    private function calculateGrossProfit($currentDate)
+    {
+        $taxService = app(TaxCalculatorService::class);
+
+        return
+            Stat::make(
+                "{$currentDate->copy()->format('Y')}'s Gross Profit",
+                Cache::remember('grossProfitOfYear', 3600, function () use ($taxService, $currentDate) {
+                    return $taxService->calculateGrossProfitOfYear($currentDate);
+                })
+            )->columnSpan(2);;
     }
 
     private function calculateCurrentYearProfit($currentDate)
@@ -66,10 +85,10 @@ class ProfitStats extends StatsOverviewWidget
 
         return
             Stat::make(
-                "{$currentDate->copy()->format('Y')}'s Profit",
-                Cache::remember('profitForTheWeek', 3600, function () use ($taxService, $currentDate) {
-                    return $taxService->calculateCurrentWeekProfit($currentDate);
+                "{$currentDate->copy()->format('Y')}'s Net Profit",
+                Cache::remember('profitForYear', 3600, function () use ($taxService, $currentDate) {
+                    return $taxService->calculateCurrentYearProfit($currentDate);
                 })
-            );
+            )->columnSpan(2);;
     }
 }

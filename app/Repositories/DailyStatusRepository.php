@@ -9,7 +9,7 @@ class DailyStatusRepository
 {
     public function __construct() {}
 
-    public function firstSallerDatedStatus(int $brokerId, Carbon $date)
+    public function firstSmallerDatedStatus(int $brokerId, Carbon $date)
     {
         return DailyStatus::query()
             ->where('broker_account_id', $brokerId)

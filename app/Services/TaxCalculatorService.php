@@ -32,21 +32,19 @@ class TaxCalculatorService
 
         foreach ($brokers as $broker) {
             $allProfitInExchangedCurrency = 0;
-            $allProfitInOriginalCurrancy = 0;
             $starterBalance = $broker->starting_balance;
 
             $ratesForBroker = $ratesOfTheYear
                 ->filter(fn ($rate) => $rate->base_currency == $broker->broker_currency);
 
             $lastBeforeTheYear = $this->daily_status_repository
-                ->firstSallerDatedStatus($broker->id, $startOfYear);
+                ->firstSmallerDatedStatus($broker->id, $startOfYear);
 
-            $allProfitInExchangedCurrency += $this->xy(
+            $allProfitInExchangedCurrency += $this->calculateYearlyProfitInBaseCurrency(
                 $broker,
                 $ratesForBroker,
                 $lastBeforeTheYear,
-                $starterBalance,
-                $allProfitInOriginalCurrancy);
+                $starterBalance);
 
             $previouseYear = $broker->yearlyTaxCalculations->first();
 
@@ -56,7 +54,7 @@ class TaxCalculatorService
                 $allProfitInExchangedCurrency -= $previouseYear->unused_loss;
             }
 
-            $tax = ceil($allProfitInExchangedCurrency * env('TAX_VOLUME', 0));
+            $tax = ceil($allProfitInExchangedCurrency * config('tax.volume'));
 
             $unusedLoss = ($grossProfit < 0 && $allProfitInExchangedCurrency < 0) ? $grossProfit : 0;
 
@@ -89,21 +87,19 @@ class TaxCalculatorService
 
         foreach ($brokers as $broker) {
             $allProfitInExchangedCurrency = 0;
-            $allProfitInOriginalCurrancy = 0;
             $starterBalance = $broker->starting_balance;
 
             $ratesForBroker = $ratesOfTheYear
                 ->filter(fn ($rate) => $rate->base_currency == $broker->broker_currency);
 
             $lastBeforeTheYear = $this->daily_status_repository
-                ->firstSallerDatedStatus($broker->id, $startOfYear);
+                ->firstSmallerDatedStatus($broker->id, $startOfYear);
 
-            $allProfitInExchangedCurrency += $this->xy(
+            $allProfitInExchangedCurrency += $this->calculateYearlyProfitInBaseCurrency(
                 $broker,
                 $ratesForBroker,
                 $lastBeforeTheYear,
-                $starterBalance,
-                $allProfitInOriginalCurrancy);
+                $starterBalance);
 
             $previouseYear = $broker->yearlyTaxCalculations->first();
 
@@ -111,11 +107,11 @@ class TaxCalculatorService
                 $allProfitInExchangedCurrency -= $previouseYear->unused_loss;
             }
 
-            $tax += ceil($allProfitInExchangedCurrency * env('TAX_VOLUME', 0));
+            $tax += ceil($allProfitInExchangedCurrency * config('tax.volume'));
 
         }
 
-        return number_format(ceil($tax)).' '.env('BASE_CURRENCY', 'HUF');
+        return number_format(ceil($tax)).' '.config('tax.base_currency');
 
     }
 
@@ -143,7 +139,7 @@ class TaxCalculatorService
             $previouseCards[] =
             Stat::make(
                 "{$prevYear} Tax",
-                number_format(ceil($yearTax)).' '.env('BASE_CURRENCY', 'HUF')
+                number_format(ceil($yearTax)).' '.config('tax.base_currency')
             );
         }
 
@@ -151,12 +147,11 @@ class TaxCalculatorService
 
     }
 
-    private function xy(
+    private function calculateYearlyProfitInBaseCurrency(
         $broker,
         $ratesForBroker,
         $lastBeforeTheYear,
         $starterBalance,
-        $allProfitInOriginalCurrancy
     ) {
         $allProfitInExchangedCurrency = 0;
         $previousStatus = null;
@@ -169,13 +164,7 @@ class TaxCalculatorService
 
             $transactions = $broker->accountTransactions->filter(fn ($act) => $act->date == $status->date);
 
-            foreach ($transactions as $transaction) {
-                $value = $transaction->amount;
-                if ($transaction->type == 'withdrawal') {
-                    $value *= -1;
-                }
-                $depositAndWithdrawSum += $value;
-            }
+            $depositAndWithdrawSum = $this->calculateSumOfTransactions($transactions);
 
             $dailyProfitOrLoss = ($previousStatus !== null) ?
                 $status->balance - ($previousStatus->balance + $depositAndWithdrawSum) :
@@ -184,12 +173,24 @@ class TaxCalculatorService
                     $status->balance - ($starterBalance + $depositAndWithdrawSum)
                 );
 
-            $allProfitInOriginalCurrancy += $dailyProfitOrLoss;
             $allProfitInExchangedCurrency += $dailyProfitOrLoss * ($rate->rate ?? 1);
 
             $previousStatus = $status;
         }
 
         return $allProfitInExchangedCurrency;
+    }
+
+    private function calculateSumOfTransactions($transactions)
+    {
+        $sum = 0;
+            foreach ($transactions as $transaction) {
+                $value = $transaction->amount;
+                if ($transaction->type == 'withdrawal') {
+                    $value *= -1;
+                }
+                $sum += $value;
+            }
+            return $sum;
     }
 }

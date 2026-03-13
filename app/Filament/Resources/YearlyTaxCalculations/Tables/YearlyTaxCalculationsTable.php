@@ -25,25 +25,25 @@ class YearlyTaxCalculationsTable
                 TextColumn::make('tax_year'),
                 TextColumn::make('gross_profit')
                     ->numeric()
-                    ->suffix(' '.env('BASE_CURRENCY', 'HUF'))
+                    ->suffix(' '.config('tax.base_currency'))
                     ->sortable(),
                 TextColumn::make('loss_carried_forward')
                     ->label('Carried Loss')
-                    ->suffix(' '.env('BASE_CURRENCY', 'HUF'))
+                    ->suffix(' '.config('tax.base_currency'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('taxable_income')
-                    ->suffix(' '.env('BASE_CURRENCY', 'HUF'))
+                    ->suffix(' '.config('tax.base_currency'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('tax_amount')
-                    ->suffix(' '.env('BASE_CURRENCY', 'HUF'))
+                    ->suffix(' '.config('tax.base_currency'))
                     ->color('warning')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('unused_loss')
                     ->color(fn ($state) => $state > 0 ? 'danger' : 'success')
-                    ->suffix(' '.env('BASE_CURRENCY', 'HUF'))
+                    ->suffix(' '.config('tax.base_currency'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')

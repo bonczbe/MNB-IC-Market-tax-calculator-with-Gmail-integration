@@ -33,7 +33,7 @@ class RateService
             if ($cells->length >= 4) {
 
                 $upsertData[] = [
-                    'for_currency' => env('BASE_CURRENCY', 'HUF'),
+                    'for_currency' => config('tax.base_currency'),
                     'base_currency' => trim($cells->item(0)->nodeValue),
                     'date' => $date,
                     'unit' => trim($cells->item(2)->nodeValue),

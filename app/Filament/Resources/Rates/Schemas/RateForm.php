@@ -28,7 +28,7 @@ class RateForm
                     ->numeric(),
                 TextInput::make('for_currency')
                     ->disabled()
-                    ->default(env('BASE_CURRENCY', 'HUF'))
+                    ->default(config('tax.base_currency'))
                     ->required(),
                 DatePicker::make('date')
                     ->maxDate(fn () => Carbon::now())

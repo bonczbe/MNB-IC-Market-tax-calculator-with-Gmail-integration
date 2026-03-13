@@ -7,6 +7,7 @@ use App\Repositories\DailyStatusRepository;
 use App\Repositories\RateRepository;
 use App\Repositories\YearlyTaxCalculationRepository;
 use Carbon\Carbon;
+use Filament\Support\Colors\Color;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
 
@@ -136,11 +137,13 @@ class TaxCalculatorService
                 $yearTax += $yd->tax_amount;
             }
 
+            $formatteResult = number_format(ceil($yearTax)).' '.config('tax.base_currency');
+
             $previouseCards[] =
-            Stat::make(
-                "{$prevYear} Tax",
-                number_format(ceil($yearTax)).' '.config('tax.base_currency')
-            );
+            Stat::make("{$prevYear} Tax", $formatteResult)
+                ->description('Final settled tax')
+                ->descriptionIcon('heroicon-m-archive-box-check')
+                ->color(Color::Gray);
         }
 
         return $previouseCards;
@@ -200,7 +203,7 @@ class TaxCalculatorService
         $startOfWeek = $currentDate->copy()->startOfWeek();
         $endOfWeek = $currentDate->copy()->endOfWeek();
 
-        return $this->calculateNetProfitForDatesBetween($startOfWeek,$endOfWeek,$currentDate);
+        return $this->calculateNetProfitForDatesBetween($startOfWeek, $endOfWeek, $currentDate);
     }
 
     public function calculateGrossProfitOfYear(Carbon $currentDate)
@@ -232,31 +235,30 @@ class TaxCalculatorService
                 $lastBeforeTheYear,
                 $starterBalance);
 
-
             $previouseYear = $broker->yearlyTaxCalculations->first();
 
             if ($previouseYear !== null) {
                 $allProfitInExchangedCurrency -= $previouseYear->unused_loss;
             }
 
-            $tax += ceil($allProfitInExchangedCurrency );
+            $tax += ceil($allProfitInExchangedCurrency);
 
         }
 
         return number_format(ceil($tax)).' '.config('tax.base_currency');
     }
 
-    public function calculateCurrentYearProfit(Carbon $currentDate)
+    public function calculateCurrentYearNetProfit(Carbon $currentDate)
     {
         $startOfYear = $currentDate->copy()->startOfYear();
         $endOfYear = $currentDate->copy()->endOfYear();
 
-        return $this->calculateNetProfitForDatesBetween($startOfYear,$endOfYear,$currentDate);
-
+        return $this->calculateNetProfitForDatesBetween($startOfYear, $endOfYear, $currentDate);
 
     }
 
-    private function calculateNetProfitForDatesBetween(Carbon $start, Carbon $end, Carbon $currentDate){
+    private function calculateNetProfitForDatesBetween(Carbon $start, Carbon $end, Carbon $currentDate)
+    {
         $tax = 0;
 
         $brokers = $this->broker_account_repository
@@ -287,7 +289,7 @@ class TaxCalculatorService
                 $allProfitInExchangedCurrency -= $previouseYear->unused_loss;
             }
 
-            $tax += ceil($allProfitInExchangedCurrency * (1-config('tax.volume')));
+            $tax += ceil($allProfitInExchangedCurrency * (1 - config('tax.volume')));
 
         }
 

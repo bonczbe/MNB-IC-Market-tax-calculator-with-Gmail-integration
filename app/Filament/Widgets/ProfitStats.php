@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Services\TaxCalculatorService;
 use Carbon\Carbon;
+use Filament\Support\Colors\Color;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
@@ -11,9 +12,9 @@ use Illuminate\Support\Facades\Cache;
 class ProfitStats extends StatsOverviewWidget
 {
     protected function getColumns(): int
-{
-    return 4;
-}
+    {
+        return 4;
+    }
 
     protected function getStats(): array
     {
@@ -24,8 +25,8 @@ class ProfitStats extends StatsOverviewWidget
         $cards = [
             $this->calculateCurrentWeekNetProfit($currentDate),
             $this->calculateGrossProfit($currentDate),
-            $this->calculateCurrentYearProfit($currentDate),
-            $this->calculatecurrentDate($currentDate),
+            $this->calculateCurrentYearNetProfit($currentDate),
+            $this->calculatecurrentYearTax($currentDate),
             ...$this->calculatePreviouseYears($currentDate),
         ];
 
@@ -40,17 +41,19 @@ class ProfitStats extends StatsOverviewWidget
         return $taxService->calculateTaxForPreviouseYears($currentDate);
     }
 
-    private function calculatecurrentDate($currentDate)
+    private function calculatecurrentYearTax($currentDate)
     {
         $taxService = app(TaxCalculatorService::class);
 
         return
             Stat::make(
-                "{$currentDate->copy()->format('Y')} Tax",
+                "{$currentDate->copy()->format('Y')} Tax Due",
                 Cache::remember('calculatecurrentDate', 3600, function () use ($taxService, $currentDate) {
                     return $taxService->calculateAllBrokerAccountTaxForActualYear($currentDate);
                 })
-            )->columnSpan(2);
+            )->columnSpan(2)->description('Estimated tax this year')
+                ->descriptionIcon('heroicon-m-receipt-percent')
+                ->color(Color::Amber);
     }
 
     private function calculateCurrentWeekNetProfit($currentDate)
@@ -59,11 +62,14 @@ class ProfitStats extends StatsOverviewWidget
 
         return
             Stat::make(
-                "{$currentDate->copy()->format('Y')}'s {$currentDate->copy()->format('w')}'s Week Net Profit",
+                "Week {$currentDate->format('W')} Net Profit",
                 Cache::remember('profitForTheWeek', 3600, function () use ($taxService, $currentDate) {
                     return $taxService->calculateCurrentWeekNetProfit($currentDate);
                 })
-            )->columnSpan(2);;
+            )->columnSpan(2)
+                ->description('After-tax profit this week')
+                ->descriptionIcon('heroicon-m-calendar-days')
+                ->color(Color::Lime);
     }
 
     private function calculateGrossProfit($currentDate)
@@ -72,23 +78,27 @@ class ProfitStats extends StatsOverviewWidget
 
         return
             Stat::make(
-                "{$currentDate->copy()->format('Y')}'s Gross Profit",
+                "{$currentDate->format('Y')} Gross Profit",
                 Cache::remember('grossProfitOfYear', 3600, function () use ($taxService, $currentDate) {
                     return $taxService->calculateGrossProfitOfYear($currentDate);
                 })
-            )->columnSpan(2);;
+            )->columnSpan(2)->description('Before tax deductions')
+                ->descriptionIcon('heroicon-m-arrow-trending-up')
+                ->color(Color::Sky);
     }
 
-    private function calculateCurrentYearProfit($currentDate)
+    private function calculateCurrentYearNetProfit($currentDate)
     {
         $taxService = app(TaxCalculatorService::class);
 
         return
             Stat::make(
-                "{$currentDate->copy()->format('Y')}'s Net Profit",
+                "{$currentDate->format('Y')} Net Profit",
                 Cache::remember('profitForYear', 3600, function () use ($taxService, $currentDate) {
-                    return $taxService->calculateCurrentYearProfit($currentDate);
+                    return $taxService->calculateCurrentYearNetProfit($currentDate);
                 })
-            )->columnSpan(2);;
+            )->columnSpan(2)->description('After-tax profit this year')
+                ->descriptionIcon('heroicon-m-banknotes')
+                ->color('success');
     }
 }

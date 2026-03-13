@@ -5,6 +5,7 @@ namespace App\Filament\Resources\YearlyTaxCalculations\Tables;
 use App\Models\YearlyTaxCalculation;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -38,11 +39,11 @@ class YearlyTaxCalculationsTable
                     ->sortable(),
                 TextColumn::make('tax_amount')
                     ->suffix(' '.config('tax.base_currency'))
-                    ->color('warning')
+                    ->color(Color::Amber)
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('unused_loss')
-                    ->color(fn ($state) => $state > 0 ? 'danger' : 'success')
+                    ->color(fn ($state) => $state > 0 ? Color::Amber : Color::Green)
                     ->suffix(' '.config('tax.base_currency'))
                     ->numeric()
                     ->sortable(),

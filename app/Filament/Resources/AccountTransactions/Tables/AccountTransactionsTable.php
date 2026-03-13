@@ -5,6 +5,7 @@ namespace App\Filament\Resources\AccountTransactions\Tables;
 use App\Models\AccountTransaction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -27,8 +28,8 @@ class AccountTransactionsTable
                     ->sortable(),
                 TextColumn::make('type')
                     ->color(fn ($state) => match ($state) {
-                        'deposit' => 'success',
-                        'withdrawal' => 'warning',
+                        'deposit' => Color::Green,
+                        'withdrawal' => Color::Amber,
                         default => null,
                     })
                     ->badge(),

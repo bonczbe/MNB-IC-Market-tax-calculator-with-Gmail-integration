@@ -5,6 +5,7 @@ namespace App\Filament\Resources\DailyStatuses\Tables;
 use App\Models\DailyStatus;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -60,7 +61,7 @@ class DailyStatusesTable
                         return $record->balance - $prevBalance->balance - $depositAndWithdrawSum;
                     })
                     ->suffix(fn ($record) => ' '.$record->broker->broker_currency)
-                    ->color(fn ($state) => ((float) $state > 0) ? 'success' : 'error')
+                    ->color(fn ($state) => ((double) $state > 0) ? Color::Green : Color::Red)
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('updated_at')

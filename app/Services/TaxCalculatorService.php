@@ -41,36 +41,12 @@ class TaxCalculatorService
             $lastBeforeTheYear = $this->daily_status_repository
                 ->firstSallerDatedStatus($broker->id, $startOfYear);
 
-            $previousStatus = null;
-
-            foreach ($broker->dailyStatuses as $status) {
-                $depositAndWithdrawSum = 0;
-                $rate = $ratesForBroker
-                    ->filter(fn ($rate) => $status->date == $rate->date)
-                    ->first();
-
-                $transactions = $broker->accountTransactions->filter(fn ($act) => $act->date == $status->date);
-
-                foreach ($transactions as $transaction) {
-                    $value = $transaction->amount;
-                    if ($transaction->type == 'withdrawal') {
-                        $value *= -1;
-                    }
-                    $depositAndWithdrawSum += $value;
-                }
-
-                $dailyProfitOrLoss = ($previousStatus !== null) ?
-                    $status->balance - ($previousStatus->balance + $depositAndWithdrawSum) :
-                    (($lastBeforeTheYear !== null) ?
-                        $status->balance - ($lastBeforeTheYear->balance + $depositAndWithdrawSum) :
-                        $status->balance - ($starterBalance + $depositAndWithdrawSum)
-                    );
-
-                $allProfitInOriginalCurrancy += $dailyProfitOrLoss;
-                $allProfitInExchangedCurrency += $dailyProfitOrLoss * ($rate->rate??1);
-
-                $previousStatus = $status;
-            }
+            $allProfitInExchangedCurrency += $this->xy(
+                $broker,
+                $ratesForBroker,
+                $lastBeforeTheYear,
+                $starterBalance,
+                $allProfitInOriginalCurrancy);
 
             $previouseYear = $broker->yearlyTaxCalculations->first();
 
@@ -122,36 +98,12 @@ class TaxCalculatorService
             $lastBeforeTheYear = $this->daily_status_repository
                 ->firstSallerDatedStatus($broker->id, $startOfYear);
 
-            $previousStatus = null;
-
-            foreach ($broker->dailyStatuses as $status) {
-                $depositAndWithdrawSum = 0;
-                $rate = $ratesForBroker
-                    ->filter(fn ($rate) => $status->date == $rate->date)
-                    ->first();
-
-                $transactions = $broker->accountTransactions->filter(fn ($act) => $act->date == $status->date);
-
-                foreach ($transactions as $transaction) {
-                    $value = $transaction->amount;
-                    if ($transaction->type == 'withdrawal') {
-                        $value *= -1;
-                    }
-                    $depositAndWithdrawSum += $value;
-                }
-
-                $dailyProfitOrLoss = ($previousStatus !== null) ?
-                    $status->balance - ($previousStatus->balance + $depositAndWithdrawSum) :
-                    (($lastBeforeTheYear !== null) ?
-                        $status->balance - ($lastBeforeTheYear->balance + $depositAndWithdrawSum) :
-                        $status->balance - ($starterBalance + $depositAndWithdrawSum)
-                    );
-
-                $allProfitInOriginalCurrancy += $dailyProfitOrLoss;
-                $allProfitInExchangedCurrency += $dailyProfitOrLoss * ($rate->rate??1);
-
-                $previousStatus = $status;
-            }
+            $allProfitInExchangedCurrency += $this->xy(
+                $broker,
+                $ratesForBroker,
+                $lastBeforeTheYear,
+                $starterBalance,
+                $allProfitInOriginalCurrancy);
 
             $previouseYear = $broker->yearlyTaxCalculations->first();
 
@@ -197,5 +149,47 @@ class TaxCalculatorService
 
         return $previouseCards;
 
+    }
+
+    private function xy(
+        $broker,
+        $ratesForBroker,
+        $lastBeforeTheYear,
+        $starterBalance,
+        $allProfitInOriginalCurrancy
+    ) {
+        $allProfitInExchangedCurrency = 0;
+        $previousStatus = null;
+
+        foreach ($broker->dailyStatuses as $status) {
+            $depositAndWithdrawSum = 0;
+            $rate = $ratesForBroker
+                ->filter(fn ($rate) => $status->date == $rate->date)
+                ->first();
+
+            $transactions = $broker->accountTransactions->filter(fn ($act) => $act->date == $status->date);
+
+            foreach ($transactions as $transaction) {
+                $value = $transaction->amount;
+                if ($transaction->type == 'withdrawal') {
+                    $value *= -1;
+                }
+                $depositAndWithdrawSum += $value;
+            }
+
+            $dailyProfitOrLoss = ($previousStatus !== null) ?
+                $status->balance - ($previousStatus->balance + $depositAndWithdrawSum) :
+                (($lastBeforeTheYear !== null) ?
+                    $status->balance - ($lastBeforeTheYear->balance + $depositAndWithdrawSum) :
+                    $status->balance - ($starterBalance + $depositAndWithdrawSum)
+                );
+
+            $allProfitInOriginalCurrancy += $dailyProfitOrLoss;
+            $allProfitInExchangedCurrency += $dailyProfitOrLoss * ($rate->rate ?? 1);
+
+            $previousStatus = $status;
+        }
+
+        return $allProfitInExchangedCurrency;
     }
 }

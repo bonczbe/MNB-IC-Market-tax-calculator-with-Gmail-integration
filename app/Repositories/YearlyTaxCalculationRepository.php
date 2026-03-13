@@ -14,7 +14,8 @@ class YearlyTaxCalculationRepository
         return YearlyTaxCalculation::upsert($data, uniqueBy: $uniqueBy);
     }
 
-    public function getAllExitingYearsExepctTheGivenDate(Carbon $date){
+    public function getAllExitingYearsExepctTheGivenDate(Carbon $date)
+    {
         return YearlyTaxCalculation::query()
             ->where('tax_year', '<>', $date->copy()->format('Y'))
             ->orderBy('tax_year', 'desc')
@@ -22,10 +23,11 @@ class YearlyTaxCalculationRepository
             ->pluck('tax_year');
     }
 
-    public function getByDate(Carbon $date){
+    public function getByDate(Carbon $date)
+    {
         return YearlyTaxCalculation::query()
-                ->where('tax_year', $date)
-                ->with('broker')
-                ->get();
+            ->where('tax_year', $date)
+            ->with('broker')
+            ->get();
     }
 }

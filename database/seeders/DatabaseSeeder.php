@@ -17,10 +17,12 @@ class DatabaseSeeder extends Seeder
             BrokerAccountsSeeder::class,
         ]);
 
+        /*
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'admin@a.a',
             'password' => bcrypt('password'),
         ]);
+        */
     }
 }

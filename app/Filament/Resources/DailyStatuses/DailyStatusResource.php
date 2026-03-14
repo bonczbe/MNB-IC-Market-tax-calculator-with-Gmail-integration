@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class DailyStatusResource extends Resource
 {
@@ -21,6 +22,10 @@ class DailyStatusResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::ChartPie;
 
     protected static ?string $recordTitleAttribute = 'DailyStatus';
+
+    protected static ?int $navigationSort = 2;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Daily Changes';
 
     public static function form(Schema $schema): Schema
     {

@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class AccountTransactionResource extends Resource
 {
@@ -21,6 +22,10 @@ class AccountTransactionResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::ArrowsUpDown;
 
     protected static ?string $recordTitleAttribute = 'AccountTransaction';
+
+    protected static ?int $navigationSort = 1;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Broker Statuses';
 
     public static function form(Schema $schema): Schema
     {

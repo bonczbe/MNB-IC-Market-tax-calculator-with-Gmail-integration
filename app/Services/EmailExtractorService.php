@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\BrokerAccount;
+use App\Models\User;
 use App\Repositories\BrokerAccountRepository;
 use App\Repositories\DailyStatusRepository;
 use App\Repositories\EmailExtractRepository;
@@ -58,11 +59,15 @@ class EmailExtractorService
 
             $this->daily_status_repository->upsert($dailyStatuses, uniqueBy: ['date', 'broker_account_id']);
 
-            Cache::forget('previouseYears');
-            Cache::forget('calculatecurrentDate');
-            Cache::forget('grossProfitOfYear');
-            Cache::forget('profitForYear');
-            Cache::forget('profitForTheWeek');
+            $users = User::query()->pluck('id');
+
+            foreach ($users as $id) {
+                Cache::forget('previouseYears'.$id);
+                Cache::forget('calculatecurrentDate'.$id);
+                Cache::forget('grossProfitOfYear'.$id);
+                Cache::forget('profitForYear'.$id);
+                Cache::forget('profitForTheWeek'.$id);
+            }
         }
     }
 

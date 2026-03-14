@@ -48,7 +48,7 @@ class ProfitStats extends StatsOverviewWidget
         return
             Stat::make(
                 "{$currentDate->copy()->format('Y')} Tax Due",
-                Cache::remember('calculatecurrentDate', 3600, function () use ($taxService, $currentDate) {
+                Cache::remember('calculatecurrentDate'.auth()->user()->id, 3600, function () use ($taxService, $currentDate) {
                     return $taxService->calculateAllBrokerAccountTaxForActualYear($currentDate);
                 })
             )->columnSpan(2)->description('Estimated tax this year')
@@ -63,7 +63,7 @@ class ProfitStats extends StatsOverviewWidget
         return
             Stat::make(
                 "Week {$currentDate->format('W')} Net Profit",
-                Cache::remember('profitForTheWeek', 3600, function () use ($taxService, $currentDate) {
+                Cache::remember('profitForTheWeek'.auth()->user()->id, 3600, function () use ($taxService, $currentDate) {
                     return $taxService->calculateCurrentWeekNetProfit($currentDate);
                 })
             )->columnSpan(2)
@@ -79,7 +79,7 @@ class ProfitStats extends StatsOverviewWidget
         return
             Stat::make(
                 "{$currentDate->format('Y')} Gross Profit",
-                Cache::remember('grossProfitOfYear', 3600, function () use ($taxService, $currentDate) {
+                Cache::remember('grossProfitOfYear'.auth()->user()->id, 3600, function () use ($taxService, $currentDate) {
                     return $taxService->calculateGrossProfitOfYear($currentDate);
                 })
             )->columnSpan(2)->description('Before tax deductions')
@@ -94,7 +94,7 @@ class ProfitStats extends StatsOverviewWidget
         return
             Stat::make(
                 "{$currentDate->format('Y')} Net Profit",
-                Cache::remember('profitForYear', 3600, function () use ($taxService, $currentDate) {
+                Cache::remember('profitForYear'.auth()->user()->id, 3600, function () use ($taxService, $currentDate) {
                     return $taxService->calculateCurrentYearNetProfit($currentDate);
                 })
             )->columnSpan(2)->description('After-tax profit this year')

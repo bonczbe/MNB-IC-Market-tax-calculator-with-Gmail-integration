@@ -50,8 +50,8 @@ class RatesTable
                     ->searchable(),
             ])
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
+                EditAction::make()->visible(fn () => auth()->user()->role === 'admin'),
+                DeleteAction::make()->visible(fn () => auth()->user()->role === 'admin'),
             ])
             ->toolbarActions([
             ]);

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Jobs\CalculateTaxByAccountForYearJob;
+use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 
@@ -30,10 +31,15 @@ class CalculateTaxByAccountForYear extends Command
         CalculateTaxByAccountForYearJob::dispatch();
         $this->info('Tax calculation for the year!');
 
-        Cache::forget('previouseYears');
-        Cache::forget('calculatecurrentDate');
-        Cache::forget('grossProfitOfYear');
-        Cache::forget('profitForYear');
-        Cache::forget('profitForTheWeek');
+        $users = User::query()->pluck('id');
+
+        foreach ($users as $id) {
+            Cache::forget('previouseYears'.$id);
+            Cache::forget('calculatecurrentDate'.$id);
+            Cache::forget('grossProfitOfYear'.$id);
+            Cache::forget('profitForYear'.$id);
+            Cache::forget('profitForTheWeek'.$id);
+        }
+
     }
 }

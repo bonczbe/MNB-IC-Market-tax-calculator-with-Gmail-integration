@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\BrokerAccounts\Schemas;
 
 use App\Models\Rate;
+use App\Models\User;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -15,14 +17,24 @@ class BrokerAccountForm
         return $schema
             ->columns(2)
             ->components([
-                Textarea::make('broker_name')
+                Select::make('user_id')
+                    ->label('Owner')
+                    ->options(User::pluck('name', 'id'))
+                    ->searchable()
+                    ->required()
+                    ->default(auth()->id())
+                    ->visible(fn () => auth()->user()->role == 'admin'),
+                Hidden::make('user_id')
+                    ->default(auth()->id())
+                    ->visible(fn () => auth()->user()->role != 'admin'),
+                TextInput::make('broker_name')
                     ->required(),
-                Textarea::make('email')
+                TextInput::make('email')
                     ->label('Email address')
                     ->required(),
-                Textarea::make('email_subject')
+                TextInput::make('email_subject')
                     ->required(),
-                Textarea::make('account_number')
+                TextInput::make('account_number')
                     ->required(),
                 TextInput::make('starting_balance')
                     ->required()

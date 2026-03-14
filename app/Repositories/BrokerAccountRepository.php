@@ -23,6 +23,7 @@ class BrokerAccountRepository
                     $query->where('tax_year', $currentYear->copy()->subYear()->format('Y'));
                 },
             ])
+            ->where('user_id', auth()->user()->id)
             ->get();
     }
 

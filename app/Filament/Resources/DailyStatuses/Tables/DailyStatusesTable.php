@@ -7,8 +7,10 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 
 class DailyStatusesTable
@@ -16,6 +18,10 @@ class DailyStatusesTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => auth()->user()->role === 'admin'
+    ? $query
+    : $query->whereHas('broker', fn ($q) => $q->where('user_id', auth()->id()))
+            )
             ->columns([
                 TextColumn::make('date')
                     ->date('Y.m.d')
@@ -39,7 +45,7 @@ class DailyStatusesTable
                     ->getStateUsing(function ($record) {
                         $depositAndWithdrawSum = 0;
 
-                        $prevBalance = Cache::remember('DailyStatus'.$record->date.$record->broker->broker_name.$record->broker->account_number, 86400, fn () => DailyStatus::query()
+                        $prevBalance = Cache::remember('DailyStatus'.$record->broker->user->id.'$'.$record->date.$record->broker->broker_name.$record->broker->account_number, 86400, fn () => DailyStatus::query()
                             ->where('date', '<', $record->date)
                             ->orderByDesc('date')
                             ->first());
@@ -70,6 +76,13 @@ class DailyStatusesTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Filter::make('only_mine')
+                    ->label('Only my accounts')
+                    ->query(fn (Builder $query) => $query->whereHas(
+                        'broker', fn ($q) => $q->where('user_id', auth()->id())
+                    ))
+                    ->default()
+                    ->visible(fn () => auth()->user()->role === 'admin'),
                 SelectFilter::make('date')
                     ->options(function () {
                         return DailyStatus::query()->distinct()->pluck('date', 'date');
@@ -77,12 +90,24 @@ class DailyStatusesTable
                     ->searchable(),
                 SelectFilter::make('broker')
                     ->label('Broker')
-                    ->relationship('broker', 'broker_name')
+                    ->relationship(
+                        'broker',
+                        'broker_name',
+                        fn ($query) => auth()->user()->role === 'admin'
+                            ? $query
+                            : $query->where('user_id', auth()->id())
+                    )
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('account_number')
                     ->label('Account Number')
-                    ->relationship('broker', 'account_number')
+                    ->relationship(
+                        'broker',
+                        'account_number',
+                        fn ($query) => auth()->user()->role === 'admin'
+                            ? $query
+                            : $query->where('user_id', auth()->id())
+                    )
                     ->searchable()
                     ->preload(),
             ])

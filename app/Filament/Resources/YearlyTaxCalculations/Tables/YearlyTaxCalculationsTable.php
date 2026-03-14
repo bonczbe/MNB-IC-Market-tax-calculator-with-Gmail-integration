@@ -7,14 +7,20 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class YearlyTaxCalculationsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => auth()->user()->role === 'admin'
+    ? $query
+    : $query->whereHas('broker', fn ($q) => $q->where('user_id', auth()->id()))
+            )
             ->columns([
                 TextColumn::make('broker.broker_name')
                     ->label('Broker Name')
@@ -57,6 +63,13 @@ class YearlyTaxCalculationsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Filter::make('only_mine')
+                    ->label('Only my accounts')
+                    ->query(fn (Builder $query) => $query->whereHas(
+                        'broker', fn ($q) => $q->where('user_id', auth()->id())
+                    ))
+                    ->default()
+                    ->visible(fn () => auth()->user()->role === 'admin'),
                 SelectFilter::make('tax_year')
                     ->options(function () {
                         return YearlyTaxCalculation::query()->distinct()->pluck('tax_year', 'tax_year');
@@ -64,12 +77,24 @@ class YearlyTaxCalculationsTable
                     ->searchable(),
                 SelectFilter::make('broker')
                     ->label('Broker')
-                    ->relationship('broker', 'broker_name')
+                    ->relationship(
+                        'broker',
+                        'broker_name',
+                        fn ($query) => auth()->user()->role === 'admin'
+                            ? $query
+                            : $query->where('user_id', auth()->id())
+                    )
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('account_number')
                     ->label('Account Number')
-                    ->relationship('broker', 'account_number')
+                    ->relationship(
+                        'broker',
+                        'account_number',
+                        fn ($query) => auth()->user()->role === 'admin'
+                            ? $query
+                            : $query->where('user_id', auth()->id())
+                    )
                     ->searchable()
                     ->preload(),
             ])

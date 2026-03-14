@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BrokerAccount extends Model
@@ -17,6 +18,7 @@ class BrokerAccount extends Model
         'filter_number',
         'filter_balance',
         'broker_currency',
+        'user_id',
     ];
 
     public function dailyStatuses(): HasMany
@@ -37,5 +39,10 @@ class BrokerAccount extends Model
     public function yearlyTaxCalculations(): HasMany
     {
         return $this->hasMany(YearlyTaxCalculation::class, 'broker_account_id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

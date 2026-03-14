@@ -88,14 +88,14 @@ class TaxCalculatorService
 
         $previouseCards = [];
 
-        $previousYears = Cache::remember('previousYears', 3600, fn () => $this
+        $previousYears = Cache::remember('previousYears'.auth()->user()->id, 3600, fn () => $this
             ->yearly_tax_calculation_repository
             ->getAllExitingYearsExepctTheGivenDate($currentYear)
         );
 
         foreach ($previousYears as $prevYear) {
             $yearTax = 0;
-            $yearDatas = Cache::remember('yearDatas'.$prevYear, 3600, fn () => $this
+            $yearDatas = Cache::remember('yearDatas'.auth()->user()->id.$prevYear, 3600, fn () => $this
                 ->yearly_tax_calculation_repository
                 ->getByDate($prevYear)
             );

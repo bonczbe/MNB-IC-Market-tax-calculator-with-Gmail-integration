@@ -48,6 +48,7 @@ class AdminPanelProvider extends PanelProvider
                     ->label('Broker Statuses')
                     ->collapsed(false),
             ])
+            ->sidebarFullyCollapsibleOnDesktop()
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

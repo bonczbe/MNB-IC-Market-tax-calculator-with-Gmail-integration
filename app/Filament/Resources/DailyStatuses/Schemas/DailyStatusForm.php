@@ -21,7 +21,7 @@ class DailyStatusForm
                     ->required(),
                 Select::make('currency')
                     ->options(function () {
-                        return Rate::query()->get()->pluck('base_currency', 'base_currency');
+                        return Rate::query()->distinct()->pluck('base_currency', 'base_currency');
                     })
                     ->required(),
                 TextInput::make('balance')

@@ -59,7 +59,7 @@ class YearlyTaxCalculationsTable
             ->filters([
                 SelectFilter::make('tax_year')
                     ->options(function () {
-                        return YearlyTaxCalculation::query()->get()->pluck('tax_year', 'tax_year');
+                        return YearlyTaxCalculation::query()->distinct()->pluck('tax_year', 'tax_year');
                     })
                     ->searchable(),
                 SelectFilter::make('broker')

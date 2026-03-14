@@ -40,12 +40,12 @@ class RatesTable
             ->filters([
                 SelectFilter::make('base_currency')
                     ->options(function () {
-                        return Rate::query()->get()->pluck('base_currency', 'base_currency');
+                        return Rate::query()->distinct()->pluck('base_currency', 'base_currency');
                     })
                     ->default(config('tax.base_broker_currency') ),
                 SelectFilter::make('date')
                     ->options(function () {
-                        return Rate::query()->get()->pluck('date', 'date');
+                        return Rate::query()->distinct()->pluck('date', 'date');
                     })
                     ->searchable(),
             ])

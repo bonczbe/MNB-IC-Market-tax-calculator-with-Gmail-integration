@@ -51,7 +51,7 @@ class AccountTransactionsTable
             ->filters([
                 SelectFilter::make('date')
                     ->options(function () {
-                        return AccountTransaction::query()->get()->pluck('date', 'date');
+                        return AccountTransaction::query()->distinct()->pluck('date', 'date');
                     })
                     ->searchable(),
                 SelectFilter::make('type')

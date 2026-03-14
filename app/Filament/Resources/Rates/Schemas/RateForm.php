@@ -17,7 +17,7 @@ class RateForm
             ->components([
                 Select::make('base_currency')
                     ->options(function () {
-                        $rates = Rate::query()->get()->pluck('base_currency', 'base_currency');
+                        $rates = Rate::query()->distinct()->pluck('base_currency', 'base_currency');
 
                         return $rates->count() == 0 ? [config('tax.base_broker_currency')  => config('tax.base_broker_currency') ] : $rates;
                     })

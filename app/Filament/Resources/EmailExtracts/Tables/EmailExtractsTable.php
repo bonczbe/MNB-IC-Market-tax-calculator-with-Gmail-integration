@@ -43,7 +43,7 @@ class EmailExtractsTable
             ->filters([
                 SelectFilter::make('date')
                     ->options(function () {
-                        return EmailExtract::query()->get()->pluck('date', 'date');
+                        return EmailExtract::query()->distinct()->pluck('date', 'date');
                     })
                     ->searchable(),
                 SelectFilter::make('broker')

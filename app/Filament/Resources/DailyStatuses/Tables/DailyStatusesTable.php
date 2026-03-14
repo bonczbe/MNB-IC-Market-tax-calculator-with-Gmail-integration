@@ -72,7 +72,7 @@ class DailyStatusesTable
             ->filters([
                 SelectFilter::make('date')
                     ->options(function () {
-                        return DailyStatus::query()->get()->pluck('date', 'date');
+                        return DailyStatus::query()->distinct()->pluck('date', 'date');
                     })
                     ->searchable(),
                 SelectFilter::make('broker')

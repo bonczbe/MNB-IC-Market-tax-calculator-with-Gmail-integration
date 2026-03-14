@@ -44,7 +44,7 @@ class BrokerAccountsTable
             ->filters([
                 SelectFilter::make('broker_currency')
                     ->options(function () {
-                        return BrokerAccount::query()->get()->pluck('broker_currency', 'broker_currency');
+                        return BrokerAccount::query()->distinct()->pluck('broker_currency', 'broker_currency');
                     }),
             ])
             ->recordActions([

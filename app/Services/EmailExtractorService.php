@@ -58,7 +58,11 @@ class EmailExtractorService
 
             $this->daily_status_repository->upsert($dailyStatuses, uniqueBy: ['date', 'broker_account_id']);
 
-            Cache::forget('calculateCurrentYear');
+            Cache::forget('previouseYears');
+            Cache::forget('calculatecurrentDate');
+            Cache::forget('grossProfitOfYear');
+            Cache::forget('profitForYear');
+            Cache::forget('profitForTheWeek');
         }
     }
 

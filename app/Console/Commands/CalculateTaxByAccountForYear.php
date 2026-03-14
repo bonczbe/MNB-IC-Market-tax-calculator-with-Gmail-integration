@@ -29,6 +29,11 @@ class CalculateTaxByAccountForYear extends Command
     {
         CalculateTaxByAccountForYearJob::dispatch();
         $this->info('Tax calculation for the year!');
-        Cache::forget('calculateCurrentYear');
+
+        Cache::forget('previouseYears');
+        Cache::forget('calculatecurrentDate');
+        Cache::forget('grossProfitOfYear');
+        Cache::forget('profitForYear');
+        Cache::forget('profitForTheWeek');
     }
 }

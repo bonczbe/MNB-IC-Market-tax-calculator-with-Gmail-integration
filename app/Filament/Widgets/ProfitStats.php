@@ -38,7 +38,7 @@ class ProfitStats extends StatsOverviewWidget
     {
         $taxService = app(TaxCalculatorService::class);
 
-        return $taxService->calculateTaxForPreviouseYears($currentDate);
+        return $taxService->calculateTaxForpreviousYears($currentDate);
     }
 
     private function calculatecurrentYearTax($currentDate)

@@ -20,12 +20,12 @@ class YearlyTaxCalculationFactory extends Factory
     {
         return [
             'broker_account_id' => BrokerAccount::factory(),
-            'tax_year' => $this->faker->year('now'),
-            'gross_profit' => $this->faker->numberBetween(-100000,100000),
-            'loss_carried_forward' => $this->faker->numberBetween(0,100000),
-            'taxable_income' => $this->faker->numberBetween(0,100000),
-            'tax_amount' => $this->faker->randomFloat(2,0,1000),
-            'unused_loss' => $this->faker->numberBetween(-100000,100000),
+            'tax_year' => $this->faker->year(),
+            'gross_profit' => $this->faker->randomFloat(2, -5000, 20000),
+            'loss_carried_forward' => 0,
+            'taxable_income' => $this->faker->randomFloat(2, -5000, 20000),
+            'tax_amount' => $this->faker->randomFloat(2, 0, 3000),
+            'unused_loss' => 0,
         ];
     }
 }

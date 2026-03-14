@@ -18,11 +18,11 @@ class RateFactory extends Factory
     public function definition(): array
     {
         return [
-            'base_currency' => $this->faker->currencyCode(),
-            'unit' => $this->faker->numberBetween(1,100),
-            'rate' => $this->faker->randomFloat(2,1,500),
-            'for_currency' => $this->faker->currencyCode(),
+            'base_currency' => 'USD',
+            'for_currency' => 'HUF',
             'date' => $this->faker->date(),
+            'unit' => 1,
+            'rate' => $this->faker->randomFloat(2, 300, 420),
         ];
     }
 }

@@ -19,10 +19,9 @@ class AccountTransactionFactory extends Factory
     public function definition(): array
     {
         return [
-            'amount' => $this->faker->numberBetween(100,1000),
-            'note' => $this->faker->sentence(3),
             'date' => $this->faker->date(),
-            'date' => $this->faker->randomElement(['withdrawal','deposit']),
+            'amount' => $this->faker->randomFloat(2, 10, 1000),
+            'type' => $this->faker->randomElement(['deposit', 'withdrawal']),
             'broker_account_id' => BrokerAccount::factory(),
         ];
     }

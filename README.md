@@ -1,4 +1,4 @@
-# DailyTaxCalculator
+# MNB-IC-Market-tax-calculator-with-Gmail-integration
 
 A locally-hosted Laravel application for tracking daily broker account statistics via email,
 calculating profit/loss, and automatically computing yearly tax obligations —
@@ -35,8 +35,8 @@ but adaptable to other brokers and currencies with minor code modifications.
 ### 1. Clone & install dependencies
 
 ```bash
-git clone [<repo-url>](https://github.com/bonczbe/DailyTaxCalculator.git)
-cd DailyTaxCalculator
+git clone [<repo-url>](https://github.com/bonczbe/MNB-IC-Market-tax-calculator-with-Gmail-integration.git)
+cd MNB-IC-Market-tax-calculator-with-Gmail-integration
 
 composer install
 npm install

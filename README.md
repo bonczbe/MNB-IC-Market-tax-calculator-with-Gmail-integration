@@ -116,7 +116,7 @@ If you use IC Markets as your broker, the filter configuration is already set co
 You only need to update the dummy broker account with your actual data:
 
 - **Account Number** — your IC Markets account number
-- **Filter Number** — replace `52776665` with your own account identifier in the text
+- **Filter Number** — replace with your own account identifier in the text
 - **Starting Balance** — your initial deposit amount
 
 Or simply create a new broker account record with your own values.

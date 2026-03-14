@@ -42,7 +42,7 @@ class RatesTable
                     ->options(function () {
                         return Rate::query()->get()->pluck('base_currency', 'base_currency');
                     })
-                    ->default(env('BASE_BROKER_CURRENCY')),
+                    ->default(config('tax.base_broker_currency') ),
                 SelectFilter::make('date')
                     ->options(function () {
                         return Rate::query()->get()->pluck('date', 'date');

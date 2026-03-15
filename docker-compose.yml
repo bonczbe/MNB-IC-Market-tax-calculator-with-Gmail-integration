@@ -25,6 +25,8 @@ services:
       - "8000:8000"
     volumes:
       - .:/var/www
+      - vendor_data:/var/www/vendor
+      - node_modules_data:/var/www/node_modules
     env_file:
       - .env
     command: /usr/local/bin/entrypoint.sh
@@ -45,6 +47,8 @@ services:
     restart: unless-stopped
     volumes:
       - .:/var/www
+      - vendor_data:/var/www/vendor
+      - node_modules_data:/var/www/node_modules
     env_file:
       - .env
     command: php artisan queue:work
@@ -60,6 +64,8 @@ services:
     restart: unless-stopped
     volumes:
       - .:/var/www
+      - vendor_data:/var/www/vendor
+      - node_modules_data:/var/www/node_modules
     env_file:
       - .env
     command: php artisan schedule:work
@@ -71,6 +77,8 @@ services:
 
 volumes:
   db_data:
+  vendor_data:
+  node_modules_data:
 
 networks:
   dailytax_net:

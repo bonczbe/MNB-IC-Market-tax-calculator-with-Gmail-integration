@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+echo "Running composer install..."
+composer install --no-dev --optimize-autoloader
+echo "Running npm install..."
+npm install
+
 echo "Waiting for database connection..."
 until php -r "
   \$conn = @mysqli_connect('${DB_HOST}', '${DB_USERNAME}', '${DB_PASSWORD}', '${DB_DATABASE}', ${DB_PORT});

@@ -2,3 +2,5 @@ vendor/
 node_modules/
 storage/logs/*
 .git/
+public/storage
+.env

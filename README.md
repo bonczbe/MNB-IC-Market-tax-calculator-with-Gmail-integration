@@ -5,7 +5,7 @@ calculating profit/loss, and automatically computing yearly tax obligations —
 built specifically for IC Markets users with MNB (Magyar Nemzeti Bank) exchange rates (e.g. USD → HUF),
 but adaptable to other brokers and currencies with minor code modifications.
 
----
+***
 
 ## What It Does
 
@@ -18,57 +18,43 @@ but adaptable to other brokers and currencies with minor code modifications.
 - Multi-user support: each user sees only their own accounts (admins see all)
 - Admin can create users and generate/reset passwords
 
----
+***
 
 ## Requirements
 
-- PHP 8.4+
-- Composer
-- Node.js 18+
-- MySQL
+- Docker
 - A Gmail account with IMAP enabled (for email parsing)
 
----
+***
 
 ## Installation
 
-### 1. Clone & install dependencies
+### 1. Clone The Project
 
-```bash
-git clone [<repo-url>](https://github.com/bonczbe/MNB-IC-Market-tax-calculator-with-Gmail-integration.git)
+git clone https://github.com/bonczbe/MNB-IC-Market-tax-calculator-with-Gmail-integration.git  
 cd MNB-IC-Market-tax-calculator-with-Gmail-integration
 
-composer install
-npm install
-npm run build
-```
+If needed, you can run `composer install` and the frontend build commands inside your app container (for example: `docker compose exec app composer install`), depending on your local workflow.
 
 ### 2. Environment setup
 
-```bash
 cp .env.example .env
-php artisan key:generate
-```
 
 Fill in `.env` with your database credentials, mail settings, and tax configuration:
 
-```env
-DB_DATABASE=your_db
-DB_USERNAME=your_user
-DB_PASSWORD=your_password
+DB_DATABASE=your_db  
+DB_USERNAME=your_user  
+DB_PASSWORD=your_password  
 
-TAX_VOLUME=0.15           # e.g. 15% tax rate
-TAX_BASE_CURRENCY=HUF
-TAX_BASE_BROKER_CURRENCY=USD
-```
+TAX_VOLUME=0.15           # e.g. 15% tax rate  
+TAX_BASE_CURRENCY=HUF  
+TAX_BASE_BROKER_CURRENCY=USD  
 
 Configure IMAP settings in `config/imap.php` for your Gmail account.
 
-### 3. Migrate & seed
+### 3. Running the Application
 
-```bash
-php artisan migrate --seed
-```
+docker compose up -d --build
 
 The seeder creates a default admin user and a dummy broker account:
 
@@ -77,24 +63,13 @@ The seeder creates a default admin user and a dummy broker account:
 | Email    | admin@a.a |
 | Password | password  |
 
----
+***
 
-## Running the Application
+## Deploy new version of the Application
 
-Three processes need to run simultaneously (use separate terminal windows):
+Run `deploy.bat` or `deploy.sh` depending on your operating system.
 
-```bash
-# 1. Web server
-php artisan serve
-
-# 2. Queue worker (processes email extraction and rate fetching jobs)
-php artisan queue:work
-
-# 3. Scheduler (triggers daily/yearly automated jobs)
-php artisan schedule:work
-```
-
----
+***
 
 ## Scheduled Jobs
 
@@ -108,7 +83,7 @@ Jobs can be individually toggled in `.env` via `config/schedule.php`:
 
 All jobs run in the `Europe/Budapest` timezone.
 
----
+***
 
 ## IC Markets Setup
 
@@ -121,7 +96,7 @@ You only need to update the dummy broker account with your actual data:
 
 Or simply create a new broker account record with your own values.
 
----
+***
 
 ## User Management
 
@@ -130,7 +105,7 @@ Or simply create a new broker account record with your own values.
 - **Regular users** see only their own broker accounts and related data
 - **Admin** can toggle between "all accounts" and "only mine" view using the filter toggle
 
----
+***
 
 ## Adapting to Other Brokers / Currencies
 
@@ -144,7 +119,7 @@ The application is built around IC Markets and MNB rates, but can be adapted:
 > ⚠️ The email parser was written specifically for Gmail IMAP. Other providers may require
 > modifications in `config/imap.php` and the email extract job.
 
----
+***
 
 ## Notes
 
@@ -152,9 +127,11 @@ The application is built around IC Markets and MNB rates, but can be adapted:
 - Exchange rates are fetched from the official MNB (Hungarian National Bank) API
 - Tax calculations use a simple flat-rate model with loss carry-forward from the previous year
 
----
+***
 
 ## Contributing
 
 Found a bug or have an idea for improvement? Issues and pull requests are welcome.
 This project is a work in progress and open to further development.
+
+Ezt most simán kijelölöd az elejétől a végéig, Ctrl+C, és mehet a `README.md`-be.

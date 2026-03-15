@@ -22,7 +22,7 @@ but adaptable to other brokers and currencies with minor code modifications.
 
 ## Requirements
 
-- PHP 8.2+
+- PHP 8.4+
 - Composer
 - Node.js 18+
 - MySQL

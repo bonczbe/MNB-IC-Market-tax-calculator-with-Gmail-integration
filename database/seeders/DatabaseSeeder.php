@@ -13,15 +13,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            BrokerAccountsSeeder::class,
-        ]);
 
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'admin@a.a',
             'password' => bcrypt('password'),
             'role' => 'admin',
+        ]);
+
+        $this->call([
+            BrokerAccountsSeeder::class,
         ]);
 
     }

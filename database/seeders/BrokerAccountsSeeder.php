@@ -14,6 +14,7 @@ class BrokerAccountsSeeder extends Seeder
     {
         BrokerAccount::create([
             'broker_name' => 'IC Markets',
+            'user_id'=>1,
             'email' => 'support@icmarkets.eu',
             'email_subject' => 'Daily Confirmation',
             'account_number' => env('IC_MARKET_ACCOUNT_NUMBER', '1234'),

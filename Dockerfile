@@ -14,9 +14,6 @@ WORKDIR /var/www
 
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader
-RUN npm install && npm run build
-
 COPY docker-entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 

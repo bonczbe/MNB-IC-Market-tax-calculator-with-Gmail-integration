@@ -44,6 +44,8 @@ class BrokerAccountForm
                     ->required(),
                 Textarea::make('filter_balance')
                     ->required(),
+                Textarea::make('filter_date')
+                    ->required(),
                 Select::make('broker_currency')
                     ->options(function () {
                         $rates = Rate::query()->distinct()->pluck('base_currency', 'base_currency');

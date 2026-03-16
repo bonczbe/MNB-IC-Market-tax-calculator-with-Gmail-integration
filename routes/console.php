@@ -15,6 +15,11 @@ if (Config::get('schedule.use_mnb_fetcher')) {
         ->dailyAt('23:00')
         ->weekdays()
         ->timezone('Europe/Budapest');
+
+    app(Schedule::class)
+        ->command('app:fetch-mnb-rate')
+        ->weeklyOn(1, '10:00')
+        ->timezone('Europe/Budapest');
 }
 if (Config::get('schedule.use_email_fetcher')) {
     app(Schedule::class)

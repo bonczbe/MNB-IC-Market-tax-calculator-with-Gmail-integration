@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Jobs\CalculateTaxByAccountForYearJob;
-use App\Models\User;
 use Illuminate\Console\Command;
 
 class CalculateTaxByAccountForYear extends Command

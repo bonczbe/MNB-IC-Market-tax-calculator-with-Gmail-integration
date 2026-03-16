@@ -7,7 +7,6 @@ use Carbon\Carbon;
 
 class BrokerAccountRepository
 {
-
     public function getAccountsWithYearlyTransactionsStatusesAndTax(Carbon $currentYear, Carbon $startOfYear, Carbon $endOfYear)
     {
         return BrokerAccount::query()

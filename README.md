@@ -17,6 +17,16 @@ but adaptable to other brokers and currencies with minor code modifications.
 - Automatically upserts yearly tax calculations on December 31st
 - Multi-user support: each user sees only their own accounts (admins see all)
 - Admin can create users and generate/reset passwords
+- Two-factor authentication (2FA) support via Laravel Fortify
+- Policy-based authorization on all resources
+
+***
+
+## Known Limitations
+
+> **Single email account:** The application currently extracts broker emails from a **single shared IMAP account** configured in `config/imap.php`. All broker accounts across all users are processed from this one mailbox.
+>
+> **Planned improvement:** Per-user email configuration is planned for a future release — each user will be able to connect their own email account for independent email extraction.
 
 ***
 
@@ -31,30 +41,38 @@ but adaptable to other brokers and currencies with minor code modifications.
 
 ### 1. Clone The Project
 
-git clone https://github.com/bonczbe/MNB-IC-Market-tax-calculator-with-Gmail-integration.git  
+```
+git clone https://github.com/bonczbe/MNB-IC-Market-tax-calculator-with-Gmail-integration.git
 cd MNB-IC-Market-tax-calculator-with-Gmail-integration
+```
 
 If needed, you can run `composer install` and the frontend build commands inside your app container (for example: `docker compose exec app composer install`), depending on your local workflow.
 
 ### 2. Environment setup
 
+```
 cp .env.example .env
+```
 
 Fill in `.env` with your database credentials, mail settings, and tax configuration:
 
-DB_DATABASE=your_db  
-DB_USERNAME=your_user  
-DB_PASSWORD=your_password  
+```
+DB_DATABASE=your_db
+DB_USERNAME=your_user
+DB_PASSWORD=your_password
 
-TAX_VOLUME=0.15           # e.g. 15% tax rate  
-TAX_BASE_CURRENCY=HUF  
-TAX_BASE_BROKER_CURRENCY=USD  
+TAX_VOLUME=0.15           # e.g. 15% tax rate
+TAX_BASE_CURRENCY=HUF
+TAX_BASE_BROKER_CURRENCY=USD
+```
 
 Configure IMAP settings in `config/imap.php` for your Gmail account.
 
 ### 3. Running the Application
 
+```
 docker compose up -d --build
+```
 
 The seeder creates a default admin user and a dummy broker account:
 
@@ -62,6 +80,8 @@ The seeder creates a default admin user and a dummy broker account:
 | -------- | --------- |
 | Email    | admin@a.a |
 | Password | password  |
+
+> ⚠️ Change the default admin password immediately after first login.
 
 ***
 
@@ -85,6 +105,24 @@ All jobs run in the `Europe/Budapest` timezone.
 
 ***
 
+## Docker Services
+
+The application runs as 4 Docker containers:
+
+| Service     | Description                              |
+| ----------- | ---------------------------------------- |
+| `app`       | Laravel application server (port 8000)   |
+| `db`        | MariaDB database                         |
+| `queue`     | Laravel queue worker for background jobs |
+| `scheduler` | Laravel scheduler for cron-like jobs     |
+
+- All services use `restart: unless-stopped`
+- Health checks are configured on the `app` service
+- `queue` and `scheduler` wait for `app` to be healthy before starting
+- Database credentials are read from `.env` (not hardcoded)
+
+***
+
 ## IC Markets Setup
 
 If you use IC Markets as your broker, the filter configuration is already set correctly.
@@ -104,6 +142,7 @@ Or simply create a new broker account record with your own values.
 - **Admin** can generate a new password for any user directly from the user edit form
 - **Regular users** see only their own broker accounts and related data
 - **Admin** can toggle between "all accounts" and "only mine" view using the filter toggle
+- All resources are protected by Laravel Policies (ownership-based access control)
 
 ***
 
@@ -123,7 +162,7 @@ The application is built around IC Markets and MNB rates, but can be adapted:
 
 ## Notes
 
-- This application is **designed for local use only** and has not been hardened for public deployment
+- This application is **designed for internal/local use only** and has not been hardened for public deployment
 - Exchange rates are fetched from the official MNB (Hungarian National Bank) API
 - Tax calculations use a simple flat-rate model with loss carry-forward from the previous year
 
@@ -133,4 +172,3 @@ The application is built around IC Markets and MNB rates, but can be adapted:
 
 Found a bug or have an idea for improvement? Issues and pull requests are welcome.
 This project is a work in progress and open to further development.
-

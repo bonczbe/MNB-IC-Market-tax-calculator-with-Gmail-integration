@@ -25,6 +25,6 @@ class BrokerEmailExtractor implements ShouldQueue
      */
     public function handle(EmailExtractorService $email_extractor_service): void
     {
-        $email_extractor_service->extratAndSaveEmail();
+        $email_extractor_service->extractAndSaveEmail();
     }
 }

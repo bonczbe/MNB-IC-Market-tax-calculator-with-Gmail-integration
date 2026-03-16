@@ -14,7 +14,7 @@ class YearlyTaxCalculationRepository
         return YearlyTaxCalculation::upsert($data, uniqueBy: $uniqueBy);
     }
 
-    public function getAllExitingYearsExepctTheGivenDate(Carbon $date)
+    public function getAllExistingYearsExceptTheGivenDate(Carbon $date)
     {
         return YearlyTaxCalculation::query()
             ->where('tax_year', '<>', $date->copy()->format('Y'))

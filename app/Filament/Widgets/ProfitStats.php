@@ -27,14 +27,14 @@ class ProfitStats extends StatsOverviewWidget
             $this->calculateGrossProfit($currentDate),
             $this->calculateCurrentYearNetProfit($currentDate),
             $this->calculatecurrentYearTax($currentDate),
-            ...$this->calculatePreviouseYears($currentDate),
+            ...$this->calculatepreviousYears($currentDate),
         ];
 
         return $cards;
 
     }
 
-    private function calculatePreviouseYears($currentDate)
+    private function calculatepreviousYears($currentDate)
     {
         $taxService = app(TaxCalculatorService::class);
 

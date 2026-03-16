@@ -20,7 +20,7 @@ class EmailExtractorService
         private readonly DailyStatusRepository $daily_status_repository,
         private readonly EmailExtractRepository $email_extract_repository) {}
 
-    public function extratAndSaveEmail()
+    public function extractAndSaveEmail()
     {
         $mailbox = new Mailbox(config('imap.default'));
 
@@ -62,7 +62,7 @@ class EmailExtractorService
             $users = User::query()->pluck('id');
 
             foreach ($users as $id) {
-                Cache::forget('previouseYears'.$id);
+                Cache::forget('previousYears'.$id);
                 Cache::forget('calculatecurrentDate'.$id);
                 Cache::forget('grossProfitOfYear'.$id);
                 Cache::forget('profitForYear'.$id);
@@ -91,8 +91,10 @@ class EmailExtractorService
             if ($account->filter_date != null) {
 
                 $dateNode = $xpath->query($account->filter_date);
+                if($dateNode?->item(0)?->nodeValue!= null){
                 $date = Carbon::createFromFormat('Y.m.d H:i', trim($dateNode->item(0)->nodeValue))
                     ->format('Y-m-d');
+                }
             }
 
             $email = [
@@ -103,7 +105,7 @@ class EmailExtractorService
 
             $query = $account->filter_balance;
             $nodeList = $xpath->query($query);
-            $balance = (float) str_replace(' ', '', $nodeList->item(0)->nodeValue);
+            $balance = (float) str_replace(' ', '', $nodeList?->item(0)?->nodeValue??'0');
 
             $dailyStatus = [
                 'date' => $date,

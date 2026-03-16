@@ -86,11 +86,11 @@ class TaxCalculatorService
     public function calculateTaxForpreviousYears(Carbon $currentYear)
     {
 
-        $previouseCards = [];
+        $previousCards = [];
 
         $previousYears = Cache::remember('previousYears'.auth()->user()->id, 3600, fn () => $this
             ->yearly_tax_calculation_repository
-            ->getAllExitingYearsExepctTheGivenDate($currentYear)
+            ->getAllExistingYearsExceptTheGivenDate($currentYear)
         );
 
         foreach ($previousYears as $prevYear) {
@@ -106,14 +106,14 @@ class TaxCalculatorService
 
             $formattedResult = number_format(ceil($yearTax)).' '.config('tax.base_currency');
 
-            $previouseCards[] =
+            $previousCards[] =
             Stat::make("{$prevYear} Tax", $formattedResult)
                 ->description('Final settled tax')
                 ->descriptionIcon('heroicon-m-archive-box-check')
                 ->color(Color::Gray);
         }
 
-        return $previouseCards;
+        return $previousCards;
 
     }
 
@@ -143,7 +143,7 @@ class TaxCalculatorService
                     $status->balance - ($starterBalance + $depositAndWithdrawSum)
                 );
 
-            $allProfitInExchangedCurrency += $dailyProfitOrLoss * ($rate->rate ?? 1);
+            $allProfitInExchangedCurrency += $dailyProfitOrLoss * (($rate->rate ?? 1)/($rate->unit ?? 1));
 
             $previousStatus = $status;
         }

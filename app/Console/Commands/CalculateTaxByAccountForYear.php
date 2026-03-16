@@ -34,7 +34,7 @@ class CalculateTaxByAccountForYear extends Command
         $users = User::query()->pluck('id');
 
         foreach ($users as $id) {
-            Cache::forget('previouseYears'.$id);
+            Cache::forget('previousYears'.$id);
             Cache::forget('calculatecurrentDate'.$id);
             Cache::forget('grossProfitOfYear'.$id);
             Cache::forget('profitForYear'.$id);

@@ -20,7 +20,11 @@ done
 echo "Database is ready!"
 
 php artisan config:clear
-if [ -z "$APP_KEY" ]; then php artisan key:generate; fi
+APP_KEY_VALUE=$(grep -oP '(?<=^APP_KEY=).+' .env 2>/dev/null || echo "")
+if [ -z "$APP_KEY_VALUE" ]; then
+  echo "No APP_KEY found, generating..."
+  php artisan key:generate
+fi
 php artisan storage:link 2>/dev/null || true
 php artisan migrate --force || exit 1
 php artisan cache:clear

@@ -44,21 +44,6 @@ class RateResource extends Resource
         ];
     }
 
-    public static function canCreate(): bool
-    {
-        return auth()->user()->role === 'admin';
-    }
-
-    public static function canEdit($record): bool
-    {
-        return auth()->user()->role === 'admin';
-    }
-
-    public static function canDelete($record): bool
-    {
-        return auth()->user()->role === 'admin';
-    }
-
     public static function getPages(): array
     {
         return [

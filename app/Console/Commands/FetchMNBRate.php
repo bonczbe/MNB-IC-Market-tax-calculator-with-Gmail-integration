@@ -19,7 +19,7 @@ class FetchMNBRate extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Fetch the latest MNB (Magyar Nemzeti Bank) exchange rates and store them in the database';
 
     /**
      * Execute the console command.

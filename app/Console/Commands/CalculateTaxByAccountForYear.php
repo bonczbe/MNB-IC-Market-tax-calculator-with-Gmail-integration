@@ -20,7 +20,7 @@ class CalculateTaxByAccountForYear extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Calculate yearly tax obligations for all broker accounts based on daily profit/loss data';
 
     /**
      * Execute the console command.
@@ -29,7 +29,5 @@ class CalculateTaxByAccountForYear extends Command
     {
         CalculateTaxByAccountForYearJob::dispatch();
         $this->info('Tax calculation for the year!');
-
-        $users = User::query()->pluck('id');
     }
 }

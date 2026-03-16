@@ -35,7 +35,6 @@ class DailyStatusesTable
                     ->sortable(),
                 TextColumn::make('broker.broker_name')
                     ->label('Broker Name')
-                    ->numeric()
                     ->sortable(),
                 TextColumn::make('broker.account_number')
                     ->label('Account Number')
@@ -49,7 +48,7 @@ class DailyStatusesTable
                         $depositAndWithdrawSum = 0;
 
                         $prevBalance = Cache::remember(
-                            'DailyStatus'.$record->broker->user->id.'$'.$record->date.'$'.$record->broker->broker_name.'$'.$record->broker->account_number,
+                            'DailyStatus'.$record->broker->user->id.'$'.$record->date.'$'.$record->broker->id,
                             86400,
                             fn () => $dailyStatusRepository
                                 ->firstSmallerDatedStatus($record->broker->id, Carbon::parse($record->date))

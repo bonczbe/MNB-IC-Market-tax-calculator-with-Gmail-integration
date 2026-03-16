@@ -19,7 +19,7 @@ class EmailExtract extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Extract daily broker account statuses from IMAP emails and save them to the database';
 
     /**
      * Execute the console command.

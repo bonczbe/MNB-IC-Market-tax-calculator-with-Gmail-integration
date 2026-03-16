@@ -29,13 +29,10 @@ class BrokerAccountsTable
                     ->sortable()
                     ->visible(fn () => auth()->user()->role === 'admin'),
                 TextColumn::make('broker_name')
-                    ->numeric()
                     ->sortable(),
                 TextColumn::make('email')
-                    ->numeric()
                     ->sortable(),
                 TextColumn::make('email_subject')
-                    ->numeric()
                     ->sortable(),
                 TextColumn::make('account_number')
                     ->sortable(),
@@ -43,7 +40,6 @@ class BrokerAccountsTable
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('broker_currency')
-                    ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

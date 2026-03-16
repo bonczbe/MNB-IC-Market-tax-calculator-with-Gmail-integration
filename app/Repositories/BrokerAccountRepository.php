@@ -7,7 +7,6 @@ use Carbon\Carbon;
 
 class BrokerAccountRepository
 {
-    public function __construct() {}
 
     public function getAccountsWithYearlyTransactionsStatusesAndTax(Carbon $currentYear, Carbon $startOfYear, Carbon $endOfYear)
     {

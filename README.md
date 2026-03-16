@@ -134,4 +134,3 @@ The application is built around IC Markets and MNB rates, but can be adapted:
 Found a bug or have an idea for improvement? Issues and pull requests are welcome.
 This project is a work in progress and open to further development.
 
-Ezt most simán kijelölöd az elejétől a végéig, Ctrl+C, és mehet a `README.md`-be.

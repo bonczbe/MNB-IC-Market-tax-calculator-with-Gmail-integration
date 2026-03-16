@@ -2,22 +2,27 @@
 
 namespace App\Filament\Resources\Rates\Schemas;
 
-use App\Models\Rate;
+use App\Repositories\RateRepository;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Cache;
 
 class RateForm
 {
     public static function configure(Schema $schema): Schema
     {
+        $rateRepository = app(RateRepository::class);
+
         return $schema
             ->components([
                 Select::make('base_currency')
-                    ->options(function () {
-                        $rates = Rate::query()->distinct()->pluck('base_currency', 'base_currency');
+                    ->options(function () use ($rateRepository) {
+                        $rates = Cache::remember('rateBaseCurrency', Carbon::now()->endOfDay()->subMinute(5), function () use ($rateRepository) {
+                            return $rateRepository->getAllDistinctedByKeyValue('base_currency');
+                        });
 
                         return $rates->count() == 0 ? [config('tax.base_broker_currency') => config('tax.base_broker_currency')] : $rates;
                     })

@@ -31,4 +31,9 @@ class BrokerAccountRepository
     {
         return BrokerAccount::query()->get();
     }
+
+    public function getAllDistinctedByKeyValue(string $column)
+    {
+        return BrokerAccount::query()->distinct()->pluck($column, $column);
+    }
 }

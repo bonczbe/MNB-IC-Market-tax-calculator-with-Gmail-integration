@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\DailyStatuses\Tables;
 
-use App\Models\DailyStatus;
+use App\Repositories\DailyStatusRepository;
+use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Support\Colors\Color;
@@ -17,6 +18,8 @@ class DailyStatusesTable
 {
     public static function configure(Table $table): Table
     {
+        $dailyStatusRepository = app(DailyStatusRepository::class);
+
         return $table
             ->modifyQueryUsing(fn ($query) => auth()->user()->role === 'admin'
     ? $query
@@ -42,13 +45,15 @@ class DailyStatusesTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('profit')
-                    ->getStateUsing(function ($record) {
+                    ->getStateUsing(function ($record) use ($dailyStatusRepository) {
                         $depositAndWithdrawSum = 0;
 
-                        $prevBalance = Cache::remember('DailyStatus'.$record->broker->user->id.'$'.$record->date.$record->broker->broker_name.$record->broker->account_number, 86400, fn () => DailyStatus::query()
-                            ->where('date', '<', $record->date)
-                            ->orderByDesc('date')
-                            ->first());
+                        $prevBalance = Cache::remember(
+                            'DailyStatus'.$record->broker->user->id.'$'.$record->date.'$'.$record->broker->broker_name.'$'.$record->broker->account_number,
+                            86400,
+                            fn () => $dailyStatusRepository
+                                ->firstSmallerDatedStatus($record->broker->id, Carbon::parse($record->date))
+                        );
 
                         $transactions = $record->broker->accountTransactions->filter(fn ($act) => $act->date == $record->date);
 
@@ -75,6 +80,7 @@ class DailyStatusesTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('date', 'desc')
             ->filters([
                 Filter::make('only_mine')
                     ->label('Only my accounts')
@@ -84,8 +90,10 @@ class DailyStatusesTable
                     ->default()
                     ->visible(fn () => auth()->user()->role === 'admin'),
                 SelectFilter::make('date')
-                    ->options(function () {
-                        return DailyStatus::query()->distinct()->pluck('date', 'date');
+                    ->options(function () use ($dailyStatusRepository) {
+                        return Cache::remember('dailyStatusDates', Carbon::now()->endOfDay()->subMinute(5), function () use ($dailyStatusRepository) {
+                            return $dailyStatusRepository->getAllDistinctedByKeyValue('date');
+                        });
                     })
                     ->searchable(),
                 SelectFilter::make('broker')

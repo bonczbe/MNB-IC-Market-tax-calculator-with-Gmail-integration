@@ -22,4 +22,9 @@ class DailyStatusRepository
     {
         return DailyStatus::upsert($multipleDatas, uniqueBy: $uniqueBy);
     }
+
+    public function getAllDistinctedByKeyValue(string $column)
+    {
+        return DailyStatus::query()->distinct()->pluck($column, $column);
+    }
 }

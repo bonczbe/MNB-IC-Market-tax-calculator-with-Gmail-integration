@@ -13,15 +13,15 @@ until php -r "
   if (\$conn) { mysqli_close(\$conn); exit(0); }
   exit(1);
 "; do
-  echo "DB not ready, retrying in 3s..."
+  echo "DB not ready, retrying in 5s..."
   sleep 5
 done
 
 echo "Database is ready!"
 
 php artisan config:clear
-php artisan key:generate
+if [ -z "$APP_KEY" ]; then php artisan key:generate; fi
 php artisan storage:link 2>/dev/null || true
-php artisan migrate
+php artisan migrate --force || exit 1
 php artisan cache:clear
 php artisan serve --host=0.0.0.0 --port=8000

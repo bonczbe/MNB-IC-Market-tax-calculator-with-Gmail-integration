@@ -20,4 +20,9 @@ class RateRepository
     {
         return Rate::upsert($multipleDatas, uniqueBy: $uniqueBy);
     }
+
+    public function getAllDistinctedByKeyValue(string $column)
+    {
+        return Rate::query()->distinct()->pluck($column, $column);
+    }
 }

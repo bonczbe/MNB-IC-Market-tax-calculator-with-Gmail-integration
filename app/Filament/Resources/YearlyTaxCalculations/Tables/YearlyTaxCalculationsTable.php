@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\YearlyTaxCalculations\Tables;
 
-use App\Models\YearlyTaxCalculation;
+use App\Repositories\YearlyTaxCalculationRepository;
+use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Support\Colors\Color;
@@ -11,11 +12,14 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 
 class YearlyTaxCalculationsTable
 {
     public static function configure(Table $table): Table
     {
+        $yearlyTaxCalcRepository = app(YearlyTaxCalculationRepository::class);
+
         return $table
             ->modifyQueryUsing(fn ($query) => auth()->user()->role === 'admin'
     ? $query
@@ -71,8 +75,10 @@ class YearlyTaxCalculationsTable
                     ->default()
                     ->visible(fn () => auth()->user()->role === 'admin'),
                 SelectFilter::make('tax_year')
-                    ->options(function () {
-                        return YearlyTaxCalculation::query()->distinct()->pluck('tax_year', 'tax_year');
+                    ->options(function () use ($yearlyTaxCalcRepository) {
+                        return Cache::remember('taxYears', Carbon::now()->endOfYear(), function () use ($yearlyTaxCalcRepository) {
+                            return $yearlyTaxCalcRepository->getAllDistinctedByKeyValue('tax_year');
+                        });
                     })
                     ->searchable(),
                 SelectFilter::make('broker')

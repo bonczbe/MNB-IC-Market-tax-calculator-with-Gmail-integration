@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\EmailExtracts\Tables;
 
-use App\Models\EmailExtract;
+use App\Repositories\EmailExtractRepository;
+use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -10,11 +11,14 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 
 class EmailExtractsTable
 {
     public static function configure(Table $table): Table
     {
+        $emailExtRepository = app(EmailExtractRepository::class);
+
         return $table
             ->modifyQueryUsing(fn ($query) => auth()->user()->role === 'admin'
     ? $query
@@ -55,8 +59,10 @@ class EmailExtractsTable
                     ->default()
                     ->visible(fn () => auth()->user()->role === 'admin'),
                 SelectFilter::make('date')
-                    ->options(function () {
-                        return EmailExtract::query()->distinct()->pluck('date', 'date');
+                    ->options(function () use ($emailExtRepository) {
+                        return Cache::remember('emailExtractDates', Carbon::now()->endOfDay()->subMinute(5), function () use ($emailExtRepository) {
+                            return $emailExtRepository->getAllDistinctedByKeyValue('date');
+                        });
                     })
                     ->searchable(),
                 SelectFilter::make('broker')

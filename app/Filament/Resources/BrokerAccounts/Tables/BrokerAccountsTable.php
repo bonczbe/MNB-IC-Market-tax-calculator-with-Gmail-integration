@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\BrokerAccounts\Tables;
 
-use App\Models\BrokerAccount;
+use App\Repositories\BrokerAccountRepository;
+use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -10,11 +11,14 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 
 class BrokerAccountsTable
 {
     public static function configure(Table $table): Table
     {
+        $brokerAcRepository = app(BrokerAccountRepository::class);
+
         return $table
             ->modifyQueryUsing(fn ($query) => auth()->user()->role === 'admin'
                 ? $query
@@ -57,8 +61,10 @@ class BrokerAccountsTable
                     ->default()
                     ->visible(fn () => auth()->user()->role === 'admin'),
                 SelectFilter::make('broker_currency')
-                    ->options(function () {
-                        return BrokerAccount::query()->distinct()->pluck('broker_currency', 'broker_currency');
+                    ->options(function () use ($brokerAcRepository) {
+                        return Cache::remember('brokerCurrency', Carbon::now()->endOfDay()->subMinute(5), function () use ($brokerAcRepository) {
+                            return $brokerAcRepository->getAllDistinctedByKeyValue('broker_currency');
+                        });
                     }),
             ])
             ->recordActions([

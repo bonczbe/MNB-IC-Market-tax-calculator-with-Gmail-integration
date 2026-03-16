@@ -2,17 +2,21 @@
 
 namespace App\Filament\Resources\Rates\Tables;
 
-use App\Models\Rate;
+use App\Repositories\RateRepository;
+use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Cache;
 
 class RatesTable
 {
     public static function configure(Table $table): Table
     {
+        $rateRepository = app(RateRepository::class);
+
         return $table
             ->columns([
                 TextColumn::make('date')
@@ -37,15 +41,20 @@ class RatesTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('date', 'desc')
             ->filters([
                 SelectFilter::make('base_currency')
-                    ->options(function () {
-                        return Rate::query()->distinct()->pluck('base_currency', 'base_currency');
+                    ->options(function () use ($rateRepository) {
+                        return Cache::remember('rateBaseCurrency', Carbon::now()->endOfDay()->subMinute(5), function () use ($rateRepository) {
+                            return $rateRepository->getAllDistinctedByKeyValue('base_currency');
+                        });
                     })
                     ->default(config('tax.base_broker_currency')),
                 SelectFilter::make('date')
-                    ->options(function () {
-                        return Rate::query()->distinct()->pluck('date', 'date');
+                    ->options(function () use ($rateRepository) {
+                        return Cache::remember('rateDate', Carbon::now()->endOfDay()->subMinute(5), function () use ($rateRepository) {
+                            return $rateRepository->getAllDistinctedByKeyValue('date');
+                        });
                     })
                     ->searchable(),
             ])

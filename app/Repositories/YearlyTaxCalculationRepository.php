@@ -30,4 +30,9 @@ class YearlyTaxCalculationRepository
             ->with('broker')
             ->get();
     }
+
+    public function getAllDistinctedByKeyValue(string $column)
+    {
+        return YearlyTaxCalculation::query()->distinct()->pluck($column, $column);
+    }
 }

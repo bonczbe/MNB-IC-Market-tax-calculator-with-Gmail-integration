@@ -12,4 +12,9 @@ class EmailExtractRepository
     {
         return EmailExtract::upsert($multipleDatas, uniqueBy: $uniqueBy);
     }
+
+    public function getAllDistinctedByKeyValue(string $column)
+    {
+        return EmailExtract::query()->distinct()->pluck($column, $column);
+    }
 }

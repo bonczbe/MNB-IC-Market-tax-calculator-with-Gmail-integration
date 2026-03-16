@@ -3,25 +3,31 @@
 namespace App\Filament\Resources\DailyStatuses\Schemas;
 
 use App\Models\BrokerAccount;
-use App\Models\Rate;
+use App\Repositories\RateRepository;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Cache;
 
 class DailyStatusForm
 {
     public static function configure(Schema $schema): Schema
     {
+        $rateRepository = app(RateRepository::class);
+
         return $schema
             ->components([
                 DatePicker::make('date')
                     ->maxDate(fn () => Carbon::now())
                     ->required(),
                 Select::make('currency')
-                    ->options(function () {
-                        return Rate::query()->distinct()->pluck('base_currency', 'base_currency');
+                    ->options(function () use ($rateRepository) {
+
+                        return Cache::remember('rateBaseCurrency', Carbon::now()->endOfDay()->subMinute(5), function () use ($rateRepository) {
+                            return $rateRepository->getAllDistinctedByKeyValue('base_currency');
+                        });
                     })
                     ->required(),
                 TextInput::make('balance')

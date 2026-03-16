@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\AccountTransactions\Tables;
 
-use App\Models\AccountTransaction;
+use App\Repositories\AccountTransactionRepository;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Support\Colors\Color;
@@ -16,6 +16,8 @@ class AccountTransactionsTable
 {
     public static function configure(Table $table): Table
     {
+        $accountTransactinRepository = app(AccountTransactionRepository::class);
+
         return $table
             ->modifyQueryUsing(fn ($query) => auth()->user()->role === 'admin'
     ? $query
@@ -63,8 +65,10 @@ class AccountTransactionsTable
                     ->default()
                     ->visible(fn () => auth()->user()->role === 'admin'),
                 SelectFilter::make('date')
-                    ->options(function () {
-                        return AccountTransaction::query()->distinct()->pluck('date', 'date');
+                    ->options(function () use ($accountTransactinRepository) {
+                        return Cache::remember('brokerAccountTransactionDates', Carbon::now()->endOfDay()->subMinute(5), function () use ($accountTransactinRepository) {
+                            return $accountTransactinRepository->getAllDistinctedByKeyValue('date');
+                        });
                     })
                     ->searchable(),
                 SelectFilter::make('type')

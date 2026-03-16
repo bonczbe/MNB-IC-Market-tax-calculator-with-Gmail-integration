@@ -4,3 +4,9 @@ storage/logs/*
 .git/
 public/storage
 .env
+tests/
+.github/
+.editorconfig
+.phpunit.xml
+*.md
+docker-compose.yml

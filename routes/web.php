@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => redirect('/admin'))->name('home');
 
-Route::get('/test', function () {
+if (app()->environment('local')) {
+    Route::get('/test', function () {
 
-    return 'ok';
-})->name('test');
+        return 'ok';
+    })->name('test');
+}

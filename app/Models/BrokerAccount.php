@@ -20,6 +20,7 @@ class BrokerAccount extends Model
         'starting_balance',
         'filter_number',
         'filter_balance',
+        'filter_date',
         'broker_currency',
         'user_id',
     ];

@@ -90,7 +90,7 @@ class EmailExtractorService
 
             if ($account->filter_date != null) {
 
-                $dateNode = $xpath->query('//tr[@align="left"][1]/td[@align="right"]/b');
+                $dateNode = $xpath->query($account->filter_date);
                 $date = Carbon::createFromFormat('Y.m.d H:i', trim($dateNode->item(0)->nodeValue))
                     ->format('Y-m-d');
             }

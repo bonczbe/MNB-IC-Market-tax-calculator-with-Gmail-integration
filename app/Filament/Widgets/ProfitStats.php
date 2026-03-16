@@ -94,7 +94,7 @@ class ProfitStats extends StatsOverviewWidget
         return
             Stat::make(
                 "{$currentDate->format('Y')} Net Profit",
-                Cache::remember('profitForYear'.auth()->user()->id, 3600, function () use ($taxService, $currentDate) {
+                Cache::remember('profitForYear'.auth()->user()->id.'W-'.$currentDate->format->format(''), 3600, function () use ($taxService, $currentDate) {
                     return $taxService->calculateCurrentYearNetProfit($currentDate);
                 })
             )->columnSpan(2)->description('After-tax profit this year')

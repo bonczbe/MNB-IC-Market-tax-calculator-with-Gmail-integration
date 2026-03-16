@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('broker_accounts', function (Blueprint $table) {
             $table->text('filter_date')
                 ->nullable();
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('broker_accounts', function (Blueprint $table) {
             $table->dropColumn('filter_date');
         });
     }

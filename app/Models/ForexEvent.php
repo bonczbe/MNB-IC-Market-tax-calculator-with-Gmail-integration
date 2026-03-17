@@ -10,6 +10,7 @@ class ForexEvent extends Model
         'date',
         'name',
         'previouse',
+        'importance',
         'forecast',
     ];
 }

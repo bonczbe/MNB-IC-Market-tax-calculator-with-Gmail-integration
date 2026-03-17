@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('forex_events', function (Blueprint $table) {
             $table->id();
             $table->dateTime('date');
+            $table->integer('importance');
             $table->text('name');
             $table->text('previouse')->nullable();
             $table->text('forecast')->nullable();

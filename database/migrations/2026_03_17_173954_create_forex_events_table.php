@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->dateTime('date');
             $table->text('name');
-            $table->text('previouse');
-            $table->text('forecast');
+            $table->text('previouse')->nullable();
+            $table->text('forecast')->nullable();
             $table->timestamps();
             $table->index('date');
         });

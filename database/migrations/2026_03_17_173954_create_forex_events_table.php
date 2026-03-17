@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('forex_events', function (Blueprint $table) {
             $table->id();
-            $table->date('date');
+            $table->dateTime('date');
             $table->text('name');
             $table->text('previouse');
             $table->text('forecast');

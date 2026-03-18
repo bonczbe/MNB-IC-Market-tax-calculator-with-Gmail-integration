@@ -42,6 +42,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationGroups([
                 NavigationGroup::make()
+                    ->label('Forex')
+                    ->collapsed(false),
+                NavigationGroup::make()
                     ->label('Daily Changes')
                     ->collapsed(false),
                 NavigationGroup::make()

@@ -11,4 +11,8 @@ class Holyday extends Model
         'name',
         'status',
     ];
+
+    protected $casts = [
+        'date' => 'date',
+    ];
 }

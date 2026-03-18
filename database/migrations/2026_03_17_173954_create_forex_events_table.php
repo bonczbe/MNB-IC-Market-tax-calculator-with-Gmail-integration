@@ -14,12 +14,13 @@ return new class extends Migration
         Schema::create('forex_events', function (Blueprint $table) {
             $table->id();
             $table->dateTime('date');
-            $table->integer('importance');
+            $table->integer('importance')->default(1);
             $table->text('name');
             $table->text('previouse')->nullable();
             $table->text('forecast')->nullable();
             $table->timestamps();
             $table->index('date');
+            $table->unique(['date', 'name']);
         });
     }
 

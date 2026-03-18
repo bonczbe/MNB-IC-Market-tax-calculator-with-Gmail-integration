@@ -16,6 +16,10 @@ class EmailExtract extends Model
         'broker_account_id',
     ];
 
+    protected $casts = [
+        'date' => 'date',
+    ];
+
     public function broker(): BelongsTo
     {
         return $this->belongsTo(BrokerAccount::class, 'broker_account_id');

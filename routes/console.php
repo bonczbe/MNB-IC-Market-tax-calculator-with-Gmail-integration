@@ -14,6 +14,16 @@ if (Config::get('schedule.use_mnb_fetcher')) {
         ->command('app:fetch-mnb-rate')
         ->weeklyOn(1, '10:00')
         ->timezone('Europe/Budapest');
+
+    app(Schedule::class)
+        ->command('app:event-extract')
+        ->weeklyOn(1, '9:00')
+        ->timezone('Europe/Budapest');
+
+    app(Schedule::class)
+        ->command('app:holyday-collect')
+        ->yearlyOn(1, 1, '00:01')
+        ->timezone('Europe/Budapest');
 }
 if (Config::get('schedule.use_email_fetcher')) {
     app(Schedule::class)
@@ -22,6 +32,7 @@ if (Config::get('schedule.use_email_fetcher')) {
         ->weekdays()
         ->timezone('Europe/Budapest');
 }
+
 if (Config::get('schedule.use_yearly_calculator')) {
     app(Schedule::class)
         ->command('app:calculate-tax-by-account-for-year')

@@ -18,6 +18,10 @@ class AccountTransaction extends Model
         'note',
     ];
 
+    protected $casts = [
+        'date' => 'date',
+    ];
+
     public function broker(): BelongsTo
     {
         return $this->belongsTo(BrokerAccount::class, 'broker_account_id');

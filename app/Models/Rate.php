@@ -16,4 +16,8 @@ class Rate extends Model
         'for_currency',
         'date',
     ];
+
+    protected $casts = [
+        'date' => 'date',
+    ];
 }

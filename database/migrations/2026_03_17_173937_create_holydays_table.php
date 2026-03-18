@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->date('date');
             $table->text('name');
-            $table->enum('status',['closed','early-close']);
+            $table->enum('status', ['closed', 'early-close']);
             $table->timestamps();
             $table->index('date');
+
+            $table->unique(['date']);
         });
     }
 

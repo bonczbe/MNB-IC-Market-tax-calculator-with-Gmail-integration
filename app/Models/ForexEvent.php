@@ -13,4 +13,8 @@ class ForexEvent extends Model
         'importance',
         'forecast',
     ];
+
+    protected $casts = [
+        'date' => 'datetime',
+    ];
 }

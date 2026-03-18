@@ -16,7 +16,7 @@ class HolyDayRepository
     public function getHolyDaysForDay($day)
     {
         return Holyday::query()
-            ->where('date', '==', $day->copy()->format('Y-m-d'))
+            ->where('date', $day->copy()->format('Y-m-d'))
             ->get();
     }
 }

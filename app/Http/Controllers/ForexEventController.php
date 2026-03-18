@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Services\ForexEventService;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Request;
 
 class ForexEventController extends Controller
 {
     public function __construct(private readonly ForexEventService $forex_event_service) {}
 
-    public function getTodaysEvents()
+    public function getTodaysEvents(Request $request)
     {
-        return $this->forex_event_service->getTodayEventsAndMap();
+        $validated = $request->validate([
+            'date' => ['required', 'date_format:Y-m-d'],
+        ]);
+        return $this->forex_event_service->getTodayEventsAndMap($validated['date']);
 
     }
 }

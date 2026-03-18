@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Services\HolydayService;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Request;
 
 class HolyDayController extends Controller
 {
     public function __construct(private readonly HolydayService $holyday_service) {}
 
-    public function getTodayHolyDay()
+    public function getTodayHolyDay(Request $request)
     {
-        return $this->holyday_service->getAndMapTodaysHolyDays();
+        $validated = $request->validate([
+            'date' => ['required', 'date_format:Y-m-d'],
+        ]);
+        return $this->holyday_service->getAndMapTodaysHolyDays($validated['date']);
 
     }
 }

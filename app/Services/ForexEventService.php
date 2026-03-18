@@ -200,10 +200,9 @@ class ForexEventService
         return false;
     }
 
-    public function getTodayEventsAndMap()
+    public function getTodayEventsAndMap($date)
     {
-        $now = Carbon::now();
 
-        return $this->forex_event_repository->getDayEvents($now);
+        return $this->forex_event_repository->getDayEvents($date);
     }
 }

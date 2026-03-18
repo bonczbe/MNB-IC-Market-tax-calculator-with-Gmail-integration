@@ -50,10 +50,8 @@ class HolydayService
         }
     }
 
-    public function getAndMapTodaysHolyDays()
+    public function getAndMapTodaysHolyDays($date)
     {
-        $now = Carbon::now();
-
-        return $this->holy_day_repository->getHolyDaysForDay($now)->map(fn ($day) => new HolyDayDTO($day->date, $day->name, $day->status));
+        return $this->holy_day_repository->getHolyDaysForDay($date)->map(fn ($day) => new HolyDayDTO($day->date, $day->name, $day->status));
     }
 }

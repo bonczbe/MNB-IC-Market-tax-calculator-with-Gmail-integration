@@ -11,8 +11,7 @@ class HolyDayController extends Controller
 
     public function getTodayHolyDay()
     {
-        $response = $this->holyday_service->getAndMapTodaysHolyDays();
+        return $this->holyday_service->getAndMapTodaysHolyDays();
 
-        return JsonResource::make($response);
     }
 }

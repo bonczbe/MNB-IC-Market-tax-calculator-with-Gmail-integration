@@ -11,8 +11,7 @@ class ForexEventController extends Controller
 
     public function getTodaysEvents()
     {
-        $response = $this->forex_event_service->getTodayEventsAndMap();
+        return $this->forex_event_service->getTodayEventsAndMap();
 
-        return JsonResource::make($response);
     }
 }

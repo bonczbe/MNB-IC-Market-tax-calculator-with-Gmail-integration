@@ -6,6 +6,8 @@ use App\DTOs\HolyDayDTO;
 use App\Repositories\HolyDayRepository;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
@@ -18,7 +20,15 @@ class HolydayService
     {
 
         try {
-            $response = Http::get('https://api.massive.com/v1/marketstatus/upcoming?apiKey='.config('services.massive.key'))
+            $response = Http::timeout(5)
+                ->retry(2, 5000, function ($exception, $request) {
+                    return $exception instanceof ConnectionException
+                        || ($exception instanceof RequestException
+                            && $exception->response?->serverError());
+                })
+                ->get('https://api.massive.com/v1/marketstatus/upcoming', [
+                    'apiKey' => config('services.massive.key'),
+                ])
                 ->throw()
                 ->json();
 

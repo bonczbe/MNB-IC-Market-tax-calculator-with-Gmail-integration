@@ -20,25 +20,34 @@ class ForexEventService
         try {
             $url = 'https://sslecal2.forexprostools.com/?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=5&calType=week&timeZone=16&lang=1';
 
-            $ch = curl_init($url);
+            $maxAttempts = 10;
+            $attempt = 0;
+            $html = null;
 
-            $headers = [
-                'Referer: https://www.investing.com/economic-calendar/',
-                'User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 16_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Mobile/15E148 Safari/604.1',
-                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language: en-US,en;q=0.5',
-                'Connection: keep-alive',
-            ];
+            while ($attempt < $maxAttempts) {
+                $attempt++;
 
-            curl_setopt_array($ch, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_SSL_VERIFYPEER => true,
-                CURLOPT_HTTPHEADER => $headers,
-                CURLOPT_TIMEOUT => 15,
-            ]);
+                try {
+                    $html = $this->fetchHtmlWithCurl($url);
 
-            $html = curl_exec($ch);
+                    if ($html && strlen($html) > 0) {
+                        break;
+                    }
+
+                    Log::warning('Forex events: empty HTML response', [
+                        'attempt' => $attempt,
+                    ]);
+                } catch (Exception $e) {
+                    Log::warning('Forex events fetch attempt failed', [
+                        'attempt' => $attempt,
+                        'message' => $e->getMessage(),
+                    ]);
+                }
+
+                if ($attempt < $maxAttempts) {
+                    sleep(random_int(300, 500));
+                }
+            }
 
             $dom = new DOMDocument;
             @$dom->loadHTML($html);
@@ -118,6 +127,44 @@ class ForexEventService
         }
 
         return $importance;
+    }
+
+    private function fetchHtmlWithCurl(string $url): string
+    {
+        $ch = curl_init($url);
+
+        $headers = [
+            'Referer: https://www.investing.com/economic-calendar/',
+            'User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 16_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Mobile/15E148 Safari/604.1',
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language: en-US,en;q=0.5',
+            'Connection: keep-alive',
+        ];
+
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_TIMEOUT => 10, // rövidebb timeout
+        ]);
+
+        $html = curl_exec($ch);
+
+        if ($html === false) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            throw new RuntimeException('cURL error: '.$error);
+        }
+
+        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($status >= 400) {
+            throw new RuntimeException('HTTP error status: '.$status);
+        }
+
+        return $html;
     }
 
     private function isHoliday($name)

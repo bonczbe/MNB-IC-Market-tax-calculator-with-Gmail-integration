@@ -18,6 +18,7 @@ class HolydaysTable
         return $table
             ->columns([
                 TextColumn::make('date')
+                ->searchable()
                     ->date()
                     ->sortable(),
                 TextColumn::make('name')

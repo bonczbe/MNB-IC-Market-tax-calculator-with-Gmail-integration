@@ -17,6 +17,7 @@ class ForexEventsTable
         return $table
             ->columns([
                 TextColumn::make('date')
+                ->searchable()
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('name')

@@ -50,7 +50,7 @@ class HolydayService
         }
     }
 
-    public function getAndMapTodaysHolyDays($date)
+    public function getHolydaysByDate($date)
     {
         return $this->holy_day_repository->getHolyDaysForDay($date)->map(fn ($day) => new HolyDayDTO($day->date, $day->name, $day->status));
     }

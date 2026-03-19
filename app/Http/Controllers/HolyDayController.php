@@ -10,12 +10,12 @@ class HolyDayController extends Controller
 {
     public function __construct(private readonly HolydayService $holyday_service) {}
 
-    public function getTodayHolyDay(Request $request)
+    public function getByDate(Request $request)
     {
         $validated = $request->validate([
             'date' => ['required', 'date_format:Y-m-d'],
         ]);
-        return $this->holyday_service->getAndMapTodaysHolyDays(Carbon::parse($validated['date']));
+        return $this->holyday_service->getHolydaysByDate(Carbon::parse($validated['date']));
 
     }
 }

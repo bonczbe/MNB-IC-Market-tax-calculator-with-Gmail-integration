@@ -2,15 +2,12 @@
 
 use App\Http\Controllers\ForexEventController;
 use App\Http\Controllers\HolyDayController;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
-
-$response = Http::get('http://example.com');
 
 Route::get('/', fn () => redirect('/admin'))->name('home');
 
-Route::get('/holyday-on-today', [HolyDayController::class, 'getTodayHolyDay']);
-Route::get('/events-on-today', [ForexEventController::class, 'getTodaysEvents']);
+Route::get('/holydays', [HolyDayController::class, 'getByDate']);
+Route::get('/events', [ForexEventController::class, 'getByDate']);
 
 if (app()->environment('local')) {
 

@@ -10,12 +10,12 @@ class ForexEventController extends Controller
 {
     public function __construct(private readonly ForexEventService $forex_event_service) {}
 
-    public function getTodaysEvents(Request $request)
+    public function getByDate(Request $request)
     {
         $validated = $request->validate([
             'date' => ['required', 'date_format:Y-m-d'],
         ]);
-        return $this->forex_event_service->getTodayEventsAndMap(Carbon::parse($validated['date']));
+        return $this->forex_event_service->getEventsByDate(Carbon::parse($validated['date']));
 
     }
 }

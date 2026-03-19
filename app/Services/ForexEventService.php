@@ -200,7 +200,7 @@ class ForexEventService
         return false;
     }
 
-    public function getTodayEventsAndMap($date)
+    public function getEventsByDate($date)
     {
 
         return $this->forex_event_repository->getDayEvents($date);

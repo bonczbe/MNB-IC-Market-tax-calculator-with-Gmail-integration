@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\HolydayService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class HolyDayController extends Controller
@@ -14,7 +15,7 @@ class HolyDayController extends Controller
         $validated = $request->validate([
             'date' => ['required', 'date_format:Y-m-d'],
         ]);
-        return $this->holyday_service->getAndMapTodaysHolyDays($validated['date']);
+        return $this->holyday_service->getAndMapTodaysHolyDays(Carbon::parse($validated['date']));
 
     }
 }

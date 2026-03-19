@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\ForexEventService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ForexEventController extends Controller
@@ -14,7 +15,7 @@ class ForexEventController extends Controller
         $validated = $request->validate([
             'date' => ['required', 'date_format:Y-m-d'],
         ]);
-        return $this->forex_event_service->getTodayEventsAndMap($validated['date']);
+        return $this->forex_event_service->getTodayEventsAndMap(Carbon::parse($validated['date']));
 
     }
 }

@@ -17,7 +17,7 @@ if (Config::get('schedule.use_mnb_fetcher')) {
 
     app(Schedule::class)
         ->command('app:event-extract')
-        ->weeklyOn(1, '9:00')
+        ->weeklyOn(1, '0:01')
         ->timezone('Europe/Budapest');
 
     app(Schedule::class)

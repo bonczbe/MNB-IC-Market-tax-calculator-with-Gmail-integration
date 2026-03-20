@@ -6,68 +6,82 @@ use App\Models\BrokerAccount;
 use App\Repositories\BrokerAccountRepository;
 use App\Repositories\DailyStatusRepository;
 use App\Repositories\EmailExtractRepository;
+use App\Repositories\UserRepository;
 use Carbon\Carbon;
 use DirectoryTree\ImapEngine\Mailbox;
 use DOMDocument;
 use DOMXPath;
 use Exception;
 use Illuminate\Support\Facades\Log;
-use RuntimeException;
 
 class EmailExtractorService
 {
     public function __construct(
+        private readonly UserRepository $user_repository,
         private readonly BrokerAccountRepository $broker_account_repository,
         private readonly DailyStatusRepository $daily_status_repository,
         private readonly EmailExtractRepository $email_extract_repository) {}
 
     public function extractAndSaveEmail()
     {
-        try {
-            $mailbox = new Mailbox(config('imap.default'));
 
-            $accounts = $this->broker_account_repository
-                ->getAll();
+        $users = $this->user_repository->getAllUser();
 
-            foreach ($accounts as $account) {
+        foreach ($users as $user) {
 
-                $inbox = $mailbox->inbox();
+            try {
+                $imap = [
+                    'host' => $user->imap_host,
+                    'port' => $user->imap_port,
+                    'encryption' => $user->imap_encryption,
+                    'validate_cert' => $user->imap_validate_cert,
+                    'username' => $user->imap_username,
+                    'password' => $user->imap_password,
+                ];
 
-                $messages = $inbox->messages()
-                    ->since(Carbon::now()->subDays(1))
-                    ->before(today()->addDay())
-                    ->from($account->email)
-                    ->subject($account->email_subject)
-                    ->withBody()
-                    ->withBodyStructure()
-                    ->get();
+                $mailbox = new Mailbox($imap);
 
-                $emails = [];
-                $dailyStatuses = [];
+                $accounts = $this->broker_account_repository
+                    ->getAll();
 
-                foreach ($messages as $message) {
-                    $extracted = $this->extractMessage($message, $account);
+                foreach ($accounts as $account) {
 
-                    if ($extracted['email']) {
-                        $emails[] = $extracted['email'];
+                    $inbox = $mailbox->inbox();
+
+                    $messages = $inbox->messages()
+                        ->since(Carbon::now()->subDays(1))
+                        ->before(today()->addDay())
+                        ->from($account->email)
+                        ->subject($account->email_subject)
+                        ->withBody()
+                        ->withBodyStructure()
+                        ->get();
+
+                    $emails = [];
+                    $dailyStatuses = [];
+
+                    foreach ($messages as $message) {
+                        $extracted = $this->extractMessage($message, $account);
+
+                        if ($extracted['email']) {
+                            $emails[] = $extracted['email'];
+                        }
+
+                        if ($extracted['dailyStatus']) {
+                            $dailyStatuses[] = $extracted['dailyStatus'];
+                        }
                     }
 
-                    if ($extracted['dailyStatus']) {
-                        $dailyStatuses[] = $extracted['dailyStatus'];
-                    }
+                    $this->email_extract_repository->upsert($emails, uniqueBy: ['date', 'broker_account_id']);
+
+                    $this->daily_status_repository->upsert($dailyStatuses, uniqueBy: ['date', 'broker_account_id']);
                 }
-
-                $this->email_extract_repository->upsert($emails, uniqueBy: ['date', 'broker_account_id']);
-
-                $this->daily_status_repository->upsert($dailyStatuses, uniqueBy: ['date', 'broker_account_id']);
+            } catch (Exception $e) {
+                Log::alert('Email extract went wrong', [
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
             }
-        } catch (Exception $e) {
-            Log::alert('Email extract went wrong', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            throw new RuntimeException('Email extract failed: '.$e->getMessage(), 0, $e);
         }
     }
 

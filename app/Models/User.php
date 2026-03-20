@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -25,6 +26,12 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'imap_host',
+        'imap_port',
+        'imap_encryption',
+        'imap_validate_cert',
+        'imap_username',
+        'imap_password',
     ];
 
     /**
@@ -48,8 +55,10 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'imap_validate_cert' => 'boolean',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
+            'imap_password' => 'encrypted',
         ];
     }
 

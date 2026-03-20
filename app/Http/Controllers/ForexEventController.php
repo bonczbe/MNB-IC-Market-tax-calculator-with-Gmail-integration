@@ -15,6 +15,7 @@ class ForexEventController extends Controller
         $validated = $request->validate([
             'date' => ['required', 'date_format:Y-m-d'],
         ]);
+
         return $this->forex_event_service->getEventsByDate(Carbon::parse($validated['date']));
 
     }

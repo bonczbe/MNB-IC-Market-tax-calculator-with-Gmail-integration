@@ -15,6 +15,7 @@ class HolyDayController extends Controller
         $validated = $request->validate([
             'date' => ['required', 'date_format:Y-m-d'],
         ]);
+
         return $this->holyday_service->getHolydaysByDate(Carbon::parse($validated['date']));
 
     }

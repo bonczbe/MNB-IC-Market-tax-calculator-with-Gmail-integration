@@ -32,7 +32,7 @@ class BrokerAccountRepository
 
     public function getAllForUserId(int $userId)
     {
-        return BrokerAccount::query()->where('user_id',$userId)->get();
+        return BrokerAccount::query()->where('user_id', $userId)->get();
     }
 
     public function getAllDistinctedByKeyValue(string $column)

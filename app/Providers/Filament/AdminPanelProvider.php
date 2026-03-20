@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Widgets\ProfitStats;
+use Carbon\Carbon;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -12,6 +13,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -40,6 +42,11 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 ProfitStats::class,
             ])
+            ->brandLogo(fn () => view('filament.brand-logo'))
+            ->darkModeBrandLogo(fn () => view('filament.brand-logo'))
+            ->brandLogoHeight('auto')
+            ->renderHook(PanelsRenderHook::FOOTER,fn()=>view('footer',['Year'=>Carbon::now()->format('Y')]))
+            ->favicon(asset('favicon.svg'))
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label('Forex')

@@ -12,6 +12,7 @@ Route::get('/events', [ForexEventController::class, 'getByDate']);
 if (app()->environment('local')) {
 
     Route::get('/test', function () {
+
         return 'ok';
     })->name('test');
 

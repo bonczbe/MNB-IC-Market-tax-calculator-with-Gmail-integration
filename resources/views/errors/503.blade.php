@@ -138,7 +138,11 @@
     <div class="container">
         <div class="icon-wrapper">
             <div class="icon-ring">
-                <span class="gear">⚙️</span>
+                <img
+        src="{{ asset('images/logo.png') }}"
+        alt="Tax Calculator"
+        style="height: 7.5rem;"
+    >
             </div>
         </div>
 

@@ -8,8 +8,8 @@ class UserRepository
 {
     public function __construct() {}
 
-    public function getAllUser()
+    public function getAllUserWithBrokers()
     {
-        return User::query()->get();
+        return User::query()->with(['brokers'])->get();
     }
 }

@@ -25,7 +25,7 @@ class EmailExtractorService
     public function extractAndSaveEmail()
     {
 
-        $users = $this->user_repository->getAllUser();
+        $users = $this->user_repository->getAllUserWithBrokers();
 
         foreach ($users as $user) {
 
@@ -41,10 +41,7 @@ class EmailExtractorService
 
                 $mailbox = new Mailbox($imap);
 
-                $accounts = $this->broker_account_repository
-                    ->getAll();
-
-                foreach ($accounts as $account) {
+                foreach ($user->brokers as $account) {
 
                     $inbox = $mailbox->inbox();
 

@@ -1,7 +1,17 @@
-<div class="">
+<style>
+    .fi-sidebar-header .brand-logo-img { height: 2rem; }
+    .fi-sidebar-header .brand-logo-text { font-size: 0.875rem; }
+    .fi-simple-header .brand-logo-img { height: 4rem; }
+    .fi-simple-header .brand-logo-text { font-size: 1.25rem; }
+</style>
+
+<div style="display: flex; align-items: center; gap: 0.5rem;">
     <img
         src="{{ asset('images/logo.png') }}"
-        alt="Tax Calculator"
-        style="height: 7.5rem;"
+        alt="{{ config('app.name') }}"
+        class="brand-logo-img"
     >
+    <span class="brand-logo-text" style="font-weight: 700; color: #F59E0B;">
+        {{ config('app.name') }}
+    </span>
 </div>

@@ -1,8 +1,8 @@
 <style>
-    .fi-sidebar-header .brand-logo-img { height: 2rem; }
-    .fi-sidebar-header .brand-logo-text { font-size: 0.875rem; }
-    .fi-simple-header .brand-logo-img { height: 4rem; }
-    .fi-simple-header .brand-logo-text { font-size: 1.25rem; }
+    .fi-sidebar-header .brand-logo-img { height: 2rem !important; }
+    .fi-sidebar-header .brand-logo-text { font-size: 0.875rem !important; }
+    .fi-simple-header .brand-logo-img { height: 4rem !important; }
+    .fi-simple-header .brand-logo-text { font-size: 1.25rem !important; }
 </style>
 
 <div style="display: flex; align-items: center; gap: 0.5rem;">

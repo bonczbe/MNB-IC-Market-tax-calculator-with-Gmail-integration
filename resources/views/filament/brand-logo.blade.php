@@ -1,6 +1,8 @@
 <style>
     .fi-sidebar-header .brand-logo-img { height: 2rem !important; }
     .fi-sidebar-header .brand-logo-text { font-size: 0.875rem !important; }
+    .brand-logo-img { height: 2rem !important; }
+    .brand-logo-text { font-size: 0.875rem !important; }
     .fi-simple-header .brand-logo-img { height: 4rem !important; }
     .fi-simple-header .brand-logo-text { font-size: 1.25rem !important; }
 </style>

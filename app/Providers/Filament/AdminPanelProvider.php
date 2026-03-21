@@ -45,7 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(fn () => view('filament.brand-logo'))
             ->darkModeBrandLogo(fn () => view('filament.brand-logo'))
             ->brandLogoHeight('auto')
-            ->renderHook(PanelsRenderHook::FOOTER,fn()=>view('footer',['Year'=>Carbon::now()->format('Y')]))
+            ->renderHook(PanelsRenderHook::FOOTER, fn () => view('footer', ['Year' => Carbon::now()->format('Y')]))
             ->favicon(asset('favicon.svg'))
             ->navigationGroups([
                 NavigationGroup::make()

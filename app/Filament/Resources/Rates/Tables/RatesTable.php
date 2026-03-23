@@ -6,9 +6,12 @@ use App\Repositories\RateRepository;
 use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 
 class RatesTable
@@ -50,13 +53,23 @@ class RatesTable
                         });
                     })
                     ->default(config('tax.base_broker_currency')),
-                SelectFilter::make('date')
-                    ->options(function () use ($rateRepository) {
-                        return Cache::remember('rateDate', Carbon::now()->endOfDay()->subMinute(5), function () use ($rateRepository) {
-                            return $rateRepository->getAllDistinctedByKeyValue('date');
-                        });
-                    })
-                    ->searchable(),
+                Filter::make('date_range')
+                    ->schema([
+                        DatePicker::make('from')
+                            ->label('From date'),
+                        DatePicker::make('to')
+                            ->label('To date'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $from = $data['from'] ?? null;
+                        $to = $data['to'] ?? null;
+
+                        return $query
+                            ->when($from, fn (Builder $q, $date): Builder => $q->whereDate('date', '>=', $date)
+                            )
+                            ->when($to, fn (Builder $q, $date): Builder => $q->whereDate('date', '<=', $date)
+                            );
+                    }),
             ])
             ->recordActions([
                 EditAction::make()->visible(fn () => auth()->user()->role === 'admin'),

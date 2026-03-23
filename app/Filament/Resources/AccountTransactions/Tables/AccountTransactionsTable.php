@@ -3,16 +3,15 @@
 namespace App\Filament\Resources\AccountTransactions\Tables;
 
 use App\Repositories\AccountTransactionRepository;
-use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Cache;
 
 class AccountTransactionsTable
 {
@@ -66,13 +65,6 @@ class AccountTransactionsTable
                     ))
                     ->default()
                     ->visible(fn () => auth()->user()->role === 'admin'),
-                SelectFilter::make('date')
-                    ->options(function () use ($accountTransactinRepository) {
-                        return Cache::remember('brokerAccountTransactionDates', Carbon::now()->endOfDay()->subMinute(5), function () use ($accountTransactinRepository) {
-                            return $accountTransactinRepository->getAllDistinctedByKeyValue('date');
-                        });
-                    })
-                    ->searchable(),
                 SelectFilter::make('type')
                     ->options([
                         'deposit' => 'deposit',
@@ -100,6 +92,23 @@ class AccountTransactionsTable
                     )
                     ->searchable()
                     ->preload(),
+                Filter::make('date_range')
+                    ->schema([
+                        DatePicker::make('from')
+                            ->label('From date'),
+                        DatePicker::make('to')
+                            ->label('To date'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $from = $data['from'] ?? null;
+                        $to = $data['to'] ?? null;
+
+                        return $query
+                            ->when($from, fn (Builder $q, $date): Builder => $q->whereDate('date', '>=', $date)
+                            )
+                            ->when($to, fn (Builder $q, $date): Builder => $q->whereDate('date', '<=', $date)
+                            );
+                    }),
             ])
             ->recordActions([
                 EditAction::make(),

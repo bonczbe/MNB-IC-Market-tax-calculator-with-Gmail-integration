@@ -6,6 +6,7 @@ use App\Repositories\DailyStatusRepository;
 use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -88,13 +89,6 @@ class DailyStatusesTable
                     ))
                     ->default()
                     ->visible(fn () => auth()->user()->role === 'admin'),
-                SelectFilter::make('date')
-                    ->options(function () use ($dailyStatusRepository) {
-                        return Cache::remember('dailyStatusDates', Carbon::now()->endOfDay()->subMinute(5), function () use ($dailyStatusRepository) {
-                            return $dailyStatusRepository->getAllDistinctedByKeyValue('date');
-                        });
-                    })
-                    ->searchable(),
                 SelectFilter::make('broker')
                     ->label('Broker')
                     ->relationship(
@@ -117,6 +111,24 @@ class DailyStatusesTable
                     )
                     ->searchable()
                     ->preload(),
+
+                Filter::make('date_range')
+                    ->schema([
+                        DatePicker::make('from')
+                            ->label('From date'),
+                        DatePicker::make('to')
+                            ->label('To date'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $from = $data['from'] ?? null;
+                        $to = $data['to'] ?? null;
+
+                        return $query
+                            ->when($from, fn (Builder $q, $date): Builder => $q->whereDate('date', '>=', $date)
+                            )
+                            ->when($to, fn (Builder $q, $date): Builder => $q->whereDate('date', '<=', $date)
+                            );
+                    }),
             ])
             ->recordActions([
                 EditAction::make(),

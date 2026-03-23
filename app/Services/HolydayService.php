@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\DTOs\HolyDayDTO;
 use App\Repositories\HolyDayRepository;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;

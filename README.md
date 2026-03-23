@@ -9,7 +9,7 @@ but adaptable to other brokers and currencies with minor code modifications.
 
 ## What It Does
 
-- Parses daily balance emails from IC Markets (Gmail) and stores them as daily statuses
+- Parses daily balance emails from IC Markets via per-user IMAP configuration and stores them as daily statuses
 - Fetches official MNB exchange rates on weekdays at 23:00
 - Calculates daily profit/loss per broker account in HUF
 - Tracks deposits and withdrawals to accurately separate profit from capital movements
@@ -24,9 +24,7 @@ but adaptable to other brokers and currencies with minor code modifications.
 
 ## Known Limitations
 
-> **Single email account:** The application currently extracts broker emails from a **single shared IMAP account** configured in `config/imap.php`. All broker accounts across all users are processed from this one mailbox.
->
-> **Planned improvement:** Per-user email configuration is planned for a future release — each user will be able to connect their own email account for independent email extraction.
+> **IMAP credentials required:** Each user must configure their own IMAP settings (host, port, username, password) in their profile before email extraction will work. The password is stored encrypted in the database.
 
 ***
 
@@ -66,8 +64,6 @@ TAX_BASE_CURRENCY=HUF
 TAX_BASE_BROKER_CURRENCY=USD
 ```
 
-Configure IMAP settings in `config/imap.php` for your Gmail account.
-
 ### 3. Running the Application
 
 ```
@@ -82,6 +78,8 @@ The seeder creates a default admin user and a dummy broker account:
 | Password | password  |
 
 > ⚠️ Change the default admin password immediately after first login.
+
+After logging in, go to the user profile and configure your IMAP settings (host, port, encryption, username, password) to enable email extraction.
 
 ***
 
@@ -155,8 +153,8 @@ The application is built around IC Markets and MNB rates, but can be adapted:
 - **Different currency pair**: update `TAX_BASE_CURRENCY` and `TAX_BASE_BROKER_CURRENCY` in `.env`
 - **Different tax rules**: update `TAX_VOLUME` in `.env` and loss carry-forward logic in `TaxCalculatorService`
 
-> ⚠️ The email parser was written specifically for Gmail IMAP. Other providers may require
-> modifications in `config/imap.php` and the email extract job.
+> ⚠️ The email parser defaults to Gmail IMAP settings (imap.gmail.com, port 993, SSL). Other providers
+> can be configured per user via the admin panel IMAP settings.
 
 ***
 

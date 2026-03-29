@@ -4,8 +4,6 @@ namespace App\Services;
 
 use App\Repositories\ForexEventRepository;
 use Carbon\Carbon;
-use DOMDocument;
-use DOMXPath;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
@@ -14,181 +12,108 @@ class ForexEventService
 {
     public function __construct(private readonly ForexEventRepository $forex_event_repository) {}
 
-    public function extractUsForexEvents()
+    public function extractUsForexEvents(): void
     {
-
         try {
-            $url = 'https://sslecal2.forexprostools.com/?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=5&calType=week&timeZone=16&lang=1';
+            $from = Carbon::now()->startOfWeek()->format('Y-m-d') . 'T00:00:00.000Z';
+            $to   = Carbon::now()->endOfWeek()->format('Y-m-d') . 'T23:59:59.000Z';
 
-            $maxAttempts = 10;
-            $attempt = 0;
-            $html = null;
+            $url = "https://economic-calendar.tradingview.com/events?from={$from}&to={$to}&countries=US";
 
-            while ($attempt < $maxAttempts) {
-                $attempt++;
+            $response = $this->fetchJsonWithCurl($url);
+            $items    = $response['result'] ?? [];
 
-                try {
-                    $html = $this->fetchHtmlWithCurl($url);
+            $events = [];
 
-                    if ($html && strlen($html) > 0) {
-                        break;
-                    }
+            foreach ($items as $item) {
+                $name = $item['title'] ?? null;
 
-                    Log::warning('Forex events: empty HTML response', [
-                        'attempt' => $attempt,
-                    ]);
-                } catch (Exception $e) {
-                    Log::warning('Forex events fetch attempt failed', [
-                        'attempt' => $attempt,
-                        'message' => $e->getMessage(),
-                    ]);
+                if (! $name || $this->isHoliday($name)) {
+                    continue;
                 }
 
-                if ($attempt < $maxAttempts) {
-                    sleep(random_int(300, 500));
-                }
-            }
+                $importance = ($item['importance'] ?? 0) + 2;
 
-            $dom = new DOMDocument;
-            @$dom->loadHTML($html);
-            $xpath = new DOMXPath($dom);
-
-            $rows = $xpath->query('//tr[starts-with(@id, "eventRowId_")]');
-
-            $evets = [];
-
-            foreach ($rows as $row) {
-                $timestamp = $row->getAttribute('event_timestamp');
                 $date = null;
-                if (! empty($timestamp)) {
-                    $date = Carbon::createFromFormat('Y-m-d H:i:s', $timestamp)->toDateTimeString();
+                if (! empty($item['date'])) {
+                    $date = Carbon::parse($item['date'])->toDateTimeString();
                 }
 
-                $nameNodeList = $xpath->query('.//td[contains(@class,"event")]', $row);
-                $name = $nameNodeList->length ? trim($nameNodeList->item(0)->nodeValue) : null;
+                $forecast = isset($item['forecast']) && $item['forecast'] !== '' ? (string) $item['forecast'] : null;
+                $previous = isset($item['prev'])     && $item['prev'] !== ''     ? (string) $item['prev']     : null;
 
-                $forecastNodeList = $xpath->query('.//td[contains(@class,"fore")]', $row);
-                $previousNodeList = $xpath->query('.//td[contains(@class,"prev")]', $row);
-                $sentimentNodeList = $xpath->query('.//td[contains(@class,"sentiment")]', $row);
-
-                $forecast = $forecastNodeList->length ? trim($forecastNodeList->item(0)->nodeValue) : null;
-                $previous = $previousNodeList->length ? trim($previousNodeList->item(0)->nodeValue) : null;
-
-                $forecast = ($forecast === "\xc2\xa0" || $forecast === '&nbsp;' || $forecast === '') ? null : $forecast;
-                $previous = ($previous === "\xc2\xa0" || $previous === '&nbsp;' || $previous === '') ? null : $previous;
-
-                $importance = $this->extractImportance($sentimentNodeList, $xpath);
-
-                if (! $name) {
-                    continue;
-                }
-
-                $isHoliday = $this->isHoliday($name);
-
-                if ($isHoliday) {
-                    continue;
-                }
-
-                $evets[] = [
-                    'date' => $date,
-                    'name' => $name,
+                $events[] = [
+                    'date'      => $date,
+                    'name'      => $name,
                     'previouse' => $previous,
-                    'forecast' => $forecast,
-                    'importance' => $importance,
+                    'forecast'  => $forecast,
+                    'importance'=> $importance,
                 ];
             }
 
-            $this->forex_event_repository->upsert($evets, uniqueBy: ['date', 'name']);
+            $this->forex_event_repository->upsert($events, uniqueBy: ['date', 'name']);
 
         } catch (Exception $e) {
             Log::alert('Forex events fetch went wrong', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'trace'   => $e->getTraceAsString(),
             ]);
 
-            throw new RuntimeException('Forex events fetch failed: '.$e->getMessage(), 0, $e);
+            throw new RuntimeException('Forex events fetch failed: ' . $e->getMessage(), 0, $e);
         }
     }
 
-    private function extractImportance($sentimentNodeList, $xpath)
-    {
-        $importance = 1;
-        if ($sentimentNodeList->length) {
-            $sentimentTd = $sentimentNodeList->item(0);
-            $icons = $xpath->query('.//i', $sentimentTd);
-            $filled = 0;
-            foreach ($icons as $icon) {
-                $cls = $icon->getAttribute('class');
-                if (str_contains($cls, 'FullBullishIcon')) {
-                    $filled++;
-                }
-            }
-            $importance = $filled ?: 1;
-        }
-
-        return $importance;
-    }
-
-    private function fetchHtmlWithCurl(string $url): string
+    private function fetchJsonWithCurl(string $url): array
     {
         $ch = curl_init($url);
-
-        $headers = [
-            'Referer: https://www.investing.com/economic-calendar/',
-            'User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 16_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Mobile/15E148 Safari/604.1',
-            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language: en-US,en;q=0.5',
-            'Connection: keep-alive',
-        ];
 
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_TIMEOUT => 10, // rövidebb timeout
+            CURLOPT_ENCODING       => '',
+            CURLOPT_TIMEOUT        => 10,
+            CURLOPT_HTTPHEADER     => [
+                'Origin: https://www.tradingview.com',
+                'Referer: https://www.tradingview.com/',
+                'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+                'Accept: application/json',
+            ],
         ]);
 
-        $html = curl_exec($ch);
+        $body = curl_exec($ch);
 
-        if ($html === false) {
+        if ($body === false) {
             $error = curl_error($ch);
             curl_close($ch);
-            throw new RuntimeException('cURL error: '.$error);
+            throw new RuntimeException('cURL error: ' . $error);
         }
 
         $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
         if ($status >= 400) {
-            throw new RuntimeException('HTTP error status: '.$status);
+            throw new RuntimeException('HTTP error status: ' . $status);
         }
 
-        return $html;
+        $data = json_decode($body, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException('JSON decode error: ' . json_last_error_msg());
+        }
+
+        return $data;
     }
 
-    private function isHoliday($name)
+    private function isHoliday(string $name): bool
     {
-
         $lowerName = mb_strtolower($name, 'UTF-8');
 
         $holidayKeywords = [
-            'holiday',
-            'christmas',
-            'new year',
-            'easter',
-            'thanksgiving',
-            'independence day',
-            'labor day',
-            'labour day',
-            'memorial day',
-            'good friday',
-            'boxing day',
-            'all saints',
-            'epiphany',
-            'day off',
-            'market closed',
-            'early close',
+            'holiday', 'christmas', 'new year', 'easter', 'thanksgiving',
+            'independence day', 'labor day', 'labour day', 'memorial day',
+            'good friday', 'boxing day', 'all saints', 'epiphany',
+            'day off', 'market closed', 'early close',
         ];
 
         foreach ($holidayKeywords as $kw) {
@@ -202,7 +127,6 @@ class ForexEventService
 
     public function getEventsByDate($date)
     {
-
         return $this->forex_event_repository->getDayEvents($date);
     }
 }

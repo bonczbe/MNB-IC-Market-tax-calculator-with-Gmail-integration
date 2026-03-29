@@ -16,13 +16,13 @@ class ForexEventService
     public function extractUsForexEvents(): void
     {
         try {
-            $from = Carbon::now()->startOfWeek()->format('Y-m-d') . 'T00:00:00.000Z';
-            $to   = Carbon::now()->endOfWeek()->format('Y-m-d') . 'T23:59:59.000Z';
+            $from = Carbon::now()->startOfWeek()->format('Y-m-d').'T00:00:00.000Z';
+            $to = Carbon::now()->endOfWeek()->format('Y-m-d').'T23:59:59.000Z';
 
             $url = "https://economic-calendar.tradingview.com/events?from={$from}&to={$to}&countries=US";
 
             $response = $this->fetchJson($url);
-            $items    = $response['result'] ?? [];
+            $items = $response['result'] ?? [];
 
             $events = [];
 
@@ -38,19 +38,19 @@ class ForexEventService
                 $date = null;
                 if (! empty($item['date'])) {
                     $date = Carbon::parse($item['date'])
-        ->setTimezone('Europe/Budapest')
-        ->toDateTimeString();
+                        ->setTimezone('Europe/Budapest')
+                        ->toDateTimeString();
                 }
 
                 $forecast = isset($item['forecast']) && $item['forecast'] !== '' ? (string) $item['forecast'] : null;
-                $previous = isset($item['prev'])     && $item['prev'] !== ''     ? (string) $item['prev']     : null;
+                $previous = isset($item['prev']) && $item['prev'] !== '' ? (string) $item['prev'] : null;
 
                 $events[] = [
-                    'date'      => $date,
-                    'name'      => $name,
+                    'date' => $date,
+                    'name' => $name,
                     'previouse' => $previous,
-                    'forecast'  => $forecast,
-                    'importance'=> $importance,
+                    'forecast' => $forecast,
+                    'importance' => $importance,
                 ];
             }
 
@@ -59,29 +59,29 @@ class ForexEventService
         } catch (Exception $e) {
             Log::alert('Forex events fetch went wrong', [
                 'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
-            throw new RuntimeException('Forex events fetch failed: ' . $e->getMessage(), 0, $e);
+            throw new RuntimeException('Forex events fetch failed: '.$e->getMessage(), 0, $e);
         }
     }
 
     private function fetchJson(string $url): array
-{
-    $response = Http::timeout(10)
-        ->withHeaders([
-            'Origin'  => 'https://www.tradingview.com',
-            'Referer' => 'https://www.tradingview.com/',
-            'Accept'  => 'application/json',
-        ])
-        ->get($url);
+    {
+        $response = Http::timeout(10)
+            ->withHeaders([
+                'Origin' => 'https://www.tradingview.com',
+                'Referer' => 'https://www.tradingview.com/',
+                'Accept' => 'application/json',
+            ])
+            ->get($url);
 
-    if ($response->failed()) {
-        throw new RuntimeException('HTTP error status: ' . $response->status());
+        if ($response->failed()) {
+            throw new RuntimeException('HTTP error status: '.$response->status());
+        }
+
+        return $response->json() ?? [];
     }
-
-    return $response->json() ?? [];
-}
 
     private function isHoliday(string $name): bool
     {

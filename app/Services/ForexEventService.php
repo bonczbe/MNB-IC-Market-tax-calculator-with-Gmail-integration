@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Repositories\ForexEventRepository;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
@@ -20,7 +21,7 @@ class ForexEventService
 
             $url = "https://economic-calendar.tradingview.com/events?from={$from}&to={$to}&countries=US";
 
-            $response = $this->fetchJsonWithCurl($url);
+            $response = $this->fetchJson($url);
             $items    = $response['result'] ?? [];
 
             $events = [];
@@ -63,47 +64,22 @@ class ForexEventService
         }
     }
 
-    private function fetchJsonWithCurl(string $url): array
-    {
-        $ch = curl_init($url);
+    private function fetchJson(string $url): array
+{
+    $response = Http::timeout(10)
+        ->withHeaders([
+            'Origin'  => 'https://www.tradingview.com',
+            'Referer' => 'https://www.tradingview.com/',
+            'Accept'  => 'application/json',
+        ])
+        ->get($url);
 
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_ENCODING       => '',
-            CURLOPT_TIMEOUT        => 10,
-            CURLOPT_HTTPHEADER     => [
-                'Origin: https://www.tradingview.com',
-                'Referer: https://www.tradingview.com/',
-                'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-                'Accept: application/json',
-            ],
-        ]);
-
-        $body = curl_exec($ch);
-
-        if ($body === false) {
-            $error = curl_error($ch);
-            curl_close($ch);
-            throw new RuntimeException('cURL error: ' . $error);
-        }
-
-        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        if ($status >= 400) {
-            throw new RuntimeException('HTTP error status: ' . $status);
-        }
-
-        $data = json_decode($body, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new RuntimeException('JSON decode error: ' . json_last_error_msg());
-        }
-
-        return $data;
+    if ($response->failed()) {
+        throw new RuntimeException('HTTP error status: ' . $response->status());
     }
+
+    return $response->json() ?? [];
+}
 
     private function isHoliday(string $name): bool
     {

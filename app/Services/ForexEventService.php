@@ -37,7 +37,9 @@ class ForexEventService
 
                 $date = null;
                 if (! empty($item['date'])) {
-                    $date = Carbon::parse($item['date'])->toDateTimeString();
+                    $date = Carbon::parse($item['date'])
+        ->setTimezone('Europe/Budapest')
+        ->toDateTimeString();
                 }
 
                 $forecast = isset($item['forecast']) && $item['forecast'] !== '' ? (string) $item['forecast'] : null;

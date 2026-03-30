@@ -52,7 +52,7 @@ class BrokerAccountForm
                     ->nullable(),
                 Select::make('broker_currency')
                     ->options(function () use ($rateRepository) {
-                        $rates = Cache::remember('rateBaseCurrency', Carbon::now()->endOfDay()->subMinute(5), function () use ($rateRepository) {
+                        $rates = Cache::remember('rateBaseCurrency', Carbon::now()->endOfDay()->subMinute(1), function () use ($rateRepository) {
                             return $rateRepository->getAllDistinctedByKeyValue('base_currency');
                         });
 

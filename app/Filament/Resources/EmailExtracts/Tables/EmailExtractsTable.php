@@ -60,7 +60,7 @@ class EmailExtractsTable
                     ->visible(fn () => auth()->user()->role === 'admin'),
                 SelectFilter::make('date')
                     ->options(function () use ($emailExtRepository) {
-                        return Cache::remember('emailExtractDates', Carbon::now()->endOfDay()->subMinute(5), function () use ($emailExtRepository) {
+                        return Cache::remember('emailExtractDates', Carbon::now()->endOfDay()->subMinute(1), function () use ($emailExtRepository) {
                             return $emailExtRepository->getAllDistinctedByKeyValue('date');
                         });
                     })

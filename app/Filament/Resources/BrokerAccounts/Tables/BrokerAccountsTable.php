@@ -58,7 +58,7 @@ class BrokerAccountsTable
                     ->visible(fn () => auth()->user()->role === 'admin'),
                 SelectFilter::make('broker_currency')
                     ->options(function () use ($brokerAcRepository) {
-                        return Cache::remember('brokerCurrency', Carbon::now()->endOfDay()->subMinute(5), function () use ($brokerAcRepository) {
+                        return Cache::remember('brokerCurrency', Carbon::now()->endOfDay()->subMinute(1), function () use ($brokerAcRepository) {
                             return $brokerAcRepository->getAllDistinctedByKeyValue('broker_currency');
                         });
                     }),

@@ -48,7 +48,7 @@ class RatesTable
             ->filters([
                 SelectFilter::make('base_currency')
                     ->options(function () use ($rateRepository) {
-                        return Cache::remember('rateBaseCurrency', Carbon::now()->endOfDay()->subMinute(5), function () use ($rateRepository) {
+                        return Cache::remember('rateBaseCurrency', Carbon::now()->endOfDay()->subMinute(1), function () use ($rateRepository) {
                             return $rateRepository->getAllDistinctedByKeyValue('base_currency');
                         });
                     })

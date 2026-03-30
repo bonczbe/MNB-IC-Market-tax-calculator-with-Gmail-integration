@@ -25,10 +25,11 @@ if (Config::get('schedule.use_mnb_fetcher')) {
         ->yearlyOn(1, 1, '00:01')
         ->timezone('Europe/Budapest');
 }
+
 if (Config::get('schedule.use_email_fetcher')) {
     app(Schedule::class)
         ->command('app:email-extract')
-        ->dailyAt('23:52')
+        ->dailyAt('23:58')
         ->weekdays()
         ->timezone('Europe/Budapest');
 }

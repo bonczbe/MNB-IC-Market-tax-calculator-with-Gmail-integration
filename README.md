@@ -15,6 +15,7 @@ but adaptable to other brokers and currencies with minor code modifications.
 - Tracks deposits and withdrawals to accurately separate profit from capital movements
 - Computes yearly taxable income with loss carry-forward support
 - Automatically upserts yearly tax calculations on December 31st
+- Monitors and processes background queue jobs via Laravel Horizon (`/horizon` dashboard)
 - Multi-user support: each user sees only their own accounts (admins see all)
 - Admin can create users and generate/reset passwords
 - Two-factor authentication (2FA) support via Laravel Fortify
@@ -32,6 +33,7 @@ but adaptable to other brokers and currencies with minor code modifications.
 
 - Docker
 - A Gmail account with IMAP enabled (for email parsing)
+- Redis (included in the Docker stack — required by Laravel Horizon)
 
 ***
 
@@ -62,6 +64,12 @@ DB_PASSWORD=your_password
 TAX_VOLUME=0.15           # e.g. 15% tax rate
 TAX_BASE_CURRENCY=HUF
 TAX_BASE_BROKER_CURRENCY=USD
+
+QUEUE_CONNECTION=redis
+REDIS_HOST=redis
+
+HORIZON_BASIC_AUTH_USERNAME=admin     # for /horizon dashboard access
+HORIZON_BASIC_AUTH_PASSWORD=secret
 ```
 
 ### 3. Running the Application
@@ -87,17 +95,40 @@ After logging in, go to the user profile and configure your IMAP settings (host,
 
 Run `deploy.bat` or `deploy.sh` depending on your operating system.
 
+The script handles the full zero-downtime deployment:
+maintenance mode on → build → container swap → healthcheck → migrate → cache clear → maintenance mode off.
+
+***
+
+## Horizon Dashboard
+
+Queue jobs can be monitored in real time via the built-in Horizon dashboard:
+
+```
+http://localhost:8000/horizon
+```
+
+Access is protected by HTTP Basic Auth — configure credentials in `.env`:
+
+```
+HORIZON_BASIC_AUTH_USERNAME=admin
+HORIZON_BASIC_AUTH_PASSWORD=secret
+```
+
 ***
 
 ## Scheduled Jobs
 
 Jobs can be individually toggled in `.env` via `config/schedule.php`:
 
-| Job                                     | Schedule             | Description                                   |
-| --------------------------------------- | -------------------- | --------------------------------------------- |
-| `app:fetch-mnb-rate`                    | Weekdays at 23:00    | Fetches MNB exchange rates                    |
-| `app:email-extract`                     | Weekdays at 23:50    | Parses broker emails and saves daily statuses |
-| `app:calculate-tax-by-account-for-year` | December 31 at 23:57 | Calculates and stores yearly tax per account  |
+| Job                                     | Schedule                   | Description                                   |
+| --------------------------------------- | -------------------------- | --------------------------------------------- |
+| `app:fetch-mnb-rate`                    | Weekdays at 23:00          | Fetches MNB exchange rates                    |
+| `app:fetch-mnb-rate`                    | Monday at 10:00            | Fetches MNB exchange rates                    |
+| `app:email-extract`                     | Weekdays at 23:58          | Parses broker emails and saves daily statuses |
+| `app:event-extract`                     | Monday at 00:01            | Fetching all the us FOREX events from external|
+| `app:holyday-collect`                   | January  at 00:01          | Fetches all the us holydays from external     |
+| `app:calculate-tax-by-account-for-year` | December 31 at 23:57       | Calculates and stores yearly tax per account  |
 
 All jobs run in the `Europe/Budapest` timezone.
 
@@ -105,18 +136,19 @@ All jobs run in the `Europe/Budapest` timezone.
 
 ## Docker Services
 
-The application runs as 4 Docker containers:
+The application runs as 5 Docker containers:
 
-| Service     | Description                              |
-| ----------- | ---------------------------------------- |
-| `app`       | Laravel application server (port 8000)   |
-| `db`        | MariaDB database                         |
-| `queue`     | Laravel queue worker for background jobs |
-| `scheduler` | Laravel scheduler for cron-like jobs     |
+| Service     | Description                                         |
+| ----------- | --------------------------------------------------- |
+| `app`       | Laravel application server (port 8000)              |
+| `db`        | MariaDB database                                    |
+| `redis`     | Redis — queue backend for Horizon                   |
+| `horizon`   | Laravel Horizon queue worker & dashboard (/horizon) |
+| `scheduler` | Laravel scheduler for cron-like jobs                |
 
 - All services use `restart: unless-stopped`
 - Health checks are configured on the `app` service
-- `queue` and `scheduler` wait for `app` to be healthy before starting
+- `horizon` and `scheduler` wait for `app` to be healthy before starting
 - Database credentials are read from `.env` (not hardcoded)
 
 ***

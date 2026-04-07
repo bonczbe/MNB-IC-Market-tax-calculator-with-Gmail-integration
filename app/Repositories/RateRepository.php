@@ -25,4 +25,17 @@ class RateRepository
     {
         return Rate::query()->distinct()->pluck($column, $column);
     }
+
+    public function getAllCurrency()
+    {
+        return Rate::query()->distinct()->pluck('base_currency');
+    }
+
+    public function getLastRateByCurrency(string $currency)
+    {
+        return Rate::query()
+            ->where('base_currency', $currency)
+            ->orderByDesc('date')
+            ->first();
+    }
 }

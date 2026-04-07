@@ -7,7 +7,7 @@ use Carbon\Carbon;
 
 class BrokerAccountRepository
 {
-    public function getAccountsWithYearlyTransactionsStatusesAndTax(Carbon $currentYear, Carbon $startOfYear, Carbon $endOfYear)
+    public function getAccountsWithYearlyTransactionsStatusesAndTax(Carbon $currentYear, Carbon $startOfYear, Carbon $endOfYear, $userId)
     {
         return BrokerAccount::query()
             ->with([
@@ -21,7 +21,7 @@ class BrokerAccountRepository
                     $query->where('tax_year', $currentYear->copy()->subYear()->format('Y'));
                 },
             ])
-            ->where('user_id', auth()->user()->id)
+            ->where('user_id', $userId)
             ->get();
     }
 

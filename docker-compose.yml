@@ -60,7 +60,7 @@ services:
       - storage_data:/var/www/storage/framework
     env_file:
       - .env
-    command: php artisan horizon
+    command: sh -c "php artisan config:clear && php artisan horizon"
     depends_on:
       app:
         condition: service_healthy
@@ -80,7 +80,7 @@ services:
       - storage_data:/var/www/storage/framework
     env_file:
       - .env
-    command: php artisan schedule:work
+    command: sh -c "php artisan config:clear && php artisan schedule:work"
     depends_on:
       app:
         condition: service_healthy

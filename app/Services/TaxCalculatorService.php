@@ -20,12 +20,12 @@ class TaxCalculatorService
         private readonly YearlyTaxCalculationRepository $yearly_tax_calculation_repository
     ) {}
 
-    public function calculateAllBrokerAccountTaxForYear(Carbon $currentDate)
+    public function calculateAllBrokerAccountTaxForYear(Carbon $currentDate, $userId)
     {
         $startOfYear = $currentDate->copy()->startOfYear();
         $endOfYear = $currentDate->copy()->endOfYear();
 
-        ['brokers' => $brokers, 'rates' => $ratesOfTheYear] = $this->getRatesAndBrokersForDateBetween($currentDate, $startOfYear, $endOfYear);
+        ['brokers' => $brokers, 'rates' => $ratesOfTheYear] = $this->getRatesAndBrokersForDateBetween($currentDate, $startOfYear, $endOfYear, $userId);
 
         foreach ($brokers as $broker) {
             $allProfitInExchangedCurrency = 0;
@@ -70,12 +70,12 @@ class TaxCalculatorService
         }
     }
 
-    public function calculateAllBrokerAccountTaxForActualYear(Carbon $currentDate)
+    public function calculateAllBrokerAccountTaxForActualYear(Carbon $currentDate, $userId)
     {
         $startOfYear = $currentDate->copy()->startOfYear();
         $endOfYear = $currentDate->copy()->endOfYear();
 
-        ['brokers' => $brokers, 'rates' => $ratesOfTheYear] = $this->getRatesAndBrokersForDateBetween($currentDate, $startOfYear, $endOfYear);
+        ['brokers' => $brokers, 'rates' => $ratesOfTheYear] = $this->getRatesAndBrokersForDateBetween($currentDate, $startOfYear, $endOfYear, $userId);
 
         $tax = $this->calculateTotalTaxForBrokers($brokers, $ratesOfTheYear, $startOfYear, config('tax.volume'));
 
@@ -165,48 +165,48 @@ class TaxCalculatorService
         return $sum;
     }
 
-    public function calculateCurrentWeekNetProfit(Carbon $currentDate)
+    public function calculateCurrentWeekNetProfit(Carbon $currentDate, $userId)
     {
         $startOfWeek = $currentDate->copy()->startOfWeek();
         $endOfWeek = $currentDate->copy()->endOfWeek();
 
-        return $this->calculateNetProfitForDatesBetween($startOfWeek, $endOfWeek, $currentDate);
+        return $this->calculateNetProfitForDatesBetween($startOfWeek, $endOfWeek, $currentDate, $userId);
     }
 
-    public function calculateGrossProfitOfYear(Carbon $currentDate)
+    public function calculateGrossProfitOfYear(Carbon $currentDate, $userId)
     {
         $startOfYear = $currentDate->copy()->startOfYear();
         $endOfYear = $currentDate->copy()->endOfYear();
 
-        ['brokers' => $brokers, 'rates' => $ratesOfTheYear] = $this->getRatesAndBrokersForDateBetween($currentDate, $startOfYear, $endOfYear);
+        ['brokers' => $brokers, 'rates' => $ratesOfTheYear] = $this->getRatesAndBrokersForDateBetween($currentDate, $startOfYear, $endOfYear, $userId);
 
         $tax = $this->calculateTotalTaxForBrokers($brokers, $ratesOfTheYear, $startOfYear, 1);
 
         return number_format(ceil($tax)).' '.config('tax.base_currency');
     }
 
-    public function calculateCurrentYearNetProfit(Carbon $currentDate)
+    public function calculateCurrentYearNetProfit(Carbon $currentDate, $userId)
     {
         $startOfYear = $currentDate->copy()->startOfYear();
         $endOfYear = $currentDate->copy()->endOfYear();
 
-        return $this->calculateNetProfitForDatesBetween($startOfYear, $endOfYear, $currentDate);
+        return $this->calculateNetProfitForDatesBetween($startOfYear, $endOfYear, $currentDate, $userId);
 
     }
 
-    private function calculateNetProfitForDatesBetween(Carbon $start, Carbon $end, Carbon $currentDate)
+    private function calculateNetProfitForDatesBetween(Carbon $start, Carbon $end, Carbon $currentDate, $userId)
     {
-        ['brokers' => $brokers, 'rates' => $rates] = $this->getRatesAndBrokersForDateBetween($currentDate, $start, $end);
+        ['brokers' => $brokers, 'rates' => $rates] = $this->getRatesAndBrokersForDateBetween($currentDate, $start, $end, $userId);
 
         $tax = $this->calculateTotalTaxForBrokers($brokers, $rates, $start, (1 - config('tax.volume')));
 
         return number_format(ceil($tax)).' '.config('tax.base_currency');
     }
 
-    private function getRatesAndBrokersForDateBetween(Carbon $current, Carbon $start, Carbon $end)
+    private function getRatesAndBrokersForDateBetween(Carbon $current, Carbon $start, Carbon $end, $userId)
     {
         $brokers = $this->broker_account_repository
-            ->getAccountsWithYearlyTransactionsStatusesAndTax($current, $start, $end);
+            ->getAccountsWithYearlyTransactionsStatusesAndTax($current, $start, $end, $userId);
 
         $rates = $this->rate_repository
             ->getRatesBetweenDates($start, $end);

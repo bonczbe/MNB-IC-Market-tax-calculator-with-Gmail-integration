@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Repositories\UserRepository;
 use App\Services\TaxCalculatorService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -28,7 +29,11 @@ class CalculateTaxByAccountForYearJob implements ShouldQueue
     {
         $currentYear = Carbon::now();
 
-        $tax_calculator_service->calculateAllBrokerAccountTaxForYear($currentYear);
+        $userRepo = app(UserRepository::class);
+
+        foreach ($userRepo->getAllUser() as $user) {
+            $tax_calculator_service->calculateAllBrokerAccountTaxForYear($currentYear, $user->id);
+        }
 
     }
 }

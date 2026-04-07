@@ -27,5 +27,5 @@ if [ -z "$APP_KEY_VALUE" ]; then
 fi
 php artisan storage:link 2>/dev/null || true
 php artisan migrate --force || exit 1
-php artisan cache:clear
+php artisan optimize:clear
 php artisan serve --host=0.0.0.0 --port=8000

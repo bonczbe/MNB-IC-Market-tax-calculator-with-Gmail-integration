@@ -12,4 +12,9 @@ class UserRepository
     {
         return User::query()->with(['brokers'])->get();
     }
+
+    public function getAllUser()
+    {
+        return User::query()->get();
+    }
 }

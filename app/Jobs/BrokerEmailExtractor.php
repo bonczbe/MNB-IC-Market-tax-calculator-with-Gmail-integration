@@ -17,7 +17,7 @@ class BrokerEmailExtractor implements ShouldQueue
      */
     public function __construct()
     {
-        //
+        $this->onQueue('high');
     }
 
     /**

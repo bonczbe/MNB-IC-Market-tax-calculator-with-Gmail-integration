@@ -15,7 +15,10 @@ class HolyDayCollecter implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct() {}
+    public function __construct()
+    {
+        $this->onQueue('high');
+    }
 
     /**
      * Execute the job.

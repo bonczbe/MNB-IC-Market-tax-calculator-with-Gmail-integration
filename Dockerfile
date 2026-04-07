@@ -3,7 +3,7 @@ FROM php:8.4-cli
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libzip-dev libpng-dev libonig-dev \
     libicu-dev \
-    && docker-php-ext-install pdo pdo_mysql mysqli mbstring zip intl
+    && docker-php-ext-install pdo pdo_mysql mysqli mbstring zip intl pcntl
 
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs

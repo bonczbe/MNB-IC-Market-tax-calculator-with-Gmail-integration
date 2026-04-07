@@ -15,6 +15,14 @@ services:
     networks:
       - dailytax_net
 
+  redis:
+    image: redis:alpine
+    container_name: dailytax_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - dailytax_net
   app:
     build: .
     container_name: dailytax_app
@@ -31,8 +39,9 @@ services:
     command: /usr/local/bin/entrypoint.sh
     depends_on:
       - db
+      - redis
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/up"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/up" ]
       interval: 10s
       timeout: 5s
       retries: 15
@@ -40,9 +49,9 @@ services:
     networks:
       - dailytax_net
 
-  queue:
+  horizon:
     build: .
-    container_name: dailytax_queue
+    container_name: dailytax_horizon
     restart: unless-stopped
     volumes:
       - .:/var/www
@@ -51,10 +60,12 @@ services:
       - storage_data:/var/www/storage/framework
     env_file:
       - .env
-    command: php artisan queue:work
+    command: php artisan horizon
     depends_on:
       app:
         condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - dailytax_net
 
@@ -73,6 +84,8 @@ services:
     depends_on:
       app:
         condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - dailytax_net
 
@@ -81,6 +94,7 @@ volumes:
   vendor_data:
   node_modules_data:
   storage_data:
+
 
 networks:
   dailytax_net:

@@ -8,7 +8,7 @@ echo "=== Maintenance mode ON ==="
 docker exec dailytax_app php artisan down --refresh=60 --retry=10
 
 echo "=== Building new image ==="
-docker compose build app queue scheduler
+docker compose build app horizon scheduler
 
 echo "=== Swapping app container ==="
 docker compose up -d --no-deps app
@@ -32,8 +32,8 @@ docker exec dailytax_app php artisan cache:clear
 docker exec dailytax_app php artisan view:clear
 docker exec dailytax_app php artisan route:clear
 
-echo "=== Starting queue and scheduler ==="
-docker compose up -d --no-deps queue scheduler
+echo "=== Starting horizon and scheduler ==="
+docker compose up -d --no-deps horizon scheduler
 
 echo "=== Maintenance mode OFF ==="
 docker exec dailytax_app php artisan up

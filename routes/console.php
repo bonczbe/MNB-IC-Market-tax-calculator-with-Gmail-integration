@@ -29,7 +29,39 @@ if (Config::get('schedule.use_mnb_fetcher')) {
 if (Config::get('schedule.use_email_fetcher')) {
     app(Schedule::class)
         ->command('app:email-extract')
-        ->dailyAt('23:58')
+        ->dailyAt('11:57:01')
+        ->weekdays()
+        ->timezone('Europe/Budapest');
+}
+
+if (Config::get('schedule.use_email_fetcher')) {
+    app(Schedule::class)
+        ->command('app:email-extract')
+        ->dailyAt('11:57:07')
+        ->weekdays()
+        ->timezone('Europe/Budapest');
+}
+
+if (Config::get('schedule.use_email_fetcher')) {
+    app(Schedule::class)
+        ->command('app:email-extract')
+        ->dailyAt('11:58:01')
+        ->weekdays()
+        ->timezone('Europe/Budapest');
+}
+
+if (Config::get('schedule.use_email_fetcher')) {
+    app(Schedule::class)
+        ->command('app:email-extract')
+        ->dailyAt('11:58:08')
+        ->weekdays()
+        ->timezone('Europe/Budapest');
+}
+
+if (Config::get('schedule.use_email_fetcher')) {
+    app(Schedule::class)
+        ->command('app:email-extract')
+        ->dailyAt('11:58:15')
         ->weekdays()
         ->timezone('Europe/Budapest');
 }

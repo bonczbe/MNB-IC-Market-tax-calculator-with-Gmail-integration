@@ -3,6 +3,8 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Widgets\ProfitStats;
+use App\Filament\Widgets\Weekly;
+use App\Filament\Widgets\Yearly;
 use Carbon\Carbon;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -38,9 +40,11 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            // ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 ProfitStats::class,
+                Weekly::class,
+                Yearly::class,
             ])
             ->brandLogo(fn () => view('filament.brand-logo'))
             ->darkModeBrandLogo(fn () => view('filament.brand-logo'))

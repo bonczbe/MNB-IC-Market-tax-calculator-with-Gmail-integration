@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\DailyStatus;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 
 class DailyStatusRepository
 {
@@ -26,5 +27,14 @@ class DailyStatusRepository
     public function getAllDistinctedByKeyValue(string $column)
     {
         return DailyStatus::query()->distinct()->pluck($column, $column);
+    }
+
+    public function getBetweenDatesByUserId($userId, Carbon $start, Carbon $end)
+    {
+        return DailyStatus::query()
+            ->whereHas('broker', fn (Builder $query) => $query->where('user_id', $userId))
+            ->whereBetween('date', [$start->format('Y-m-d'), $end->format('Y-m-d')])
+            ->get(['balance', 'date', 'currency']);
+
     }
 }

@@ -38,4 +38,11 @@ class RateRepository
             ->orderByDesc('date')
             ->first();
     }
+
+    public function getRatesByDate(Carbon $date)
+    {
+        return Rate::query()
+            ->where('date', $date->format('Y-m-d'))
+            ->pluck('rate', 'base_currency');
+    }
 }

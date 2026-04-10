@@ -25,12 +25,19 @@ class ChartService
         $data = [];
 
         foreach ($period as $date) {
+
             $rates = $this->rateRepository->getRatesByDate($date);
+
+            $dateFormat = $date->format('l');
+
+            if($dateFormat =='Saturday' || $dateFormat == 'Sunday') {
+                continue;
+            }
 
             $records = $statuses->where('date', $date);
 
             if (count($records) == 0) {
-                $data[$date->format('l')] = 0;
+                $data[$dateFormat] = 0;
             }
 
             $sum = 0;
@@ -39,7 +46,7 @@ class ChartService
                 $sum += $record->balance * ($rates[$record->currency] ?? 1);
             }
 
-            $data[$date->format('l')] = $sum;
+            $data[$dateFormat] = $sum;
         }
 
         return $data;
@@ -59,6 +66,11 @@ class ChartService
         $data = [];
 
         foreach ($period as $date) {
+            $dateFormat = $date->copy()->format('l');
+
+            if($dateFormat =='Saturday' || $dateFormat == 'Sunday') {
+                continue;
+            }
             $rates = $this->rateRepository->getRatesByDate($date);
 
             $records = $statuses->where('date', $date);

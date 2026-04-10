@@ -49,7 +49,7 @@ class ChartService
     {
         $now = Carbon::now();
         $startOfWeek = $now->copy()->startOfYear();
-        $endOfWeek = $now->copy();
+        $endOfWeek = $now->copy()->subDay(1);
         $user = auth()->user()->id;
 
         $statuses = $this->dailyStatusRepository->getBetweenDatesByUserId($user, $startOfWeek, $endOfWeek);

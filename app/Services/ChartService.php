@@ -78,16 +78,22 @@ class ChartService
                 $data[$dateFormat] = 0;
             }
 
-            $sum = 0;
-
-            foreach ($records as $record) {
-                $sum += $record->balance * ($rates[$record->currency] ?? 1);
-            }
-
-            $data[$dateFormat] = $sum;
+            $data[$dateFormat] = $this->calcSum($records, $rates);
         }
 
         return $data;
+    }
+
+    private function calcSum($records, $rates)
+    {
+
+        $sum = 0;
+
+        foreach ($records as $record) {
+            $sum += $record->balance * ($rates[$record->currency] ?? 1);
+        }
+
+        return $sum;
     }
 
     private function setupPeriodAndStatuses($startDate, $endDate): array

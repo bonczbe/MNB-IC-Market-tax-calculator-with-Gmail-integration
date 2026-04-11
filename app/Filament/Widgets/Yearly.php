@@ -11,18 +11,20 @@ class Yearly extends ChartWidget
 {
     protected ?string $heading = 'Yearly Movements';
 
+    public ?string $filter = 'current_year';
 
     protected bool $isCollapsible = true;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected function getData(): array
     {
+        $activeYear = $this->filter;
 
         $chartService = app(ChartService::class);
 
-        $data = Cache::remember('yearly_chart_data'.auth()->user()->id, Carbon::now()->endOfDay()->subMinute(1), function () use ($chartService) {
-            return $chartService->getYearlyChartData();
+        $data = Cache::remember('yearly_chart_data_'.auth()->user()->id.'_'.$activeYear, Carbon::now()->endOfDay()->subMinute(1), function () use ($chartService, $activeYear) {
+            return $chartService->getYearlyChartData($activeYear);
         });
 
         return [
@@ -44,5 +46,15 @@ class Yearly extends ChartWidget
     protected function getMaxHeight(): ?string
     {
         return '500px';
+    }
+
+    protected function getFilters(): ?array
+    {
+        $chartService = app(ChartService::class);
+
+        return [
+            'current_year' => now()->format('Y'),
+            ...$chartService->getYearsForUserExceptCurrent() ?? [],
+        ];
     }
 }

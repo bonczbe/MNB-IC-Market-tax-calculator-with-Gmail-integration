@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\DailyStatus;
 use App\Repositories\DailyStatusRepository;
 use App\Repositories\RateRepository;
 use Carbon\Carbon;
@@ -30,7 +31,7 @@ class ChartService
 
             $dateFormat = $date->format('l');
 
-            if($dateFormat =='Saturday' || $dateFormat == 'Sunday') {
+            if ($dateFormat == 'Saturday' || $dateFormat == 'Sunday') {
                 continue;
             }
 
@@ -52,25 +53,26 @@ class ChartService
         return $data;
     }
 
-    public function getYearlyChartData()
+    public function getYearlyChartData(string $year)
     {
-        $now = Carbon::now();
-        $startOfWeek = $now->copy()->startOfYear();
-        $endOfWeek = $now->copy()->subDay(1);
+        $now = ($year == 'current_year') ? Carbon::now() : Carbon::parse($year.'-01-01');
+        $startOfYear = $now->copy()->startOfYear();
+        $endOfYear = ($year == 'current_year') ? $now->copy()->subDay(1) : $now->copy()->endOfYear();
         $user = auth()->user()->id;
 
-        $statuses = $this->dailyStatusRepository->getBetweenDatesByUserId($user, $startOfWeek, $endOfWeek);
+        $statuses = $this->dailyStatusRepository->getBetweenDatesByUserId($user, $startOfYear, $endOfYear);
 
-        $period = CarbonPeriod::create($startOfWeek, $endOfWeek);
+        $period = CarbonPeriod::create($startOfYear, $endOfYear);
 
         $data = [];
 
         foreach ($period as $date) {
             $dateFormat = $date->copy()->format('l');
 
-            if($dateFormat =='Saturday' || $dateFormat == 'Sunday') {
+            if ($dateFormat == 'Saturday' || $dateFormat == 'Sunday') {
                 continue;
             }
+
             $rates = $this->rateRepository->getRatesByDate($date);
 
             $records = $statuses->where('date', $date);
@@ -89,5 +91,27 @@ class ChartService
         }
 
         return $data;
+    }
+
+    public function isWeekend(Carbon $date): bool
+    {
+        return $date->isWeekend();
+
+    }
+
+    public function getYearsForUserExceptCurrent(): array
+    {
+
+        $userId = auth()->user()->id;
+
+        return DailyStatus::selectRaw('YEAR(date) as year')
+            ->whereRaw('YEAR(date) != ?', [now()->year])
+            ->whereHas('broker', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year', 'year')
+            ->toArray();
     }
 }

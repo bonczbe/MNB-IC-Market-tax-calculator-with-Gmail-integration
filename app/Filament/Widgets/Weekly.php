@@ -11,10 +11,9 @@ class Weekly extends ChartWidget
 {
     protected ?string $heading = 'Weekly Movements';
 
-
     protected bool $isCollapsible = true;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected function getData(): array
     {

@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\PrevProfitStats;
 use App\Filament\Widgets\ProfitStats;
 use App\Filament\Widgets\Weekly;
 use App\Filament\Widgets\Yearly;
@@ -45,6 +46,7 @@ class AdminPanelProvider extends PanelProvider
                 ProfitStats::class,
                 Weekly::class,
                 Yearly::class,
+                PrevProfitStats::class,
             ])
             ->brandLogo(fn () => view('filament.brand-logo'))
             ->darkModeBrandLogo(fn () => view('filament.brand-logo'))

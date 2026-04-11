@@ -12,30 +12,67 @@ class ChartService
 {
     public function __construct(private readonly DailyStatusRepository $dailyStatusRepository, private readonly RateRepository $rateRepository) {}
 
-    public function getWeeklyChartData()
+    public function getWeeklyChartData(): array
     {
         $now = Carbon::now();
         $startOfWeek = $now->copy()->startOfWeek();
         $endOfWeek = $now->copy()->endOfWeek();
-        $user = auth()->user()->id;
 
-        $statuses = $this->dailyStatusRepository->getBetweenDatesByUserId($user, $startOfWeek, $endOfWeek);
+        [$statuses, $period] = $this->setupPeriodAndStatuses($startOfWeek, $endOfWeek);
 
-        $period = CarbonPeriod::create($startOfWeek, $endOfWeek);
+        return $this->calculateChartData($period, $statuses, 'l');
+    }
+
+    public function getYearlyChartData(string $year): array
+    {
+        $now = ($year == 'current_year') ? Carbon::now() : Carbon::parse($year.'-01-01');
+        $startOfYear = $now->copy()->startOfYear();
+        $endOfYear = ($year == 'current_year') ? $now->copy()->subDay(1) : $now->copy()->endOfYear();
+
+        [$statuses, $period] = $this->setupPeriodAndStatuses($startOfYear, $endOfYear);
+
+        return $this->calculateChartData($period, $statuses, 'm-d');
+    }
+
+    public function getYearsForUserExceptCurrent(): array
+    {
+
+        $userId = auth()->user()->id;
+
+        return DailyStatus::selectRaw('YEAR(date) as year')
+            ->whereRaw('YEAR(date) != ?', [now()->year])
+            ->whereHas('broker', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year', 'year')
+            ->toArray();
+    }
+
+    private function getRatesAndStatusRecordsForDate(Carbon $date, $statuses): array
+    {
+        $rates = $this->rateRepository->getRatesByDate($date);
+
+        $records = $statuses->where('date', $date);
+
+        return [$rates, $records];
+    }
+
+    private function calculateChartData($period, $statuses, $format): array
+    {
 
         $data = [];
 
         foreach ($period as $date) {
 
-            $rates = $this->rateRepository->getRatesByDate($date);
-
-            $dateFormat = $date->format('l');
-
-            if ($dateFormat == 'Saturday' || $dateFormat == 'Sunday') {
+            if ($date->isWeekend()) {
                 continue;
             }
 
-            $records = $statuses->where('date', $date);
+            [$rates, $records] = $this->getRatesAndStatusRecordsForDate($date, $statuses);
+
+            $dateFormat = $date->format($format);
 
             if (count($records) == 0) {
                 $data[$dateFormat] = 0;
@@ -53,65 +90,15 @@ class ChartService
         return $data;
     }
 
-    public function getYearlyChartData(string $year)
+    private function setupPeriodAndStatuses($startDate, $endDate): array
     {
-        $now = ($year == 'current_year') ? Carbon::now() : Carbon::parse($year.'-01-01');
-        $startOfYear = $now->copy()->startOfYear();
-        $endOfYear = ($year == 'current_year') ? $now->copy()->subDay(1) : $now->copy()->endOfYear();
         $user = auth()->user()->id;
 
-        $statuses = $this->dailyStatusRepository->getBetweenDatesByUserId($user, $startOfYear, $endOfYear);
+        $statuses = $this->dailyStatusRepository->getBetweenDatesByUserId($user, $startDate, $endDate);
 
-        $period = CarbonPeriod::create($startOfYear, $endOfYear);
+        $period = CarbonPeriod::create($startDate, $endDate);
 
-        $data = [];
+        return [$statuses, $period];
 
-        foreach ($period as $date) {
-            $dateFormat = $date->copy()->format('l');
-
-            if ($dateFormat == 'Saturday' || $dateFormat == 'Sunday') {
-                continue;
-            }
-
-            $rates = $this->rateRepository->getRatesByDate($date);
-
-            $records = $statuses->where('date', $date);
-
-            if (count($records) == 0) {
-                $data[$date->format('m-d')] = 0;
-            }
-
-            $sum = 0;
-
-            foreach ($records as $record) {
-                $sum += $record->balance * ($rates[$record->currency] ?? 1);
-            }
-
-            $data[$date->format('m-d')] = $sum;
-        }
-
-        return $data;
-    }
-
-    public function isWeekend(Carbon $date): bool
-    {
-        return $date->isWeekend();
-
-    }
-
-    public function getYearsForUserExceptCurrent(): array
-    {
-
-        $userId = auth()->user()->id;
-
-        return DailyStatus::selectRaw('YEAR(date) as year')
-            ->whereRaw('YEAR(date) != ?', [now()->year])
-            ->whereHas('broker', function ($query) use ($userId) {
-                $query->where('user_id', $userId);
-            })
-            ->distinct()
-            ->orderBy('year', 'desc')
-            ->pluck('year', 'year')
-            ->toArray();
     }
 }

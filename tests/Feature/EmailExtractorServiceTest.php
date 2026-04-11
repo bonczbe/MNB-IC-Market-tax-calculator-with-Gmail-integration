@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Services;
+namespace Tests\Feature;
 
 use App\Models\BrokerAccount;
 use App\Models\User;

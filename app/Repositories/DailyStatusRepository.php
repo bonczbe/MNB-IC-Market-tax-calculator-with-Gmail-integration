@@ -35,6 +35,17 @@ class DailyStatusRepository
             ->whereHas('broker', fn (Builder $query) => $query->where('user_id', $userId))
             ->whereBetween('date', [$start->format('Y-m-d'), $end->format('Y-m-d')])
             ->get(['balance', 'date', 'currency']);
+    }
 
+    public function getYearsForUserExceptCurrent(int $userId)
+    {
+        return DailyStatus::query()
+            ->selectRaw('YEAR(date) as year')
+            ->whereRaw('YEAR(date) != ?', [now()->year])
+            ->whereHas('broker', fn (Builder $query) => $query->where('user_id', $userId))
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year', 'year')
+            ->toArray();
     }
 }

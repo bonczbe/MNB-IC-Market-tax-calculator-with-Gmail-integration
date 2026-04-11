@@ -39,15 +39,7 @@ class ChartService
 
         $userId = auth()->user()->id;
 
-        return DailyStatus::selectRaw('YEAR(date) as year')
-            ->whereRaw('YEAR(date) != ?', [now()->year])
-            ->whereHas('broker', function ($query) use ($userId) {
-                $query->where('user_id', $userId);
-            })
-            ->distinct()
-            ->orderBy('year', 'desc')
-            ->pluck('year', 'year')
-            ->toArray();
+        return $this->dailyStatusRepository->getYearsForUserExceptCurrent($userId);
     }
 
     private function getRatesAndStatusRecordsForDate(Carbon $date, $statuses): array

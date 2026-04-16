@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\DailyStatus;
 use App\Repositories\DailyStatusRepository;
 use App\Repositories\RateRepository;
 use Carbon\Carbon;

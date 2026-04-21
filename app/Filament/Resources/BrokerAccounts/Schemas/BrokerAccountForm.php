@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BrokerAccounts\Schemas;
 
+use App\Enums\UserRoleEnum;
 use App\Models\User;
 use App\Repositories\RateRepository;
 use Carbon\Carbon;
@@ -27,10 +28,10 @@ class BrokerAccountForm
                     ->searchable()
                     ->required()
                     ->default(auth()->id())
-                    ->visible(fn () => auth()->user()->role == 'admin'),
+                    ->visible(fn () => auth()->user()->role == UserRoleEnum::ADMIN),
                 Hidden::make('user_id')
                     ->default(auth()->id())
-                    ->visible(fn () => auth()->user()->role != 'admin'),
+                    ->visible(fn () => auth()->user()->role != UserRoleEnum::ADMIN),
                 TextInput::make('broker_name')
                     ->required(),
                 TextInput::make('email')

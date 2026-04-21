@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\AccountTransactions\Tables;
 
+use App\Enums\UserRoleEnum;
 use App\Repositories\AccountTransactionRepository;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -20,7 +21,7 @@ class AccountTransactionsTable
         $accountTransactinRepository = app(AccountTransactionRepository::class);
 
         return $table
-            ->modifyQueryUsing(fn ($query) => auth()->user()->role === 'admin'
+            ->modifyQueryUsing(fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
     ? $query
     : $query->whereHas('broker', fn ($q) => $q->where('user_id', auth()->id()))
             )
@@ -64,7 +65,7 @@ class AccountTransactionsTable
                         'broker', fn ($q) => $q->where('user_id', auth()->id())
                     ))
                     ->default()
-                    ->visible(fn () => auth()->user()->role === 'admin'),
+                    ->visible(fn () => auth()->user()->role === UserRoleEnum::ADMIN),
                 SelectFilter::make('type')
                     ->options([
                         'deposit' => 'deposit',
@@ -75,7 +76,7 @@ class AccountTransactionsTable
                     ->relationship(
                         'broker',
                         'broker_name',
-                        fn ($query) => auth()->user()->role === 'admin'
+                        fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
                             ? $query
                             : $query->where('user_id', auth()->id())
                     )
@@ -86,7 +87,7 @@ class AccountTransactionsTable
                     ->relationship(
                         'broker',
                         'account_number',
-                        fn ($query) => auth()->user()->role === 'admin'
+                        fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
                             ? $query
                             : $query->where('user_id', auth()->id())
                     )

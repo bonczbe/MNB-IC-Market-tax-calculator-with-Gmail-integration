@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\EmailExtracts\Tables;
 
+use App\Enums\UserRoleEnum;
 use App\Repositories\EmailExtractRepository;
 use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
@@ -20,7 +21,7 @@ class EmailExtractsTable
         $emailExtRepository = app(EmailExtractRepository::class);
 
         return $table
-            ->modifyQueryUsing(fn ($query) => auth()->user()->role === 'admin'
+            ->modifyQueryUsing(fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
     ? $query
     : $query->whereHas('broker', fn ($q) => $q->where('user_id', auth()->id()))
             )
@@ -57,7 +58,7 @@ class EmailExtractsTable
                         'broker', fn ($q) => $q->where('user_id', auth()->id())
                     ))
                     ->default()
-                    ->visible(fn () => auth()->user()->role === 'admin'),
+                    ->visible(fn () => auth()->user()->role === UserRoleEnum::ADMIN),
                 SelectFilter::make('date')
                     ->options(function () use ($emailExtRepository) {
                         return Cache::remember('emailExtractDates', Carbon::now()->endOfDay()->subMinute(1), function () use ($emailExtRepository) {
@@ -70,7 +71,7 @@ class EmailExtractsTable
                     ->relationship(
                         'broker',
                         'broker_name',
-                        fn ($query) => auth()->user()->role === 'admin'
+                        fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
                             ? $query
                             : $query->where('user_id', auth()->id())
                     )
@@ -81,7 +82,7 @@ class EmailExtractsTable
                     ->relationship(
                         'broker',
                         'account_number',
-                        fn ($query) => auth()->user()->role === 'admin'
+                        fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
                             ? $query
                             : $query->where('user_id', auth()->id())
                     )

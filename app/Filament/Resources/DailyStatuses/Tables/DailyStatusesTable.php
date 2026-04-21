@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\DailyStatuses\Tables;
 
+use App\Enums\UserRoleEnum;
 use App\Repositories\DailyStatusRepository;
 use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
@@ -22,7 +23,7 @@ class DailyStatusesTable
         $dailyStatusRepository = app(DailyStatusRepository::class);
 
         return $table
-            ->modifyQueryUsing(fn ($query) => auth()->user()->role === 'admin'
+            ->modifyQueryUsing(fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
     ? $query
     : $query->whereHas('broker', fn ($q) => $q->where('user_id', auth()->id()))
             )
@@ -88,13 +89,13 @@ class DailyStatusesTable
                         'broker', fn ($q) => $q->where('user_id', auth()->id())
                     ))
                     ->default()
-                    ->visible(fn () => auth()->user()->role === 'admin'),
+                    ->visible(fn () => auth()->user()->role === UserRoleEnum::ADMIN),
                 SelectFilter::make('broker')
                     ->label('Broker')
                     ->relationship(
                         'broker',
                         'broker_name',
-                        fn ($query) => auth()->user()->role === 'admin'
+                        fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
                             ? $query
                             : $query->where('user_id', auth()->id())
                     )
@@ -105,7 +106,7 @@ class DailyStatusesTable
                     ->relationship(
                         'broker',
                         'account_number',
-                        fn ($query) => auth()->user()->role === 'admin'
+                        fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
                             ? $query
                             : $query->where('user_id', auth()->id())
                     )

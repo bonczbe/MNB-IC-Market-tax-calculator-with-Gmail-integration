@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRoleEnum;
 use App\Models\User;
 use App\Models\YearlyTaxCalculation;
 
@@ -14,26 +15,26 @@ class YearlyTaxCalculationPolicy
 
     public function view(User $user, YearlyTaxCalculation $yearlyTaxCalculation): bool
     {
-        return $user->role === 'admin' || $yearlyTaxCalculation->broker->user_id === $user->id;
+        return $user->role === UserRoleEnum::ADMIN || $yearlyTaxCalculation->broker->user_id === $user->id;
     }
 
     public function create(User $user): bool
     {
-        return $user->role === 'admin';
+        return $user->role === UserRoleEnum::ADMIN;
     }
 
     public function update(User $user, YearlyTaxCalculation $yearlyTaxCalculation): bool
     {
-        return $user->role === 'admin';
+        return $user->role === UserRoleEnum::ADMIN;
     }
 
     public function delete(User $user, YearlyTaxCalculation $yearlyTaxCalculation): bool
     {
-        return $user->role === 'admin';
+        return $user->role === UserRoleEnum::ADMIN;
     }
 
     public function deleteAny(User $user): bool
     {
-        return $user->role === 'admin';
+        return $user->role === UserRoleEnum::ADMIN;
     }
 }

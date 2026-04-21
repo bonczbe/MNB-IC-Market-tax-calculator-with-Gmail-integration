@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Enums\UserRoleEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -14,7 +15,7 @@ class UsersTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => auth()->user()->role === 'admin'
+            ->modifyQueryUsing(fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
                 ? $query
                 : $query->where('id', auth()->id())
             )
@@ -28,7 +29,8 @@ class UsersTable
                     ->searchable(),
                 TextColumn::make('role')
                     ->badge()
-                    ->color(fn ($record) => ($record->role == 'admin') ? Color::Red : Color::Green),
+                    ->formatStateUsing(fn($state)=>$state?->label())
+                    ->color(fn ($record) => ($record->role == UserRoleEnum::ADMIN) ? Color::Red : Color::Green),
                 TextColumn::make('brokers')
                     ->label('Number Of Broker Accounts')
                     ->badge()

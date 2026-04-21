@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Rates\Tables;
 
+use App\Enums\UserRoleEnum;
 use App\Repositories\RateRepository;
 use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
@@ -72,8 +73,8 @@ class RatesTable
                     }),
             ])
             ->recordActions([
-                EditAction::make()->visible(fn () => auth()->user()->role === 'admin'),
-                DeleteAction::make()->visible(fn () => auth()->user()->role === 'admin'),
+                EditAction::make()->visible(fn () => auth()->user()->role === UserRoleEnum::ADMIN),
+                DeleteAction::make()->visible(fn () => auth()->user()->role === UserRoleEnum::ADMIN),
             ])
             ->toolbarActions([
             ]);

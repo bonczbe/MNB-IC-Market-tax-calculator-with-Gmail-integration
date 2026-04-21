@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BrokerAccounts\Tables;
 
+use App\Enums\UserRoleEnum;
 use App\Repositories\BrokerAccountRepository;
 use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
@@ -20,14 +21,14 @@ class BrokerAccountsTable
         $brokerAcRepository = app(BrokerAccountRepository::class);
 
         return $table
-            ->modifyQueryUsing(fn ($query) => auth()->user()->role === 'admin'
+            ->modifyQueryUsing(fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
                 ? $query
                 : $query->where('user_id', auth()->id())
             )
             ->columns([
                 TextColumn::make('user.id')
                     ->sortable()
-                    ->visible(fn () => auth()->user()->role === 'admin'),
+                    ->visible(fn () => auth()->user()->role === UserRoleEnum::ADMIN),
                 TextColumn::make('broker_name')
                     ->sortable(),
                 TextColumn::make('email')
@@ -55,7 +56,7 @@ class BrokerAccountsTable
                     ->label('Only my accounts')
                     ->query(fn (Builder $query) => $query->where('user_id', auth()->id()))
                     ->default()
-                    ->visible(fn () => auth()->user()->role === 'admin'),
+                    ->visible(fn () => auth()->user()->role === UserRoleEnum::ADMIN),
                 SelectFilter::make('broker_currency')
                     ->options(function () use ($brokerAcRepository) {
                         return Cache::remember('brokerCurrency', Carbon::now()->endOfDay()->subMinute(1), function () use ($brokerAcRepository) {

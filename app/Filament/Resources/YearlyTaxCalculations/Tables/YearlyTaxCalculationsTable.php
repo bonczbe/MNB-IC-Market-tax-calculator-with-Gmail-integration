@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\YearlyTaxCalculations\Tables;
 
+use App\Enums\UserRoleEnum;
 use App\Repositories\YearlyTaxCalculationRepository;
 use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
@@ -21,7 +22,7 @@ class YearlyTaxCalculationsTable
         $yearlyTaxCalcRepository = app(YearlyTaxCalculationRepository::class);
 
         return $table
-            ->modifyQueryUsing(fn ($query) => auth()->user()->role === 'admin'
+            ->modifyQueryUsing(fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
     ? $query
     : $query->whereHas('broker', fn ($q) => $q->where('user_id', auth()->id()))
             )
@@ -73,7 +74,7 @@ class YearlyTaxCalculationsTable
                         'broker', fn ($q) => $q->where('user_id', auth()->id())
                     ))
                     ->default()
-                    ->visible(fn () => auth()->user()->role === 'admin'),
+                    ->visible(fn () => auth()->user()->role === UserRoleEnum::ADMIN),
                 SelectFilter::make('tax_year')
                     ->options(function () use ($yearlyTaxCalcRepository) {
                         return Cache::remember('taxYears', Carbon::now()->endOfYear(), function () use ($yearlyTaxCalcRepository) {
@@ -86,7 +87,7 @@ class YearlyTaxCalculationsTable
                     ->relationship(
                         'broker',
                         'broker_name',
-                        fn ($query) => auth()->user()->role === 'admin'
+                        fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
                             ? $query
                             : $query->where('user_id', auth()->id())
                     )
@@ -97,7 +98,7 @@ class YearlyTaxCalculationsTable
                     ->relationship(
                         'broker',
                         'account_number',
-                        fn ($query) => auth()->user()->role === 'admin'
+                        fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
                             ? $query
                             : $query->where('user_id', auth()->id())
                     )

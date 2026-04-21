@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRoleEnum;
 use App\Models\DailyStatus;
 use App\Models\User;
 
@@ -14,7 +15,7 @@ class DailyStatusPolicy
 
     public function view(User $user, DailyStatus $dailyStatus): bool
     {
-        return $user->role === 'admin' || $dailyStatus->broker->user_id === $user->id;
+        return $user->role === UserRoleEnum::ADMIN || $dailyStatus->broker->user_id === $user->id;
     }
 
     public function create(User $user): bool
@@ -24,16 +25,16 @@ class DailyStatusPolicy
 
     public function update(User $user, DailyStatus $dailyStatus): bool
     {
-        return $user->role === 'admin' || $dailyStatus->broker->user_id === $user->id;
+        return $user->role === UserRoleEnum::ADMIN || $dailyStatus->broker->user_id === $user->id;
     }
 
     public function delete(User $user, DailyStatus $dailyStatus): bool
     {
-        return $user->role === 'admin' || $dailyStatus->broker->user_id === $user->id;
+        return $user->role === UserRoleEnum::ADMIN || $dailyStatus->broker->user_id === $user->id;
     }
 
     public function deleteAny(User $user): bool
     {
-        return $user->role === 'admin';
+        return $user->role === UserRoleEnum::ADMIN;
     }
 }

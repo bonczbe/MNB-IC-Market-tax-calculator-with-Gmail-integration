@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRoleEnum;
 use App\Models\AccountTransaction;
 use App\Models\User;
 
@@ -14,7 +15,7 @@ class AccountTransactionPolicy
 
     public function view(User $user, AccountTransaction $accountTransaction): bool
     {
-        return $user->role === 'admin' || $accountTransaction->broker->user_id === $user->id;
+        return $user->role === UserRoleEnum::ADMIN || $accountTransaction->broker->user_id === $user->id;
     }
 
     public function create(User $user): bool
@@ -24,16 +25,16 @@ class AccountTransactionPolicy
 
     public function update(User $user, AccountTransaction $accountTransaction): bool
     {
-        return $user->role === 'admin' || $accountTransaction->broker->user_id === $user->id;
+        return $user->role === UserRoleEnum::ADMIN || $accountTransaction->broker->user_id === $user->id;
     }
 
     public function delete(User $user, AccountTransaction $accountTransaction): bool
     {
-        return $user->role === 'admin' || $accountTransaction->broker->user_id === $user->id;
+        return $user->role === UserRoleEnum::ADMIN || $accountTransaction->broker->user_id === $user->id;
     }
 
     public function deleteAny(User $user): bool
     {
-        return $user->role === 'admin';
+        return $user->role === UserRoleEnum::ADMIN;
     }
 }

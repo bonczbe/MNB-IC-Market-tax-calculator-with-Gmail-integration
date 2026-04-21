@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use App\Enums\UserRoleEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Select;
@@ -32,7 +33,7 @@ class UserForm
                     ->suffixAction(Action::make('generatePassword')
                         ->icon('heroicon-m-arrow-path')
                         ->tooltip('Generate new password')
-                        ->visible(fn ($record) => auth()->user()->role == 'admin' && $record?->id != null)
+                        ->visible(fn ($record) => auth()->user()->role == UserRoleEnum::ADMIN && $record?->id != null)
                         ->action(function ($record) {
                             $newPassword = Str::password(12);
 
@@ -48,9 +49,9 @@ class UserForm
                                 ->send();
                         })),
                 Select::make('role')
-                    ->options(['admin' => 'Admin', 'user' => 'User'])
+                    ->options(UserRoleEnum::options())
                     ->default('user')
-                    ->visible(fn () => auth()->user()->role == 'admin')
+                    ->visible(fn () => auth()->user()->role == UserRoleEnum::ADMIN)
                     ->required(),
 
                 Section::make('Imap Settings')->schema([

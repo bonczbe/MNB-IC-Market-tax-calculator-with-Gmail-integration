@@ -23,6 +23,17 @@ class ForexEventsTable
                     ->sortable(),
                 TextColumn::make('name')
                     ->sortable(),
+                TextColumn::make('country')
+                ->formatStateUsing(fn ($state) => match ($state) {
+                    'US' => 'United States',
+                    'DE' => 'Germany',
+                    'FR' => 'France',
+                    'IT' => 'Italy',
+                    'ES' => 'Spain',
+                    'UK' => 'United Kingdom',
+                    default => $state,
+                })
+                    ->sortable(),
                 TextColumn::make('importance')
                     ->numeric()
                     ->sortable(),

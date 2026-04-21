@@ -48,6 +48,7 @@ class ForexEventService
                 $events[] = [
                     'date' => $date,
                     'name' => $name,
+                    'country' => $item['country'] ?? 'US',
                     'previouse' => $previous,
                     'forecast' => $forecast,
                     'importance' => $importance,

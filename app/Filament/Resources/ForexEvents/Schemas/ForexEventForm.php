@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ForexEvents\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -13,8 +14,17 @@ class ForexEventForm
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->columnSpanFull()
                     ->required(),
+                Select::make('country')
+                    ->required()
+                    ->options([
+                        'US' => 'United States',
+                        'DE' => 'Germany',
+                        'FR' => 'France',
+                        'IT' => 'Italy',
+                        'ES' => 'Spain',
+                        'UK' => 'United Kingdom',
+                    ]),
                 DateTimePicker::make('date')
                     ->required(),
                 TextInput::make('importance')

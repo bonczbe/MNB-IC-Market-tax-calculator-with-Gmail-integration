@@ -10,6 +10,7 @@ class ForexEvent extends Model
     protected $fillable = [
         'date',
         'name',
+        'country',
         'previouse',
         'importance',
         'forecast',

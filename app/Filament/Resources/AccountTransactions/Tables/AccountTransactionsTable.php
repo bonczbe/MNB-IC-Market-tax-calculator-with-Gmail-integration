@@ -69,10 +69,7 @@ class AccountTransactionsTable
                     ->default()
                     ->visible(fn () => auth()->user()->role === UserRoleEnum::ADMIN),
                 SelectFilter::make('type')
-                    ->options([
-                        'deposit' => 'deposit',
-                        'withdrawal' => 'withdrawal',
-                    ]),
+                    ->options(AccountTransactionTypeEnum::options()),
                 SelectFilter::make('broker')
                     ->label('Broker')
                     ->relationship(

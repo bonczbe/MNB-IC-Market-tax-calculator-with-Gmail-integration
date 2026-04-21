@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\AccountTransactionTypeEnum;
 use App\Repositories\BrokerAccountRepository;
 use App\Repositories\DailyStatusRepository;
 use App\Repositories\RateRepository;
@@ -156,7 +157,7 @@ class TaxCalculatorService
         $sum = 0;
         foreach ($transactions as $transaction) {
             $value = $transaction->amount;
-            if ($transaction->type == 'withdrawal') {
+            if ($transaction->type == AccountTransactionTypeEnum::WITHDRAWAL) {
                 $value *= -1;
             }
             $sum += $value;

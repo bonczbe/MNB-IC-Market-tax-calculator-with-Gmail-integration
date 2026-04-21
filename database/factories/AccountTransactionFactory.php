@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\AccountTransactionTypeEnum;
 use App\Models\AccountTransaction;
 use App\Models\BrokerAccount;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -21,7 +22,7 @@ class AccountTransactionFactory extends Factory
         return [
             'date' => $this->faker->date(),
             'amount' => $this->faker->randomFloat(2, 10, 1000),
-            'type' => $this->faker->randomElement(['deposit', 'withdrawal']),
+            'type' => $this->faker->randomElement(AccountTransactionTypeEnum::values()),
             'broker_account_id' => BrokerAccount::factory(),
         ];
     }

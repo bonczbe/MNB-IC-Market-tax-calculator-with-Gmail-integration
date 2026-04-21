@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\AccountTransactionTypeEnum;
 use App\Models\AccountTransaction;
 use App\Models\BrokerAccount;
 use App\Models\DailyStatus;
@@ -56,7 +57,7 @@ class TaxCalculatorServiceTest extends TestCase
         ]);
 
         // (1200 - 1000) * 370 = 74000
-        $result = $this->service->calculateGrossProfitOfYear(Carbon::create(2024, 6, 15));
+        $result = $this->service->calculateGrossProfitOfYear(Carbon::create(2024, 6, 15),$this->user->id);
 
         $this->assertStringContainsString('74,000', $result);
         $this->assertStringEndsWith('HUF', $result);
@@ -74,7 +75,7 @@ class TaxCalculatorServiceTest extends TestCase
             'broker_account_id' => $this->broker->id,
             'date' => '2024-06-15',
             'amount' => 200.00,
-            'type' => 'deposit',
+            'type' => AccountTransactionTypeEnum::DEPOSIT,
         ]);
 
         Rate::factory()->create([
@@ -86,7 +87,7 @@ class TaxCalculatorServiceTest extends TestCase
         ]);
 
         // (1500 - (1000 + 200)) * 370 = 111000
-        $result = $this->service->calculateGrossProfitOfYear(Carbon::create(2024, 6, 15));
+        $result = $this->service->calculateGrossProfitOfYear(Carbon::create(2024, 6, 15),$this->user->id);
 
         $this->assertStringContainsString('111,000', $result);
     }
@@ -96,6 +97,7 @@ class TaxCalculatorServiceTest extends TestCase
         DailyStatus::factory()->create([
             'broker_account_id' => $this->broker->id,
             'date' => '2024-06-15',
+            'currency'=> 'USD',
             'balance' => 900.00,
         ]);
 
@@ -103,7 +105,7 @@ class TaxCalculatorServiceTest extends TestCase
             'broker_account_id' => $this->broker->id,
             'date' => '2024-06-15',
             'amount' => 200.00,
-            'type' => 'withdrawal',
+            'type' => AccountTransactionTypeEnum::WITHDRAWAL,
         ]);
 
         Rate::factory()->create([
@@ -115,7 +117,7 @@ class TaxCalculatorServiceTest extends TestCase
         ]);
 
         // (900 - (1000 - 200)) * 370 = 37000
-        $result = $this->service->calculateGrossProfitOfYear(Carbon::create(2024, 6, 15));
+        $result = $this->service->calculateGrossProfitOfYear(Carbon::create(2024, 6, 15),$this->user->id);
 
         $this->assertStringContainsString('37,000', $result);
     }
@@ -137,7 +139,7 @@ class TaxCalculatorServiceTest extends TestCase
         ]);
 
         // 74000 * (1 - 0.15) = 62900
-        $result = $this->service->calculateCurrentYearNetProfit(Carbon::create(2024, 6, 15));
+        $result = $this->service->calculateCurrentYearNetProfit(Carbon::create(2024, 6, 15),$this->user->id);
 
         $this->assertStringContainsString('62,900', $result);
         $this->assertStringEndsWith('HUF', $result);
@@ -160,7 +162,7 @@ class TaxCalculatorServiceTest extends TestCase
         ]);
 
         // 74000 * 0.15 = 11100
-        $result = $this->service->calculateAllBrokerAccountTaxForActualYear(Carbon::create(2024, 6, 15));
+        $result = $this->service->calculateAllBrokerAccountTaxForActualYear(Carbon::create(2024, 6, 15),$this->user->id);
 
         $this->assertStringContainsString('11,100', $result);
         $this->assertStringEndsWith('HUF', $result);
@@ -182,7 +184,7 @@ class TaxCalculatorServiceTest extends TestCase
             'unit' => 1,
         ]);
 
-        $this->service->calculateAllBrokerAccountTaxForYear(Carbon::create(2024, 6, 15));
+        $this->service->calculateAllBrokerAccountTaxForYear(Carbon::create(2024, 6, 15),$this->user->id);
 
         $this->assertDatabaseHas('yearly_tax_calculations', [
             'broker_account_id' => $this->broker->id,
@@ -209,8 +211,8 @@ class TaxCalculatorServiceTest extends TestCase
             'unit' => 1,
         ]);
 
-        $this->service->calculateAllBrokerAccountTaxForYear(Carbon::create(2024, 6, 15));
-        $this->service->calculateAllBrokerAccountTaxForYear(Carbon::create(2024, 6, 15));
+        $this->service->calculateAllBrokerAccountTaxForYear(Carbon::create(2024, 6, 15),$this->user->id);
+        $this->service->calculateAllBrokerAccountTaxForYear(Carbon::create(2024, 6, 15),$this->user->id);
 
         $this->assertDatabaseCount('yearly_tax_calculations', 1);
     }
@@ -237,7 +239,7 @@ class TaxCalculatorServiceTest extends TestCase
             'unit' => 1,
         ]);
 
-        $this->service->calculateAllBrokerAccountTaxForYear(Carbon::create(2024, 6, 15));
+        $this->service->calculateAllBrokerAccountTaxForYear(Carbon::create(2024, 6, 15),$this->user->id);
 
         $record = YearlyTaxCalculation::where('broker_account_id', $this->broker->id)
             ->where('tax_year', 2024)
@@ -263,7 +265,7 @@ class TaxCalculatorServiceTest extends TestCase
         ]);
 
         // (800 - 1000) * 370 = -74000
-        $this->service->calculateAllBrokerAccountTaxForYear(Carbon::create(2024, 6, 15));
+        $this->service->calculateAllBrokerAccountTaxForYear(Carbon::create(2024, 6, 15),$this->user->id);
 
         $this->assertDatabaseHas('yearly_tax_calculations', [
             'broker_account_id' => $this->broker->id,
@@ -287,7 +289,7 @@ class TaxCalculatorServiceTest extends TestCase
             'unit' => 1,
         ]);
 
-        $this->service->calculateAllBrokerAccountTaxForYear(Carbon::create(2024, 6, 15));
+        $this->service->calculateAllBrokerAccountTaxForYear(Carbon::create(2024, 6, 15),$this->user->id);
 
         $record = YearlyTaxCalculation::where('broker_account_id', $this->broker->id)->first();
 
@@ -325,7 +327,7 @@ class TaxCalculatorServiceTest extends TestCase
         ]);
 
         // day1: (1100-1000)*370=37000, day2: (1300-1100)*380=76000, total: 113000
-        $result = $this->service->calculateGrossProfitOfYear(Carbon::create(2024, 3, 1));
+        $result = $this->service->calculateGrossProfitOfYear(Carbon::create(2024, 3, 1),$this->user->id);
 
         $this->assertStringContainsString('113,000', $result);
     }
@@ -361,7 +363,7 @@ class TaxCalculatorServiceTest extends TestCase
         ]);
 
         // day1: (1050-1000)*370=18500, day2: (1100-1050)*370=18500, total: 37000
-        $result = $this->service->calculateGrossProfitOfYear(Carbon::create(2024, 2, 1));
+        $result = $this->service->calculateGrossProfitOfYear(Carbon::create(2024, 2, 1),$this->user->id);
 
         $this->assertStringContainsString('37,000', $result);
     }
@@ -375,7 +377,7 @@ class TaxCalculatorServiceTest extends TestCase
         ]);
 
         // no rate inserted → (1200 - 1000) * 1 = 200
-        $result = $this->service->calculateGrossProfitOfYear(Carbon::create(2024, 6, 15));
+        $result = $this->service->calculateGrossProfitOfYear(Carbon::create(2024, 6, 15),$this->user->id);
 
         $this->assertStringContainsString('200', $result);
     }
@@ -404,7 +406,7 @@ class TaxCalculatorServiceTest extends TestCase
             'unit' => 1,
         ]);
 
-        $this->service->calculateAllBrokerAccountTaxForYear(Carbon::create(2024, 6, 15));
+        $this->service->calculateAllBrokerAccountTaxForYear(Carbon::create(2024, 6, 15),$this->user->id);
 
         $this->assertDatabaseCount('yearly_tax_calculations', 2);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\DailyStatuses\Tables;
 
+use App\Enums\AccountTransactionTypeEnum;
 use App\Enums\UserRoleEnum;
 use App\Repositories\DailyStatusRepository;
 use Carbon\Carbon;
@@ -60,7 +61,7 @@ class DailyStatusesTable
 
                         foreach ($transactions as $transaction) {
                             $value = $transaction->amount;
-                            if ($transaction->type == 'withdrawal') {
+                            if ($transaction->type == AccountTransactionTypeEnum::WITHDRAWAL) {
                                 $value *= -1;
                             }
                             $depositAndWithdrawSum += $value;

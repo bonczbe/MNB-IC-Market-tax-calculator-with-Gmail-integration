@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Services\RateService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -58,14 +59,14 @@ class RateServiceTest extends TestCase
         $this->assertDatabaseHas('rates', [
             'base_currency' => 'USD',
             'for_currency' => 'HUF',
-            'date' => '2026-03-15',
+            'date' => Carbon::now()->format('Y-m-d'),
             'rate' => 370.50,
         ]);
 
         $this->assertDatabaseHas('rates', [
             'base_currency' => 'EUR',
             'for_currency' => 'HUF',
-            'date' => '2026-03-15',
+            'date' => Carbon::now()->format('Y-m-d'),
             'rate' => 395.20,
         ]);
     }
@@ -100,7 +101,7 @@ class RateServiceTest extends TestCase
 
         $this->assertDatabaseHas('rates', [
             'base_currency' => 'USD',
-            'date' => '2025-01-01',
+            'date' => Carbon::now()->format('Y-m-d'),
         ]);
     }
 

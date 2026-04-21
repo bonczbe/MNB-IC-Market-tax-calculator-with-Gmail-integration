@@ -29,7 +29,7 @@ if (Config::get('schedule.use_mnb_fetcher')) {
 if (Config::get('schedule.use_email_fetcher')) {
     app(Schedule::class)
         ->command('app:email-extract')
-        ->dailyAt('23:58')
+        ->dailyAt('23:59')
         ->weekdays()
         ->timezone('Europe/Budapest');
 }

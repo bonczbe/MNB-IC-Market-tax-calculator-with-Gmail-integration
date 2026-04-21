@@ -37,6 +37,6 @@ if (Config::get('schedule.use_email_fetcher')) {
 if (Config::get('schedule.use_yearly_calculator')) {
     app(Schedule::class)
         ->command('app:calculate-tax-by-account-for-year')
-        ->yearlyOn(12, 31, '23:59')
+        ->yearlyOn(12, 31, '23:55')
         ->timezone('Europe/Budapest');
 }

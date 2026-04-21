@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\CountryEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Crypt;
@@ -13,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('forex_events', function (Blueprint $table) {
-            $table->enum('country', ['US', 'DE', 'FR', 'IT', 'ES', 'UK'])->default('US')->after('name');
+            $table->enum('country', CountryEnum::values())->default(CountryEnum::US->value)->after('name');
         });
     }
 

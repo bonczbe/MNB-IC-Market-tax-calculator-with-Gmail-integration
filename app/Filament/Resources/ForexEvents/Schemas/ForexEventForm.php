@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ForexEvents\Schemas;
 
+use App\Enums\CountryEnum;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -17,14 +18,7 @@ class ForexEventForm
                     ->required(),
                 Select::make('country')
                     ->required()
-                    ->options([
-                        'US' => 'United States',
-                        'DE' => 'Germany',
-                        'FR' => 'France',
-                        'IT' => 'Italy',
-                        'ES' => 'Spain',
-                        'UK' => 'United Kingdom',
-                    ]),
+                    ->options(CountryEnum::options()),
                 DateTimePicker::make('date')
                     ->required(),
                 TextInput::make('importance')

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ForexEvents\Tables;
 
+use App\Enums\CountryEnum;
 use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -24,15 +25,7 @@ class ForexEventsTable
                 TextColumn::make('name')
                     ->sortable(),
                 TextColumn::make('country')
-                ->formatStateUsing(fn ($state) => match ($state) {
-                    'US' => 'United States',
-                    'DE' => 'Germany',
-                    'FR' => 'France',
-                    'IT' => 'Italy',
-                    'ES' => 'Spain',
-                    'UK' => 'United Kingdom',
-                    default => $state,
-                })
+                    ->formatStateUsing(fn ($state) => $state->label())
                     ->sortable(),
                 TextColumn::make('importance')
                     ->numeric()

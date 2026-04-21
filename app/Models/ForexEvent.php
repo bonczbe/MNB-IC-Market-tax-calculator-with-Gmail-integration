@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CountryEnum;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,6 +19,7 @@ class ForexEvent extends Model
 
     protected $casts = [
         'date' => 'datetime',
+        'country' => CountryEnum::class,
     ];
 
     protected function serializeDate(DateTimeInterface $date): string

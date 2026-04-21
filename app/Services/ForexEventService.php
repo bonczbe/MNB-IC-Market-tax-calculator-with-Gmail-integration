@@ -19,7 +19,7 @@ class ForexEventService
             $from = Carbon::now()->startOfWeek()->format('Y-m-d').'T00:00:00.000Z';
             $to = Carbon::now()->endOfWeek()->format('Y-m-d').'T23:59:59.000Z';
 
-            $url = "https://economic-calendar.tradingview.com/events?from={$from}&to={$to}&countries=US";
+            $url = "https://economic-calendar.tradingview.com/events?from={$from}&to={$to}&countries=US,DE,FR,IT,ES,UK";
 
             $response = $this->fetchJson($url);
             $items = $response['result'] ?? [];

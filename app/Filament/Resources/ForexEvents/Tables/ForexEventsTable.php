@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\ForexEvents\Tables;
 
-use App\Enums\CountryEnum;
 use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Holydays\Tables;
 
+use App\Enums\HolidayEnum;
 use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -25,7 +26,8 @@ class HolydaysTable
                 TextColumn::make('name')
                     ->sortable(),
                 TextColumn::make('status')
-                    ->color(fn ($state) => ($state == 'early-close') ? Color::Blue : Color::Red)
+                    ->formatStateUsing(fn ($state) => $state->label())
+                    ->color(fn ($state) => ($state == HolidayEnum::EARLY_CLOSE) ? Color::Blue : Color::Red)
                     ->badge(),
                 TextColumn::make('created_at')
                     ->dateTime()

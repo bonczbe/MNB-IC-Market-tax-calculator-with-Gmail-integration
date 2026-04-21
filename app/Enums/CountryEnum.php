@@ -41,10 +41,10 @@ enum CountryEnum: string
     public static function values(): array
     {
         return array_map(
-                fn (self $country) => [
-                    'value' => $country->value,
-                ],
-                self::cases()
-            );
+            fn (self $country) => [
+                'value' => $country->value,
+            ],
+            self::cases()
+        );
     }
 }

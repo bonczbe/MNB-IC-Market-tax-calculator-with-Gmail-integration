@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Holydays\Schemas;
 
+use App\Enums\HolidayEnum;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -18,7 +19,7 @@ class HolydayForm
                 TextInput::make('name')
                     ->required(),
                 Select::make('status')
-                    ->options(['closed' => 'Closed', 'early-close' => 'Early close'])
+                    ->options(HolidayEnum::options())
                     ->required(),
             ]);
     }

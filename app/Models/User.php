@@ -55,7 +55,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'role'=> UserRoleEnum::class,
+            'role' => UserRoleEnum::class,
             'email_verified_at' => 'datetime',
             'imap_validate_cert' => 'boolean',
             'password' => 'hashed',

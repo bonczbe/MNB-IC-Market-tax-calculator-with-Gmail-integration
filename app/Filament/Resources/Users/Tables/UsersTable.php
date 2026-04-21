@@ -29,7 +29,7 @@ class UsersTable
                     ->searchable(),
                 TextColumn::make('role')
                     ->badge()
-                    ->formatStateUsing(fn($state)=>$state?->label())
+                    ->formatStateUsing(fn ($state) => $state?->label())
                     ->color(fn ($record) => ($record->role == UserRoleEnum::ADMIN) ? Color::Red : Color::Green),
                 TextColumn::make('brokers')
                     ->label('Number Of Broker Accounts')

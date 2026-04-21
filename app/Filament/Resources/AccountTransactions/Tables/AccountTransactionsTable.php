@@ -38,7 +38,7 @@ class AccountTransactionsTable
                     ->date()
                     ->sortable(),
                 TextColumn::make('type')
-                    ->formatStateUsing(fn($state) => $state->label())
+                    ->formatStateUsing(fn ($state) => $state->label())
                     ->color(fn ($state) => match ($state) {
                         AccountTransactionTypeEnum::DEPOSIT => Color::Green,
                         AccountTransactionTypeEnum::WITHDRAWAL => Color::Amber,

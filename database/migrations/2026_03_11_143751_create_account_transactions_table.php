@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\AccountTransactionTypeEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('broker_account_id');
             $table->date('date');
-            $table->enum('type', ['deposit', 'withdrawal']);
+            $table->enum('type', AccountTransactionTypeEnum::values());
             $table->decimal('amount', 15, 2);
             $table->text('note')->nullable();
             $table->timestamps();

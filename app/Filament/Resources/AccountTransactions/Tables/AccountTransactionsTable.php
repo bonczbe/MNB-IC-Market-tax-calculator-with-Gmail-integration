@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\AccountTransactions\Tables;
 
+use App\Enums\AccountTransactionTypeEnum;
 use App\Enums\UserRoleEnum;
 use App\Repositories\AccountTransactionRepository;
 use Filament\Actions\DeleteAction;
@@ -37,9 +38,10 @@ class AccountTransactionsTable
                     ->date()
                     ->sortable(),
                 TextColumn::make('type')
+                    ->formatStateUsing(fn($state) => $state->label())
                     ->color(fn ($state) => match ($state) {
-                        'deposit' => Color::Green,
-                        'withdrawal' => Color::Amber,
+                        AccountTransactionTypeEnum::DEPOSIT => Color::Green,
+                        AccountTransactionTypeEnum::WITHDRAWAL => Color::Amber,
                         default => null,
                     })
                     ->badge(),

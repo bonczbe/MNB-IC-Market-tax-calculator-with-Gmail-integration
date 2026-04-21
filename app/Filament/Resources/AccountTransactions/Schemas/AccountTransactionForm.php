@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\AccountTransactions\Schemas;
 
+use App\Enums\AccountTransactionTypeEnum;
 use App\Models\BrokerAccount;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
@@ -32,7 +33,7 @@ class AccountTransactionForm
                     ->default(fn () => Carbon::now())
                     ->required(),
                 Select::make('type')
-                    ->options(['deposit' => 'Deposit', 'withdrawal' => 'Withdrawal'])
+                    ->options(AccountTransactionTypeEnum::options())
                     ->required(),
                 TextInput::make('amount')
                     ->required()

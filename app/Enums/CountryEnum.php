@@ -10,6 +10,11 @@ enum CountryEnum: string
     case IT = 'IT';
     case ES = 'ES';
     case UK = 'UK';
+    case JP = 'JP';
+    case CN = 'CN';
+    case CH = 'CH';
+    case CA = 'CA';
+    case AU = 'AU';
 
     public function label(): string
     {
@@ -20,6 +25,11 @@ enum CountryEnum: string
             self::IT => 'Italy',
             self::ES => 'Spain',
             self::UK => 'United Kingdom',
+            self::JP => 'Japan',
+            self::CN => 'China',
+            self::CH => 'Switzerland',
+            self::CA => 'Canada',
+            self::AU => 'Australia',
         };
     }
 

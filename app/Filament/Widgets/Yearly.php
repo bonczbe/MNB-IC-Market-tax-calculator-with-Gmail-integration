@@ -4,14 +4,17 @@ namespace App\Filament\Widgets;
 
 use App\Services\ChartService;
 use Carbon\Carbon;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Schema;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\ChartWidget\Concerns\HasFiltersSchema;
 use Illuminate\Support\Facades\Cache;
 
 class Yearly extends ChartWidget
 {
-    protected ?string $heading = 'Yearly Movements';
+    use HasFiltersSchema;
 
-    public ?string $filter = 'current_year';
+    protected ?string $heading = 'Yearly Movements';
 
     protected bool $isCollapsible = true;
 
@@ -19,12 +22,13 @@ class Yearly extends ChartWidget
 
     protected function getData(): array
     {
-        $activeYear = $this->filter;
+        $activeYear = $this->filter['year'] ?? 'current_year';
+        $activeBroker = $this->filter['broker'] ?? 0;
 
         $chartService = app(ChartService::class);
 
-        $data = Cache::remember('yearly_chart_data_'.auth()->user()->id.'_'.$activeYear, Carbon::now()->endOfDay()->subMinute(1), function () use ($chartService, $activeYear) {
-            return $chartService->getYearlyChartData($activeYear);
+        $data = Cache::remember('yearly_chart_data_'.auth()->user()->id.'_'.$activeYear.'_'.$activeBroker, Carbon::now()->endOfDay()->subMinute(1), function () use ($chartService, $activeYear, $activeBroker) {
+            return $chartService->getYearlyChartData($activeYear, $activeBroker);
         });
 
         return [
@@ -48,13 +52,27 @@ class Yearly extends ChartWidget
         return '500px';
     }
 
-    protected function getFilters(): ?array
+    public function filtersSchema(Schema $schema): Schema
     {
         $chartService = app(ChartService::class);
 
-        return [
-            'current_year' => now()->format('Y'),
-            ...$chartService->getYearsForUserExceptCurrent() ?? [],
-        ];
+        return $schema->components([
+            Select::make('year')
+                ->options(fn () => [
+                    'current_year' => now()->format('Y'),
+                    ...$chartService->getYearsForUserExceptCurrent() ?? [],
+                ])
+                ->default('current_year')
+                ->selectablePlaceholder(false),
+            Select::make('broker')
+                ->options(fn () => [
+                    0 => 'All',
+                    ...$chartService->getAllBrokerForAccountIdLabel(),
+                ])
+                ->searchable()
+                ->preload()
+                ->default(0)
+                ->selectablePlaceholder(false),
+        ]);
     }
 }

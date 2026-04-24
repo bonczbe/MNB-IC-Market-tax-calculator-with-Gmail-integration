@@ -4,11 +4,16 @@ namespace App\Filament\Widgets;
 
 use App\Services\ChartService;
 use Carbon\Carbon;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Schema;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\ChartWidget\Concerns\HasFiltersSchema;
 use Illuminate\Support\Facades\Cache;
 
 class Weekly extends ChartWidget
 {
+    use HasFiltersSchema;
+
     protected ?string $heading = 'Weekly Movements';
 
     protected bool $isCollapsible = true;
@@ -19,9 +24,10 @@ class Weekly extends ChartWidget
     {
 
         $chartService = app(ChartService::class);
+        $activeBroker = $this->filter['broker'] ?? 0;
 
-        $data = Cache::remember('weekly_chart_data'.auth()->user()->id, Carbon::now()->endOfDay()->subMinute(1), function () use ($chartService) {
-            return $chartService->getWeeklyChartData();
+        $data = Cache::remember('weekly_chart_data'.auth()->user()->id.'_'.$activeBroker, Carbon::now()->endOfDay()->subMinute(1), function () use ($chartService, $activeBroker) {
+            return $chartService->getWeeklyChartData($activeBroker);
         });
 
         return [
@@ -43,5 +49,22 @@ class Weekly extends ChartWidget
     protected function getMaxHeight(): ?string
     {
         return '500px';
+    }
+
+    public function filtersSchema(Schema $schema): Schema
+    {
+        $chartService = app(ChartService::class);
+
+        return $schema->components([
+            Select::make('broker')
+                ->options(fn () => [
+                    0 => 'All',
+                    ...$chartService->getAllBrokerForAccountIdLabel(),
+                ])
+                ->searchable()
+                ->preload()
+                ->default(0)
+                ->selectablePlaceholder(false),
+        ]);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\BrokerAccount;
+use App\Repositories\BrokerAccountRepository;
 use App\Repositories\DailyStatusRepository;
 use App\Repositories\RateRepository;
 use Carbon\Carbon;
@@ -9,26 +11,26 @@ use Carbon\CarbonPeriod;
 
 class ChartService
 {
-    public function __construct(private readonly DailyStatusRepository $dailyStatusRepository, private readonly RateRepository $rateRepository) {}
+    public function __construct(private readonly BrokerAccountRepository $broker_account_repository, private readonly DailyStatusRepository $dailyStatusRepository, private readonly RateRepository $rateRepository) {}
 
-    public function getWeeklyChartData(): array
+    public function getWeeklyChartData($activeBroker): array
     {
         $now = Carbon::now();
         $startOfWeek = $now->copy()->startOfWeek();
         $endOfWeek = $now->copy()->endOfWeek();
 
-        [$statuses, $period] = $this->setupPeriodAndStatuses($startOfWeek, $endOfWeek);
+        [$statuses, $period] = $this->setupPeriodAndStatuses($startOfWeek, $endOfWeek, $activeBroker);
 
         return $this->calculateChartData($period, $statuses, 'l');
     }
 
-    public function getYearlyChartData(string $year): array
+    public function getYearlyChartData(string $year, $activeBroker): array
     {
         $now = ($year == 'current_year') ? Carbon::now() : Carbon::parse($year.'-01-01');
         $startOfYear = $now->copy()->startOfYear();
         $endOfYear = ($year == 'current_year') ? $now->copy()->subDay(1) : $now->copy()->endOfYear();
 
-        [$statuses, $period] = $this->setupPeriodAndStatuses($startOfYear, $endOfYear);
+        [$statuses, $period] = $this->setupPeriodAndStatuses($startOfYear, $endOfYear, $activeBroker);
 
         return $this->calculateChartData($period, $statuses, 'm-d');
     }
@@ -87,15 +89,29 @@ class ChartService
         return $sum;
     }
 
-    private function setupPeriodAndStatuses($startDate, $endDate): array
+    private function setupPeriodAndStatuses($startDate, $endDate, $activeBroker = null): array
     {
         $user = auth()->user()->id;
 
-        $statuses = $this->dailyStatusRepository->getBetweenDatesByUserId($user, $startDate, $endDate);
+        $statuses = $this->dailyStatusRepository->getBetweenDatesByUserId($user, $startDate, $endDate, $activeBroker);
 
         $period = CarbonPeriod::create($startDate, $endDate);
 
         return [$statuses, $period];
 
+    }
+
+    public function getAllBrokerForAccountIdLabel()
+    {
+        $user = auth()->user()->id;
+
+        $brokers = $this->broker_account_repository
+            ->getAllForUserId($user)
+            ->map(fn (BrokerAccount $broker) => [
+                'value' => $broker->id,
+                'label' => $broker->broker_name.' - '.$broker->account_number,
+            ]);
+
+        return $brokers->pluck('label', 'value');
     }
 }

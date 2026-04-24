@@ -29,10 +29,13 @@ class DailyStatusRepository
         return DailyStatus::query()->distinct()->pluck($column, $column);
     }
 
-    public function getBetweenDatesByUserId($userId, Carbon $start, Carbon $end)
+    public function getBetweenDatesByUserId($userId, Carbon $start, Carbon $end, $activeBroker = null)
     {
         return DailyStatus::query()
             ->whereHas('broker', fn (Builder $query) => $query->where('user_id', $userId))
+            ->when($activeBroker && $activeBroker !== 0, function (Builder $query, string $activeBroker) {
+                $query->where('broker_account_id', $activeBroker);
+            })
             ->whereBetween('date', [$start->format('Y-m-d'), $end->format('Y-m-d')])
             ->get(['balance', 'date', 'currency']);
     }

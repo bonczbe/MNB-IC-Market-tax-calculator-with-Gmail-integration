@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\EditProfile;
+use App\Filament\Pages\Register;
 use App\Filament\Widgets\PrevProfitStats;
 use App\Filament\Widgets\ProfitStats;
 use App\Filament\Widgets\Weekly;
@@ -33,6 +35,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->registration(Register::class)
+            ->profile(EditProfile::class, isSimple:false)
             ->colors([
                 'primary' => Color::Amber,
             ])

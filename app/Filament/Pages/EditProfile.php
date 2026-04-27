@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages\Auth;
+namespace App\Filament\Pages;
 
 use App\Enums\UserRoleEnum;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;

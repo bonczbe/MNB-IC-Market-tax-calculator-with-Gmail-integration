@@ -2,7 +2,7 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Pages\Auth\EditProfile;
+use App\Filament\Pages\EditProfile;
 use App\Filament\Pages\Register;
 use App\Filament\Widgets\PrevProfitStats;
 use App\Filament\Widgets\ProfitStats;

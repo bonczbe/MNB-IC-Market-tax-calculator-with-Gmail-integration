@@ -27,10 +27,10 @@ class UserForm
                     ->email()
                     ->required(),
                 TextInput::make('password')
-                    ->revealable()
                     ->password()
-                    ->required()
+                    ->disabled()
                     ->suffixAction(Action::make('generatePassword')
+                        ->disabled()
                         ->icon('heroicon-m-arrow-path')
                         ->tooltip('Generate new password')
                         ->visible(fn ($record) => auth()->user()->role == UserRoleEnum::ADMIN && $record?->id != null)
@@ -75,7 +75,8 @@ class UserForm
                     TextInput::make('imap_password')
                         ->visible(fn ($record) => ($record?->id) == auth()->user()->id || $record?->id == null)
                         ->password()
-                        ->revealable()
+                        ->disabled()
+                        ->revealable(false)
                         ->afterStateUpdated(function (string $state, Set $set) {
                             $set('imap_password', str_replace(' ', '', $state ?? ''));
                         })

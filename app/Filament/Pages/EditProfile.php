@@ -61,7 +61,7 @@ class EditProfile extends BaseEditProfile
                 ])->columnSpanFull()
                     ->columns(2),
             ])->columns(2)
-                ->inlineLabel(false);
+            ->inlineLabel(false);
     }
 
     protected function getRedirectUrl(): string

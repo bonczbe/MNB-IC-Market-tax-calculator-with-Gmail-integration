@@ -2,10 +2,8 @@
 
 namespace App\Filament\Resources\DailyStatuses\Tables;
 
-use App\Enums\AccountTransactionTypeEnum;
 use App\Enums\UserRoleEnum;
-use App\Repositories\DailyStatusRepository;
-use Carbon\Carbon;
+use App\Services\DailyStatusService;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -15,13 +13,12 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Cache;
 
 class DailyStatusesTable
 {
     public static function configure(Table $table): Table
     {
-        $dailyStatusRepository = app(DailyStatusRepository::class);
+        $dailyStatusService = app(DailyStatusService::class);
 
         return $table
             ->modifyQueryUsing(fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
@@ -47,31 +44,8 @@ class DailyStatusesTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('profit')
-                    ->getStateUsing(function ($record) use ($dailyStatusRepository) {
-                        $depositAndWithdrawSum = 0;
-
-                        $prevBalance = Cache::remember(
-                            'DailyStatus'.$record->broker->user->id.'$'.$record->date.'$'.$record->broker->id,
-                            86400,
-                            fn () => $dailyStatusRepository
-                                ->firstSmallerDatedStatus($record->broker->id, Carbon::parse($record->date))
-                        );
-
-                        $transactions = $record->broker->accountTransactions->filter(fn ($act) => $act->date == $record->date);
-
-                        foreach ($transactions as $transaction) {
-                            $value = $transaction->amount;
-                            if ($transaction->type == AccountTransactionTypeEnum::WITHDRAWAL) {
-                                $value *= -1;
-                            }
-                            $depositAndWithdrawSum += $value;
-                        }
-
-                        if ($prevBalance == null) {
-                            return $record->balance - $record->broker->starting_balance - $depositAndWithdrawSum;
-                        }
-
-                        return $record->balance - $prevBalance->balance - $depositAndWithdrawSum;
+                    ->getStateUsing(function ($record) use ($dailyStatusService) {
+                        return $dailyStatusService->calculateProfitForDay($record);
                     })
                     ->suffix(fn ($record) => ' '.$record->broker->broker_currency)
                     ->color(fn ($state) => ((float) $state > 0) ? Color::Green : Color::Red)

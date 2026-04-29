@@ -16,9 +16,9 @@ class TaxCalculatorService
 {
     public function __construct(
         private readonly BrokerAccountRepository $broker_account_repository,
-        private readonly DailyStatusRepository $daily_status_repository,
         private readonly RateRepository $rate_repository,
-        private readonly YearlyTaxCalculationRepository $yearly_tax_calculation_repository
+        private readonly YearlyTaxCalculationRepository $yearly_tax_calculation_repository,
+        private readonly DailyStatusService $daily_status_service
     ) {}
 
     public function calculateAllBrokerAccountTaxForYear(Carbon $currentDate, $userId)
@@ -35,7 +35,7 @@ class TaxCalculatorService
             $ratesForBroker = $ratesOfTheYear
                 ->filter(fn ($rate) => $rate->base_currency == $broker->broker_currency);
 
-            $lastBeforeTheYear = $this->daily_status_repository
+            $lastBeforeTheYear = $this->daily_status_service
                 ->firstSmallerDatedStatus($broker->id, $startOfYear);
 
             $allProfitInExchangedCurrency += $this->calculateYearlyProfitInBaseCurrency(
@@ -135,7 +135,7 @@ class TaxCalculatorService
 
             $transactions = $broker->accountTransactions->filter(fn ($act) => $act->date == $status->date);
 
-            $depositAndWithdrawSum = $this->sumOfTransactions($transactions);
+            $depositAndWithdrawSum = $this->daily_status_service->sumOfTransactions($transactions);
 
             $dailyProfitOrLoss = ($previousStatus !== null) ?
                 $status->balance - ($previousStatus->balance + $depositAndWithdrawSum) :
@@ -150,20 +150,6 @@ class TaxCalculatorService
         }
 
         return $allProfitInExchangedCurrency;
-    }
-
-    private function sumOfTransactions($transactions)
-    {
-        $sum = 0;
-        foreach ($transactions as $transaction) {
-            $value = $transaction->amount;
-            if ($transaction->type == AccountTransactionTypeEnum::WITHDRAWAL) {
-                $value *= -1;
-            }
-            $sum += $value;
-        }
-
-        return $sum;
     }
 
     public function calculateCurrentWeekNetProfit(Carbon $currentDate, $userId)
@@ -226,7 +212,7 @@ class TaxCalculatorService
             $ratesForBroker = $rates
                 ->filter(fn ($rate) => $rate->base_currency == $broker->broker_currency);
 
-            $lastBeforeStartDate = $this->daily_status_repository
+            $lastBeforeStartDate = $this->daily_status_service
                 ->firstSmallerDatedStatus($broker->id, $startDate);
 
             $allProfitInExchangedCurrency += $this->calculateYearlyProfitInBaseCurrency(

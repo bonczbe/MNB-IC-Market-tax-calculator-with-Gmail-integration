@@ -15,24 +15,17 @@ class DailyStatusService
     public function calculateProfitForDay(DailyStatus $record)
     {
         return Cache::remember('DailyStatusCalculated_'.$record->id, Carbon::now()->addMinutes(30), function () use ($record) {
-            $depositAndWithdrawSum = 0;
 
             $prevBalance = Cache::remember(
                 'DailyStatus'.$record->broker->user->id.'$'.$record->date.'$'.$record->broker->id,
                 86400,
-                fn () => $this->daily_status_repository
+                fn () => $this
                     ->firstSmallerDatedStatus($record->broker->id, Carbon::parse($record->date))
             );
 
             $transactions = $record->broker->accountTransactions->filter(fn ($act) => $act->date == $record->date);
 
-            foreach ($transactions as $transaction) {
-                $value = $transaction->amount;
-                if ($transaction->type == AccountTransactionTypeEnum::WITHDRAWAL) {
-                    $value *= -1;
-                }
-                $depositAndWithdrawSum += $value;
-            }
+            $depositAndWithdrawSum = $this->sumOfTransactions($transactions);
 
             if ($prevBalance == null) {
                 return $record->balance - $record->broker->starting_balance - $depositAndWithdrawSum;
@@ -40,5 +33,25 @@ class DailyStatusService
 
             return $record->balance - $prevBalance->balance - $depositAndWithdrawSum;
         });
+    }
+
+    public function sumOfTransactions($transactions)
+    {
+        $sum = 0;
+        foreach ($transactions as $transaction) {
+            $value = $transaction->amount;
+            if ($transaction->type == AccountTransactionTypeEnum::WITHDRAWAL) {
+                $value *= -1;
+            }
+            $sum += $value;
+        }
+
+        return $sum;
+    }
+
+    public function firstSmallerDatedStatus($brokerId,$startDate)
+    {
+        return $this->daily_status_repository
+                ->firstSmallerDatedStatus($brokerId, $startDate);;
     }
 }

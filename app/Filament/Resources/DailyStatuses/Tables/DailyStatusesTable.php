@@ -22,8 +22,8 @@ class DailyStatusesTable
 
         return $table
             ->modifyQueryUsing(fn ($query) => auth()->user()->role === UserRoleEnum::ADMIN
-    ? $query
-    : $query->whereHas('broker', fn ($q) => $q->where('user_id', auth()->id()))
+                ? $query
+                : $query->whereHas('broker', fn ($q) => $q->where('user_id', auth()->id()))
             )
             ->columns([
                 TextColumn::make('date')

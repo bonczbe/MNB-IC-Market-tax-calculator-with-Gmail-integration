@@ -17,7 +17,7 @@ class DailyStatusService
         return Cache::remember('DailyStatusCalculated_'.$record->id, Carbon::now()->addMinutes(30), function () use ($record) {
 
             $prevBalance = $this
-                    ->firstSmallerDatedStatus($record->broker->id, Carbon::parse($record->date));
+                ->firstSmallerDatedStatus($record->broker->id, Carbon::parse($record->date));
 
             $transactions = $record->broker->accountTransactions->filter(fn ($act) => $act->date == $record->date);
 
@@ -45,9 +45,9 @@ class DailyStatusService
         return $sum;
     }
 
-    public function firstSmallerDatedStatus(int $brokerId,Carbon $startDate)
+    public function firstSmallerDatedStatus(int $brokerId, Carbon $startDate)
     {
         return $this->daily_status_repository
-                ->firstSmallerDatedStatus($brokerId, $startDate);;
+            ->firstSmallerDatedStatus($brokerId, $startDate);
     }
 }

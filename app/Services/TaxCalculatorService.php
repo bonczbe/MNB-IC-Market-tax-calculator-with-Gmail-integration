@@ -2,9 +2,7 @@
 
 namespace App\Services;
 
-use App\Enums\AccountTransactionTypeEnum;
 use App\Repositories\BrokerAccountRepository;
-use App\Repositories\DailyStatusRepository;
 use App\Repositories\RateRepository;
 use App\Repositories\YearlyTaxCalculationRepository;
 use Carbon\Carbon;
@@ -21,12 +19,32 @@ class TaxCalculatorService
         private readonly DailyStatusService $daily_status_service
     ) {}
 
-    public function calculateAllBrokerAccountTaxForYear(Carbon $currentDate, $userId)
+    private function generateStartEndOfYear(Carbon $now)
     {
-        $startOfYear = $currentDate->copy()->startOfYear();
-        $endOfYear = $currentDate->copy()->endOfYear();
+        $start = $now->copy()->startOfYear();
+        $end = $now->copy()->endOfYear();
 
-        ['brokers' => $brokers, 'rates' => $ratesOfTheYear] = $this->getRatesAndBrokersForDateBetween($currentDate, $startOfYear, $endOfYear, $userId);
+        return [$start, $end];
+    }
+
+    private function formatMoney(float $value)
+    {
+        return number_format((int) ceil($value)).' '.config('tax.base_currency');
+    }
+
+    private function getYearContext(Carbon $currentDate, int $userId)
+    {
+        [$startOfYear, $endOfYear] = $this->generateStartEndOfYear($currentDate);
+
+        ['brokers' => $brokers, 'rates' => $rates] =
+            $this->getRatesAndBrokersForDateBetween($currentDate, $startOfYear, $endOfYear, $userId);
+
+        return compact('startOfYear', 'endOfYear', 'brokers', 'rates');
+    }
+
+    public function calculateAllBrokerAccountTaxForYear(Carbon $currentDate, int $userId)
+    {
+        ['startOfYear' => $startOfYear, 'brokers' => $brokers, 'rates' => $ratesOfTheYear] = $this->getYearContext($currentDate, $userId);
 
         foreach ($brokers as $broker) {
             $allProfitInExchangedCurrency = 0;
@@ -71,32 +89,30 @@ class TaxCalculatorService
         }
     }
 
-    public function calculateAllBrokerAccountTaxForActualYear(Carbon $currentDate, $userId)
+    public function calculateAllBrokerAccountTaxForActualYear(Carbon $currentDate, int $userId)
     {
-        $startOfYear = $currentDate->copy()->startOfYear();
-        $endOfYear = $currentDate->copy()->endOfYear();
-
-        ['brokers' => $brokers, 'rates' => $ratesOfTheYear] = $this->getRatesAndBrokersForDateBetween($currentDate, $startOfYear, $endOfYear, $userId);
+        ['startOfYear' => $startOfYear, 'brokers' => $brokers, 'rates' => $ratesOfTheYear] = $this->getYearContext($currentDate, $userId);
 
         $tax = $this->calculateTotalTaxForBrokers($brokers, $ratesOfTheYear, $startOfYear, config('tax.volume'));
 
-        return number_format(ceil($tax)).' '.config('tax.base_currency');
+        return $this->formatMoney($tax);
 
     }
 
     public function calculateTaxForPreviousYears(Carbon $currentYear)
     {
-
+        $userId = auth()->user()->id;
         $previousCards = [];
 
-        $previousYears = Cache::remember('previousYears'.auth()->user()->id, Carbon::now()->endOfDay()->subMinute(1), fn () => $this
+        $previousYears = Cache::remember('previousYears'.$userId, Carbon::now()->endOfDay()->subMinute(1), fn () => $this
             ->yearly_tax_calculation_repository
             ->getAllExistingYearsExceptTheGivenDate($currentYear)
         );
 
         foreach ($previousYears as $prevYear) {
             $yearTax = 0;
-            $yearDatas = Cache::remember('yearDatas'.auth()->user()->id.$prevYear, Carbon::now()->endOfDay()->subMinute(1), fn () => $this
+
+            $yearDatas = Cache::remember('yearDatas'.$userId.$prevYear, Carbon::now()->endOfDay()->subMinute(1), fn () => $this
                 ->yearly_tax_calculation_repository
                 ->getByDate($prevYear)
             );
@@ -117,7 +133,19 @@ class TaxCalculatorService
         return $previousCards;
 
     }
+private function calculateDailyPnL(
+    $status,
+    $previousStatus,
+    $lastBeforePeriod,
+    $starterBalance,
+    $netDepositsForDay
+) {
+    $referenceBalance = $previousStatus->balance
+        ?? $lastBeforePeriod->balance
+        ?? $starterBalance;
 
+    return $status->balance - ($referenceBalance + $netDepositsForDay);
+}
     private function calculateYearlyProfitInBaseCurrency(
         $broker,
         $ratesForBroker,
@@ -137,12 +165,7 @@ class TaxCalculatorService
 
             $depositAndWithdrawSum = $this->daily_status_service->sumOfTransactions($transactions);
 
-            $dailyProfitOrLoss = ($previousStatus !== null) ?
-                $status->balance - ($previousStatus->balance + $depositAndWithdrawSum) :
-                (($lastBeforeTheYear !== null) ?
-                    $status->balance - ($lastBeforeTheYear->balance + $depositAndWithdrawSum) :
-                    $status->balance - ($starterBalance + $depositAndWithdrawSum)
-                );
+            $dailyProfitOrLoss = $this->calculateDailyPnL($status,$previousStatus,$lastBeforeTheYear,$starterBalance,$depositAndWithdrawSum);
 
             $allProfitInExchangedCurrency += $dailyProfitOrLoss * (($rate->rate ?? 1) / ($rate->unit ?? 1));
 
@@ -160,22 +183,18 @@ class TaxCalculatorService
         return $this->calculateNetProfitForDatesBetween($startOfWeek, $endOfWeek, $currentDate, $userId);
     }
 
-    public function calculateGrossProfitOfYear(Carbon $currentDate, $userId)
+    public function calculateGrossProfitOfYear(Carbon $currentDate, int $userId)
     {
-        $startOfYear = $currentDate->copy()->startOfYear();
-        $endOfYear = $currentDate->copy()->endOfYear();
-
-        ['brokers' => $brokers, 'rates' => $ratesOfTheYear] = $this->getRatesAndBrokersForDateBetween($currentDate, $startOfYear, $endOfYear, $userId);
+        ['startOfYear' => $startOfYear, 'brokers' => $brokers, 'rates' => $ratesOfTheYear] = $this->getYearContext($currentDate, $userId);
 
         $tax = $this->calculateTotalTaxForBrokers($brokers, $ratesOfTheYear, $startOfYear, 1);
 
-        return number_format(ceil($tax)).' '.config('tax.base_currency');
+        return $this->formatMoney($tax);
     }
 
-    public function calculateCurrentYearNetProfit(Carbon $currentDate, $userId)
+    public function calculateCurrentYearNetProfit(Carbon $currentDate, int $userId)
     {
-        $startOfYear = $currentDate->copy()->startOfYear();
-        $endOfYear = $currentDate->copy()->endOfYear();
+        [$startOfYear, $endOfYear] = $this->generateStartEndOfYear($currentDate);
 
         return $this->calculateNetProfitForDatesBetween($startOfYear, $endOfYear, $currentDate, $userId);
 
@@ -187,7 +206,7 @@ class TaxCalculatorService
 
         $tax = $this->calculateTotalTaxForBrokers($brokers, $rates, $start, (1 - config('tax.volume')));
 
-        return number_format(ceil($tax)).' '.config('tax.base_currency');
+        return $this->formatMoney($tax);
     }
 
     private function getRatesAndBrokersForDateBetween(Carbon $current, Carbon $start, Carbon $end, $userId)

@@ -27,7 +27,7 @@ class Yearly extends ChartWidget
 
         $chartService = app(ChartService::class);
 
-        $data = Cache::remember('yearly_chart_data_'.auth()->user()->id.'_'.$activeYear.'_'.$activeBroker, Carbon::now()->endOfDay()->subMinute(1), function () use ($chartService, $activeYear, $activeBroker) {
+        $data = Cache::remember('yearly_chart_data_'.auth()->user()->id.'_'.$activeYear.'_'.$activeBroker, Carbon::now()->endOfDay(), function () use ($chartService, $activeYear, $activeBroker) {
             return $chartService->getYearlyChartData($activeYear, $activeBroker);
         });
 

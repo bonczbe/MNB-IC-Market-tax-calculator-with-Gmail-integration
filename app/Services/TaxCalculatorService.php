@@ -133,19 +133,21 @@ class TaxCalculatorService
         return $previousCards;
 
     }
-private function calculateDailyPnL(
-    $status,
-    $previousStatus,
-    $lastBeforePeriod,
-    $starterBalance,
-    $netDepositsForDay
-) {
-    $referenceBalance = $previousStatus->balance
-        ?? $lastBeforePeriod->balance
-        ?? $starterBalance;
 
-    return $status->balance - ($referenceBalance + $netDepositsForDay);
-}
+    private function calculateDailyPnL(
+        $status,
+        $previousStatus,
+        $lastBeforePeriod,
+        $starterBalance,
+        $netDepositsForDay
+    ) {
+        $referenceBalance = $previousStatus?->balance
+            ?? $lastBeforePeriod?->balance
+            ?? $starterBalance;
+
+        return $status->balance - ($referenceBalance + $netDepositsForDay);
+    }
+
     private function calculateYearlyProfitInBaseCurrency(
         $broker,
         $ratesForBroker,
@@ -165,7 +167,7 @@ private function calculateDailyPnL(
 
             $depositAndWithdrawSum = $this->daily_status_service->sumOfTransactions($transactions);
 
-            $dailyProfitOrLoss = $this->calculateDailyPnL($status,$previousStatus,$lastBeforeTheYear,$starterBalance,$depositAndWithdrawSum);
+            $dailyProfitOrLoss = $this->calculateDailyPnL($status, $previousStatus, $lastBeforeTheYear, $starterBalance, $depositAndWithdrawSum);
 
             $allProfitInExchangedCurrency += $dailyProfitOrLoss * (($rate->rate ?? 1) / ($rate->unit ?? 1));
 

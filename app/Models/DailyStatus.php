@@ -33,6 +33,7 @@ class DailyStatus extends Model
         static::updated(function (DailyStatus $dailyStatus) {
             Cache::forget('DailyStatusCalculated_'.$dailyStatus->id);
             Cache::forget('weekly_chart_data'.(auth()->user()->id ?? 0).'_'.$dailyStatus->broker->id);
+            Cache::forget('weekly_chart_data'.(auth()->user()->id ?? 0).'_0');
         });
     }
 }

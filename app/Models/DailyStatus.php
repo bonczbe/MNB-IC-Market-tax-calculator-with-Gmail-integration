@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,7 +30,10 @@ class DailyStatus extends Model
 
     protected static function booted(): void
     {
+
         static::created(function (DailyStatus $dailyStatus) {
+        $currentDate = Carbon::now();
+
             Cache::forget('DailyStatusCalculated_'.$dailyStatus->id);
 
             $userId = $dailyStatus->broker()->first()?->user_id;
@@ -38,10 +42,16 @@ class DailyStatus extends Model
             if ($userId !== null) {
                 Cache::forget("weekly_chart_data{$userId}_{$brokerId}");
                 Cache::forget("weekly_chart_data{$userId}_0");
+                Cache::forget("calculatecurrentDate{$userId}");
+                Cache::forget("profitForTheWeek{$userId}w_{$currentDate->copy()->format('W')}");
+                Cache::forget("grossProfitOfYear{$userId}");
+                Cache::forget("profitForYear{$userId}");
             }
         });
-        
+
         static::updated(function (DailyStatus $dailyStatus) {
+        $currentDate = Carbon::now();
+
             Cache::forget('DailyStatusCalculated_'.$dailyStatus->id);
 
             $userId = $dailyStatus->broker()->first()?->user_id;
@@ -50,6 +60,10 @@ class DailyStatus extends Model
             if ($userId !== null) {
                 Cache::forget("weekly_chart_data{$userId}_{$brokerId}");
                 Cache::forget("weekly_chart_data{$userId}_0");
+                Cache::forget("calculatecurrentDate{$userId}");
+                Cache::forget("profitForTheWeek{$userId}w_{$currentDate->copy()->format('W')}");
+                Cache::forget("grossProfitOfYear{$userId}");
+                Cache::forget("profitForYear{$userId}");
             }
         });
     }

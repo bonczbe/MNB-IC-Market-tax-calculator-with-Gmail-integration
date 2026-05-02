@@ -28,43 +28,34 @@ class DailyStatus extends Model
         return $this->belongsTo(BrokerAccount::class, 'broker_account_id');
     }
 
+    private function resetCaches(DailyStatus $dailyStatus)
+    {
+        $currentDate = Carbon::now();
+
+        Cache::forget('DailyStatusCalculated_'.$dailyStatus->id);
+
+        $userId = $dailyStatus->broker()->first()?->user_id;
+        $brokerId = $dailyStatus->broker_account_id;
+
+        if ($userId !== null) {
+            Cache::forget("weekly_chart_data{$userId}_{$brokerId}");
+            Cache::forget("weekly_chart_data{$userId}_0");
+            Cache::forget("calculatecurrentDate{$userId}");
+            Cache::forget("profitForTheWeek{$userId}w_{$currentDate->copy()->format('W')}");
+            Cache::forget("grossProfitOfYear{$userId}");
+            Cache::forget("profitForYear{$userId}");
+        }
+    }
+
     protected static function booted(): void
     {
 
         static::created(function (DailyStatus $dailyStatus) {
-        $currentDate = Carbon::now();
-
-            Cache::forget('DailyStatusCalculated_'.$dailyStatus->id);
-
-            $userId = $dailyStatus->broker()->first()?->user_id;
-            $brokerId = $dailyStatus->broker_account_id;
-
-            if ($userId !== null) {
-                Cache::forget("weekly_chart_data{$userId}_{$brokerId}");
-                Cache::forget("weekly_chart_data{$userId}_0");
-                Cache::forget("calculatecurrentDate{$userId}");
-                Cache::forget("profitForTheWeek{$userId}w_{$currentDate->copy()->format('W')}");
-                Cache::forget("grossProfitOfYear{$userId}");
-                Cache::forget("profitForYear{$userId}");
-            }
+            $this->resetCaches($dailyStatus);
         });
 
         static::updated(function (DailyStatus $dailyStatus) {
-        $currentDate = Carbon::now();
-
-            Cache::forget('DailyStatusCalculated_'.$dailyStatus->id);
-
-            $userId = $dailyStatus->broker()->first()?->user_id;
-            $brokerId = $dailyStatus->broker_account_id;
-
-            if ($userId !== null) {
-                Cache::forget("weekly_chart_data{$userId}_{$brokerId}");
-                Cache::forget("weekly_chart_data{$userId}_0");
-                Cache::forget("calculatecurrentDate{$userId}");
-                Cache::forget("profitForTheWeek{$userId}w_{$currentDate->copy()->format('W')}");
-                Cache::forget("grossProfitOfYear{$userId}");
-                Cache::forget("profitForYear{$userId}");
-            }
+            $this->resetCaches($dailyStatus);
         });
     }
 }

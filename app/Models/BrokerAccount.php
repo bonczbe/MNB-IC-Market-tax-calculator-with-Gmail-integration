@@ -61,6 +61,8 @@ class BrokerAccount extends Model
         $brokerId = $this->id;
 
         if ($userId !== null) {
+            Cache::forget("yearly_chart_data_{$userId}_current_year_0");
+            Cache::forget("yearly_chart_data_{$userId}_current_year_{$brokerId}");
             Cache::forget("weekly_chart_data{$userId}_{$brokerId}");
             Cache::forget("weekly_chart_data{$userId}_0");
             Cache::forget("calculatecurrentDate{$userId}");

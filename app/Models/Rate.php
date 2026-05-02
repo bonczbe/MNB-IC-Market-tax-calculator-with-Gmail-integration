@@ -26,11 +26,11 @@ class Rate extends Model
     {
 
         static::created(function (Rate $rate) {
-            Cache::forget("rateBaseCurrency");
+            Cache::clear();
         });
 
         static::updated(function (Rate $rate) {
-            Cache::forget("rateBaseCurrency");
+            Cache::clear();
         });
     }
 }

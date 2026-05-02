@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Cache;
 
 class BrokerAccount extends Model
 {
@@ -48,5 +50,35 @@ class BrokerAccount extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+    public function resetCaches()
+    {
+        $currentDate = Carbon::now();
+
+        Cache::forget('DailyStatusCalculated_'.$this->id);
+
+        $userId = $this->user_id;
+        $brokerId = $this->id;
+
+        if ($userId !== null) {
+            Cache::forget("weekly_chart_data{$userId}_{$brokerId}");
+            Cache::forget("weekly_chart_data{$userId}_0");
+            Cache::forget("calculatecurrentDate{$userId}");
+            Cache::forget("profitForTheWeek{$userId}w_{$currentDate->copy()->format('W')}");
+            Cache::forget("grossProfitOfYear{$userId}");
+            Cache::forget("profitForYear{$userId}");
+        }
+    }
+
+    protected static function booted(): void
+    {
+
+        static::created(function (BrokerAccount $broker) {
+            $broker->resetCaches();
+        });
+
+        static::updated(function (BrokerAccount $broker) {
+            $broker->resetCaches();
+        });
     }
 }

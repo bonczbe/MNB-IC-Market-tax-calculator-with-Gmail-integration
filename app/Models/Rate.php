@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Rate extends Model
 {
@@ -20,4 +21,16 @@ class Rate extends Model
     protected $casts = [
         'date' => 'date',
     ];
+
+    protected static function booted(): void
+    {
+
+        static::created(function (Rate $rate) {
+            Cache::forget("rateBaseCurrency");
+        });
+
+        static::updated(function (Rate $rate) {
+            Cache::forget("rateBaseCurrency");
+        });
+    }
 }

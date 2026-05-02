@@ -34,7 +34,7 @@ class DailyStatus extends Model
 
         Cache::forget('DailyStatusCalculated_'.$this->id);
 
-        $userId = $this->broker()->first()?->user_id;
+        $userId = $this->broker()->value('user_id');
         $brokerId = $this->broker_account_id;
 
         if ($userId !== null) {

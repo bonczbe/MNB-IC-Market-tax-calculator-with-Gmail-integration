@@ -29,6 +29,18 @@ class DailyStatus extends Model
 
     protected static function booted(): void
     {
+        static::created(function (DailyStatus $dailyStatus) {
+            Cache::forget('DailyStatusCalculated_'.$dailyStatus->id);
+
+            $userId = $dailyStatus->broker()->first()?->user_id;
+            $brokerId = $dailyStatus->broker_account_id;
+
+            if ($userId !== null) {
+                Cache::forget("weekly_chart_data{$userId}_{$brokerId}");
+                Cache::forget("weekly_chart_data{$userId}_0");
+            }
+        });
+        
         static::updated(function (DailyStatus $dailyStatus) {
             Cache::forget('DailyStatusCalculated_'.$dailyStatus->id);
 

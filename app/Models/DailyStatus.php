@@ -28,7 +28,7 @@ class DailyStatus extends Model
         return $this->belongsTo(BrokerAccount::class, 'broker_account_id');
     }
 
-    private function resetCaches(DailyStatus $dailyStatus)
+    public function resetCaches(DailyStatus $dailyStatus)
     {
         $currentDate = Carbon::now();
 
@@ -51,11 +51,11 @@ class DailyStatus extends Model
     {
 
         static::created(function (DailyStatus $dailyStatus) {
-            $this->resetCaches($dailyStatus);
+            $dailyStatus->resetCaches($dailyStatus);
         });
 
         static::updated(function (DailyStatus $dailyStatus) {
-            $this->resetCaches($dailyStatus);
+            $dailyStatus->resetCaches($dailyStatus);
         });
     }
 }

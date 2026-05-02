@@ -28,14 +28,14 @@ class DailyStatus extends Model
         return $this->belongsTo(BrokerAccount::class, 'broker_account_id');
     }
 
-    public function resetCaches(DailyStatus $dailyStatus)
+    public function resetCaches()
     {
         $currentDate = Carbon::now();
 
-        Cache::forget('DailyStatusCalculated_'.$dailyStatus->id);
+        Cache::forget('DailyStatusCalculated_'.$this->id);
 
-        $userId = $dailyStatus->broker()->first()?->user_id;
-        $brokerId = $dailyStatus->broker_account_id;
+        $userId = $this->broker()->first()?->user_id;
+        $brokerId = $this->broker_account_id;
 
         if ($userId !== null) {
             Cache::forget("weekly_chart_data{$userId}_{$brokerId}");
@@ -51,11 +51,11 @@ class DailyStatus extends Model
     {
 
         static::created(function (DailyStatus $dailyStatus) {
-            $dailyStatus->resetCaches($dailyStatus);
+            $dailyStatus->resetCaches();
         });
 
         static::updated(function (DailyStatus $dailyStatus) {
-            $dailyStatus->resetCaches($dailyStatus);
+            $dailyStatus->resetCaches();
         });
     }
 }

@@ -13,11 +13,11 @@ class ForexEventService
 {
     public function __construct(private readonly ForexEventRepository $forex_event_repository) {}
 
-    public function extractUsForexEvents(): void
+    public function extractForexEvents(): void
     {
         try {
-            $from = Carbon::now()->startOfWeek()->format('Y-m-d').'T00:00:00.000Z';
-            $to = Carbon::now()->endOfWeek()->format('Y-m-d').'T23:59:59.000Z';
+            $from = Carbon::now()->addweek()->startOfWeek()->format('Y-m-d').'T00:00:00.000Z';
+            $to = Carbon::now()->addweek()->endOfWeek()->format('Y-m-d').'T23:59:59.000Z';
 
             $url = "https://economic-calendar.tradingview.com/events?from={$from}&to={$to}&countries=US,DE,FR,IT,ES,UK,JP,CN,CH,CA,AU";
 

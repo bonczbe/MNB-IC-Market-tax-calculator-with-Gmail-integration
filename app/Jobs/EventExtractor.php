@@ -25,6 +25,6 @@ class EventExtractor implements ShouldQueue
      */
     public function handle(ForexEventService $forex_event_service): void
     {
-        $forex_event_service->extractUsForexEvents();
+        $forex_event_service->extractForexEvents();
     }
 }

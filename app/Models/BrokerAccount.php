@@ -51,6 +51,7 @@ class BrokerAccount extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
     public function resetCaches()
     {
         $currentDate = Carbon::now();

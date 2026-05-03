@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\BrokerEmailExtractor;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class EmailExtract extends Command
 {
@@ -26,7 +27,17 @@ class EmailExtract extends Command
      */
     public function handle()
     {
-        BrokerEmailExtractor::dispatch();
-        $this->info('Email extract job dispatched!');
+        $lock = Cache::lock('email-extract-lock', 5);
+        if (! $lock->get()) {
+            $this->info('Another instance of the command is already running. Exiting.');
+
+            return;
+        }
+        try {
+            BrokerEmailExtractor::dispatch();
+            $this->info('Email extract job dispatched!');
+        } finally {
+            $lock->release();
+        }
     }
 }

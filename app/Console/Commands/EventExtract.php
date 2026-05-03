@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\EventExtractor;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class EventExtract extends Command
 {
@@ -26,7 +27,17 @@ class EventExtract extends Command
      */
     public function handle()
     {
-        EventExtractor::dispatch();
-        $this->info('Event extract job dispatched!');
+        $lock = Cache::lock('event-extract-lock', 5);
+        if (! $lock->get()) {
+            $this->info('Another instance of the command is already running. Exiting.');
+
+            return;
+        }
+        try {
+            EventExtractor::dispatch();
+            $this->info('Event extract job dispatched!');
+        } finally {
+            $lock->release();
+        }
     }
 }

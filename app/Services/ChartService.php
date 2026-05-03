@@ -8,6 +8,7 @@ use App\Repositories\DailyStatusRepository;
 use App\Repositories\RateRepository;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Illuminate\Support\Facades\Cache;
 
 class ChartService
 {
@@ -40,7 +41,7 @@ class ChartService
 
         $userId = auth()->user()->id;
 
-        return $this->dailyStatusRepository->getYearsForUserExceptCurrent($userId);
+        return Cache::remember("years_for_user_{$userId}",Carbon::now()->endOfDay(),fn()=>$this->dailyStatusRepository->getYearsForUserExceptCurrent($userId));
     }
 
     private function getRatesAndStatusRecordsForDate(Carbon $date, $statuses): array

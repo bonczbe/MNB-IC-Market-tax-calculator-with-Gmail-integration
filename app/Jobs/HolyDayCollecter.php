@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Services\HolydayService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Cache;
 
 class HolyDayCollecter implements ShouldQueue
 {
@@ -25,6 +26,15 @@ class HolyDayCollecter implements ShouldQueue
      */
     public function handle(HolydayService $holyday_service): void
     {
+        $lock = Cache::lock('holyday-collect-lock', 5);
+        if (! $lock->get()) {
+
+            return;
+        }
+        try {
         $holyday_service->fetchHolyDays();
+        } finally {
+            $lock->release();
+        }
     }
 }

@@ -27,19 +27,7 @@ class FetchMNBRate extends Command
      */
     public function handle()
     {
-
-        $lock = Cache::lock('fetch-mnb-rate-lock', 5);
-
-        if (! $lock->get()) {
-            $this->info('Another instance of the command is already running. Exiting.');
-
-            return;
-        }
-        try {
             MNBRateFetcher::dispatch();
             $this->info('MNB rate job dispatched!');
-        } finally {
-            $lock->release();
-        }
     }
 }

@@ -27,17 +27,7 @@ class EventExtract extends Command
      */
     public function handle()
     {
-        $lock = Cache::lock('event-extract-lock', 5);
-        if (! $lock->get()) {
-            $this->info('Another instance of the command is already running. Exiting.');
-
-            return;
-        }
-        try {
             EventExtractor::dispatch();
             $this->info('Event extract job dispatched!');
-        } finally {
-            $lock->release();
-        }
     }
 }

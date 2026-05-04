@@ -27,17 +27,7 @@ class HolyDayCollect extends Command
      */
     public function handle()
     {
-        $lock = Cache::lock('holyday-collect-lock', 5);
-        if (! $lock->get()) {
-            $this->info('Another instance of the command is already running. Exiting.');
-
-            return;
-        }
-        try {
             HolyDayCollecter::dispatch();
             $this->info('Get holydays job dispatched!');
-        } finally {
-            $lock->release();
-        }
     }
 }

@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Services\ForexEventService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Cache;
 
 class EventExtractor implements ShouldQueue
 {
@@ -25,6 +26,16 @@ class EventExtractor implements ShouldQueue
      */
     public function handle(ForexEventService $forex_event_service): void
     {
-        $forex_event_service->extractForexEvents();
+        
+        $lock = Cache::lock('event-extract-lock', 5);
+        if (! $lock->get()) {
+
+            return;
+        }
+        try {
+         $forex_event_service->extractForexEvents();
+        } finally {
+            $lock->release();
+        }
     }
 }

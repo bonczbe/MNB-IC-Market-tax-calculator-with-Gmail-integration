@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Services\EmailExtractorService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Cache;
 
 class BrokerEmailExtractor implements ShouldQueue
 {
@@ -25,6 +26,16 @@ class BrokerEmailExtractor implements ShouldQueue
      */
     public function handle(EmailExtractorService $email_extractor_service): void
     {
-        $email_extractor_service->extractAndSaveEmail();
+        $lock = Cache::lock('email-extract-lock', 5);
+
+        if (! $lock->get()) {
+            return;
+        }
+        
+        try{
+            $email_extractor_service->extractAndSaveEmail();
+        }finally{
+            $lock->release();
+        }
     }
 }

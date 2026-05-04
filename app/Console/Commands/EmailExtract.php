@@ -27,17 +27,7 @@ class EmailExtract extends Command
      */
     public function handle()
     {
-        $lock = Cache::lock('email-extract-lock', 5);
-        if (! $lock->get()) {
-            $this->info('Another instance of the command is already running. Exiting.');
-
-            return;
-        }
-        try {
-            BrokerEmailExtractor::dispatch();
-            $this->info('Email extract job dispatched!');
-        } finally {
-            $lock->release();
-        }
+        BrokerEmailExtractor::dispatch();
+        $this->info('Email extract job dispatched!');
     }
 }

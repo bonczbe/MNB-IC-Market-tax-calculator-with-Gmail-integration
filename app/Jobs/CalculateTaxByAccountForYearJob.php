@@ -7,6 +7,7 @@ use App\Services\TaxCalculatorService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Cache;
 
 class CalculateTaxByAccountForYearJob implements ShouldQueue
 {
@@ -27,12 +28,22 @@ class CalculateTaxByAccountForYearJob implements ShouldQueue
      */
     public function handle(TaxCalculatorService $tax_calculator_service): void
     {
-        $currentYear = Carbon::now();
+        
+        $lock = Cache::lock('calculate-tax-by-account-for-year-lock', 5);
 
-        $userRepo = app(UserRepository::class);
+        if (! $lock->get()) {
+            return;
+        }
+        try {
+            $currentYear = Carbon::now();
 
-        foreach ($userRepo->getAllUser() as $user) {
-            $tax_calculator_service->calculateAllBrokerAccountTaxForYear($currentYear, $user->id);
+            $userRepo = app(UserRepository::class);
+
+            foreach ($userRepo->getAllUser() as $user) {
+                $tax_calculator_service->calculateAllBrokerAccountTaxForYear($currentYear, $user->id);
+            }
+        } finally {
+            $lock->release();
         }
 
     }

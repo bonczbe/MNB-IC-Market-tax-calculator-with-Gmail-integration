@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Services\RateService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Cache;
 
 class MNBRateFetcher implements ShouldQueue
 {
@@ -25,6 +26,17 @@ class MNBRateFetcher implements ShouldQueue
      */
     public function handle(RateService $rate_service): void
     {
+
+        $lock = Cache::lock('fetch-mnb-rate-lock', 5);
+
+        if (! $lock->get()) {
+
+            return;
+        }
+        try {
         $rate_service->fetchAndUpsertRatesByMNB();
+        } finally {
+            $lock->release();
+        }
     }
 }

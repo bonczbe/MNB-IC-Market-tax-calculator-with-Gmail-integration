@@ -29,7 +29,7 @@ class DailyStatusRepository
         return DailyStatus::query()->distinct()->pluck($column, $column);
     }
 
-    public function getBetweenDatesByUserId($userId, Carbon $start, Carbon $end, $activeBroker = null)
+    public function getBetweenDatesByUserId(int $userId, Carbon $start, Carbon $end, $activeBroker = null)
     {
         return DailyStatus::query()
             ->whereHas('broker', fn (Builder $query) => $query->where('user_id', $userId))

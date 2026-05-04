@@ -31,10 +31,10 @@ class BrokerEmailExtractor implements ShouldQueue
         if (! $lock->get()) {
             return;
         }
-        
-        try{
+
+        try {
             $email_extractor_service->extractAndSaveEmail();
-        }finally{
+        } finally {
             $lock->release();
         }
     }

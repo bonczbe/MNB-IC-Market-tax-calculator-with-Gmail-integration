@@ -44,7 +44,7 @@ class DailyStatusRepository
     {
         return DailyStatus::query()
             ->selectRaw('YEAR(date) as year')
-            ->where('date','<',Carbon::now()->startOfYear())
+            ->where('date', '<', Carbon::now()->startOfYear())
             ->whereHas('broker', fn (Builder $query) => $query->where('user_id', $userId))
             ->distinct()
             ->orderBy('year', 'desc')

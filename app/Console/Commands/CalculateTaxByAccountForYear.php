@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Jobs\CalculateTaxByAccountForYearJob;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
 
 class CalculateTaxByAccountForYear extends Command
 {
@@ -27,7 +26,7 @@ class CalculateTaxByAccountForYear extends Command
      */
     public function handle()
     {
-            CalculateTaxByAccountForYearJob::dispatch();
-            $this->info('Tax calculation for the year job dispatched!');
+        CalculateTaxByAccountForYearJob::dispatch();
+        $this->info('Tax calculation for the year job dispatched!');
     }
 }

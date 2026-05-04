@@ -34,7 +34,7 @@ class MNBRateFetcher implements ShouldQueue
             return;
         }
         try {
-        $rate_service->fetchAndUpsertRatesByMNB();
+            $rate_service->fetchAndUpsertRatesByMNB();
         } finally {
             $lock->release();
         }

@@ -28,7 +28,7 @@ class CalculateTaxByAccountForYearJob implements ShouldQueue
      */
     public function handle(TaxCalculatorService $tax_calculator_service): void
     {
-        
+
         $lock = Cache::lock('calculate-tax-by-account-for-year-lock', 5);
 
         if (! $lock->get()) {

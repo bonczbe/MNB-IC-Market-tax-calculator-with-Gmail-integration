@@ -26,14 +26,14 @@ class EventExtractor implements ShouldQueue
      */
     public function handle(ForexEventService $forex_event_service): void
     {
-        
+
         $lock = Cache::lock('event-extract-lock', 5);
         if (! $lock->get()) {
 
             return;
         }
         try {
-         $forex_event_service->extractForexEvents();
+            $forex_event_service->extractForexEvents();
         } finally {
             $lock->release();
         }

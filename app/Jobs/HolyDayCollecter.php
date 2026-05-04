@@ -32,7 +32,7 @@ class HolyDayCollecter implements ShouldQueue
             return;
         }
         try {
-        $holyday_service->fetchHolyDays();
+            $holyday_service->fetchHolyDays();
         } finally {
             $lock->release();
         }

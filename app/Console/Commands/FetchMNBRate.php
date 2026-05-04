@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Jobs\MNBRateFetcher;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
 
 class FetchMNBRate extends Command
 {
@@ -27,7 +26,7 @@ class FetchMNBRate extends Command
      */
     public function handle()
     {
-            MNBRateFetcher::dispatch();
-            $this->info('MNB rate job dispatched!');
+        MNBRateFetcher::dispatch();
+        $this->info('MNB rate job dispatched!');
     }
 }

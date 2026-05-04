@@ -41,7 +41,7 @@ class ChartService
 
         $userId = auth()->user()->id;
 
-        return Cache::remember("years_for_user_{$userId}",Carbon::now()->endOfDay(),fn()=>$this->dailyStatusRepository->getYearsForUserExceptCurrent($userId));
+        return Cache::remember("years_for_user_{$userId}", Carbon::now()->endOfDay(), fn () => $this->dailyStatusRepository->getYearsForUserExceptCurrent($userId));
     }
 
     private function getRatesAndStatusRecordsForDate(Carbon $date, $statuses): array

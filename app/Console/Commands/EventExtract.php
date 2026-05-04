@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Jobs\EventExtractor;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
 
 class EventExtract extends Command
 {
@@ -27,7 +26,7 @@ class EventExtract extends Command
      */
     public function handle()
     {
-            EventExtractor::dispatch();
-            $this->info('Event extract job dispatched!');
+        EventExtractor::dispatch();
+        $this->info('Event extract job dispatched!');
     }
 }

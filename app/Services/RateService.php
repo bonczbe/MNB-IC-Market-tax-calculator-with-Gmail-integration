@@ -17,7 +17,7 @@ class RateService
     public function fetchAndUpsertRatesByMNB()
     {
         try {
-            $currencies = $this->rate_repository->getAllCurrency();
+            //$currencies = $this->rate_repository->getAllCurrency();
 
             $html = file_get_contents('https://www.mnb.hu/en/arfolyamok');
 
@@ -25,7 +25,7 @@ class RateService
             @$dom->loadHTML($html);
             $xpath = new DOMXPath($dom);
 
-            $caption = $xpath->query('//caption[@class="ttl ttl-s"]');
+            //$caption = $xpath->query('//caption[@class="ttl ttl-s"]');
             $rows = $xpath->query('//tr[td[@class="fw-b"]]');
 
             $now = Carbon::now()->format('Y-m-d');

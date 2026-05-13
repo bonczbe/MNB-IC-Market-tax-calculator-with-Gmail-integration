@@ -1,0 +1,26 @@
+name: Laravel Pint
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  laravel-pint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+      with:
+        php-version: '8.5'
+    - uses: actions/checkout@v4
+    - name: Install Dependencies
+      run: composer install
+    - name: Pint
+      run: composer pint
+    - name: Commit Pint changes 
+      uses: stefanzweifel/git-auto-commit-action@v4  
+      with:
+        commit_message: "[pint] Apply Laravel Pint code-style fixes"
+        skip_fetch: true

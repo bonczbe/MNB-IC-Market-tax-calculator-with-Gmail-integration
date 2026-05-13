@@ -18,7 +18,7 @@ jobs:
     - name: Install Dependencies
       run: composer install
     - name: Pint
-      run: composer pint
+      run: ./vendor/bin/pint
     - name: Commit Pint changes 
       uses: stefanzweifel/git-auto-commit-action@v4  
       with:

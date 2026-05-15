@@ -42,9 +42,9 @@ class AccountTransactionForm
                     ->required(),
                 TextInput::make('amount')
                     ->live()
-                    ->suffix(function(Get $get) use($brokerRepository){
+                    ->suffix(function (Get $get) use ($brokerRepository) {
                         $broker = $brokerRepository->findById($get('broker_account_id'));
-                        if($broker){
+                        if ($broker) {
                             return $broker->broker_currency;
                         }
                     })

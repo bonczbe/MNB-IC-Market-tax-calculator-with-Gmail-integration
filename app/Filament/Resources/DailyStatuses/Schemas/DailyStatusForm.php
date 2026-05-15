@@ -31,7 +31,7 @@ class DailyStatusForm
                 Select::make('broker_account_id')
                     ->live()
                     ->required()
-                    ->afterStateUpdated(function ($state, Set $set) use($brokerRepository) {
+                    ->afterStateUpdated(function ($state, Set $set) use ($brokerRepository) {
                         $broker = $brokerRepository->findById($state);
                         $set('currency', $broker?->broker_currency ?? null);
                     })
@@ -45,7 +45,7 @@ class DailyStatusForm
                     })
                     ->searchable(),
                 Select::make('currency')
-                ->live()
+                    ->live()
                     ->options(function () use ($rateRepository) {
 
                         return Cache::remember('rateBaseCurrency', Carbon::now()->endOfDay()->subMinute(1), function () use ($rateRepository) {

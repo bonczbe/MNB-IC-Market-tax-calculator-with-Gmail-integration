@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\DailyStatuses\Schemas;
 
 use App\Models\BrokerAccount;
-use App\Models\DailyStatus;
 use App\Repositories\RateRepository;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
@@ -29,9 +28,9 @@ class DailyStatusForm
                     ->numeric(),
                 Select::make('broker_account_id')
                     ->required()
-                    ->afterStateUpdated(function($state,Set $set){
+                    ->afterStateUpdated(function ($state, Set $set) {
                         $broker = BrokerAccount::find($state);
-                        $set('currency', $broker?->broker_currency??null);
+                        $set('currency', $broker?->broker_currency ?? null);
                     })
                     ->options(function () {
                         return BrokerAccount::query()

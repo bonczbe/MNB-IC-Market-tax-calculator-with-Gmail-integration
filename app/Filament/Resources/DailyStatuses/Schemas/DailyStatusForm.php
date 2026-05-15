@@ -3,11 +3,13 @@
 namespace App\Filament\Resources\DailyStatuses\Schemas;
 
 use App\Models\BrokerAccount;
+use App\Models\DailyStatus;
 use App\Repositories\RateRepository;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Cache;
 
@@ -22,19 +24,15 @@ class DailyStatusForm
                 DatePicker::make('date')
                     ->maxDate(fn () => Carbon::now())
                     ->required(),
-                Select::make('currency')
-                    ->options(function () use ($rateRepository) {
-
-                        return Cache::remember('rateBaseCurrency', Carbon::now()->endOfDay()->subMinute(1), function () use ($rateRepository) {
-                            return $rateRepository->getAllDistinctedByKeyValue('base_currency');
-                        });
-                    })
-                    ->required(),
                 TextInput::make('balance')
                     ->required()
                     ->numeric(),
                 Select::make('broker_account_id')
                     ->required()
+                    ->afterStateUpdated(function($state,Set $set){
+                        $broker = BrokerAccount::find($state);
+                        $set('currency', $broker?->broker_currency??null);
+                    })
                     ->options(function () {
                         return BrokerAccount::query()
                             ->get()
@@ -44,6 +42,14 @@ class DailyStatusForm
                             ->toArray();
                     })
                     ->searchable(),
+                Select::make('currency')
+                    ->options(function () use ($rateRepository) {
+
+                        return Cache::remember('rateBaseCurrency', Carbon::now()->endOfDay()->subMinute(1), function () use ($rateRepository) {
+                            return $rateRepository->getAllDistinctedByKeyValue('base_currency');
+                        });
+                    })
+                    ->required(),
             ]);
     }
 }

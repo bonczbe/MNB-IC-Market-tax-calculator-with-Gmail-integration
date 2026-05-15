@@ -39,4 +39,8 @@ class BrokerAccountRepository
     {
         return BrokerAccount::query()->distinct()->pluck($column, $column);
     }
+
+    public function findById(?int $id){
+        return BrokerAccount::find($id);
+    }
 }

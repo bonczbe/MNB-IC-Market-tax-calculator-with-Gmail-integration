@@ -4,17 +4,21 @@ namespace App\Filament\Resources\AccountTransactions\Schemas;
 
 use App\Enums\AccountTransactionTypeEnum;
 use App\Models\BrokerAccount;
+use App\Repositories\BrokerAccountRepository;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class AccountTransactionForm
 {
     public static function configure(Schema $schema): Schema
     {
+        $brokerRepository = app(BrokerAccountRepository::class);
+
         return $schema
             ->components([
                 Select::make('broker_account_id')
@@ -27,6 +31,7 @@ class AccountTransactionForm
                             ])
                             ->toArray();
                     })
+                    ->live()
                     ->searchable(),
                 DatePicker::make('date')
                     ->maxDate(fn () => Carbon::now())
@@ -36,6 +41,13 @@ class AccountTransactionForm
                     ->options(AccountTransactionTypeEnum::options())
                     ->required(),
                 TextInput::make('amount')
+                    ->live()
+                    ->suffix(function(Get $get) use($brokerRepository){
+                        $broker = $brokerRepository->findById($get('broker_account_id'));
+                        if($broker){
+                            return $broker->broker_currency;
+                        }
+                    })
                     ->required()
                     ->numeric(),
                 Textarea::make('note')

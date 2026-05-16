@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Rates\Schemas;
 
+use App\Forms\Fields\MaxNowDatePicker;
 use App\Repositories\RateRepository;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
@@ -38,9 +39,7 @@ class RateForm
                     ->default(config('tax.base_currency'))
 
                     ->required(),
-                DatePicker::make('date')
-                    ->maxDate(fn () => Carbon::now())
-                    ->required(),
+                MaxNowDatePicker::make('date'),
             ]);
     }
 }

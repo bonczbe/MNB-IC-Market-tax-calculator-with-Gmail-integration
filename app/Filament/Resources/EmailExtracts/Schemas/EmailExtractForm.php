@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\EmailExtracts\Schemas;
 
+use App\Forms\Fields\MaxNowDatePicker;
 use App\Models\BrokerAccount;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
@@ -27,10 +28,8 @@ class EmailExtractForm
                     })
                     ->disabled()
                     ->searchable(),
-                DatePicker::make('date')
-                    ->maxDate(fn () => Carbon::now())
-                    ->disabled()
-                    ->required(),
+                MaxNowDatePicker::make('date')
+                ->disabled(),
                 Textarea::make('content')
                     ->required()
                     ->disabled()

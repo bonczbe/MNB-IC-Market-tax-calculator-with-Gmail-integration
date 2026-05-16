@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\AccountTransactions\Schemas;
 
 use App\Enums\AccountTransactionTypeEnum;
+use App\Forms\Fields\MaxNowDatePicker;
 use App\Models\BrokerAccount;
 use App\Repositories\BrokerAccountRepository;
 use Carbon\Carbon;
@@ -33,10 +34,7 @@ class AccountTransactionForm
                     })
                     ->live()
                     ->searchable(),
-                DatePicker::make('date')
-                    ->maxDate(fn () => Carbon::now())
-                    ->default(fn () => Carbon::now())
-                    ->required(),
+                MaxNowDatePicker::make('date'),
                 Select::make('type')
                     ->options(AccountTransactionTypeEnum::options())
                     ->required(),

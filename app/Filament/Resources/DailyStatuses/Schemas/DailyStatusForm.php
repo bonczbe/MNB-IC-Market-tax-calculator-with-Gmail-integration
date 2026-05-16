@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\DailyStatuses\Schemas;
 
+use App\Forms\Fields\MaxNowDatePicker;
 use App\Models\BrokerAccount;
 use App\Repositories\BrokerAccountRepository;
 use App\Repositories\RateRepository;
@@ -22,9 +23,7 @@ class DailyStatusForm
 
         return $schema
             ->components([
-                DatePicker::make('date')
-                    ->maxDate(fn () => Carbon::now())
-                    ->required(),
+                MaxNowDatePicker::make('date'),
                 TextInput::make('balance')
                     ->required()
                     ->numeric(),

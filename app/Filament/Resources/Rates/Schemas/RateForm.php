@@ -5,7 +5,6 @@ namespace App\Filament\Resources\Rates\Schemas;
 use App\Forms\Fields\MaxNowDatePicker;
 use App\Repositories\RateRepository;
 use Carbon\Carbon;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;

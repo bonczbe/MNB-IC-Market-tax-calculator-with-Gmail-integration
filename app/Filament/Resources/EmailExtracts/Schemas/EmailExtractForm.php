@@ -4,8 +4,6 @@ namespace App\Filament\Resources\EmailExtracts\Schemas;
 
 use App\Forms\Fields\MaxNowDatePicker;
 use App\Models\BrokerAccount;
-use Carbon\Carbon;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
@@ -29,7 +27,7 @@ class EmailExtractForm
                     ->disabled()
                     ->searchable(),
                 MaxNowDatePicker::make('date')
-                ->disabled(),
+                    ->disabled(),
                 Textarea::make('content')
                     ->required()
                     ->disabled()

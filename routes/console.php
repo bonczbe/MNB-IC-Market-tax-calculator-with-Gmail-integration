@@ -29,7 +29,7 @@ if (Config::get('schedule.use_mnb_fetcher')) {
 if (Config::get('schedule.use_email_fetcher')) {
     app(Schedule::class)
         ->command('app:email-extract')
-        ->dailyAt('23:45')
+        ->dailyAt('23:53')
         ->weekdays()
         ->timezone('Europe/Budapest');
 }
@@ -37,6 +37,6 @@ if (Config::get('schedule.use_email_fetcher')) {
 if (Config::get('schedule.use_yearly_calculator')) {
     app(Schedule::class)
         ->command('app:calculate-tax-by-account-for-year')
-        ->yearlyOn(12, 31, '23:50')
+        ->yearlyOn(12, 31, '23:56')
         ->timezone('Europe/Budapest');
 }

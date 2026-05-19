@@ -9,6 +9,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -44,6 +45,17 @@ class TaxCalculatorPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/TaxCalculator/Widgets'), for: 'App\Filament\TaxCalculator\Widgets')
             ->widgets([
+            ])
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->label('Forex')
+                    ->collapsed(false),
+                NavigationGroup::make()
+                    ->label('Daily Changes')
+                    ->collapsed(false),
+                NavigationGroup::make()
+                    ->label('Broker Statuses')
+                    ->collapsed(false),
             ])
             ->renderHook(PanelsRenderHook::FOOTER, fn () => view('footer', ['Year' => Carbon::now()->format('Y')]))
             ->sidebarFullyCollapsibleOnDesktop()

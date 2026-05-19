@@ -4,17 +4,12 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\EditProfile;
 use App\Filament\Pages\Register;
-use App\Filament\Widgets\PrevProfitStats;
-use App\Filament\Widgets\ProfitStats;
-use App\Filament\Widgets\Weekly;
-use App\Filament\Widgets\Yearly;
 use App\Http\Middleware\RedirectNonAdminsFromAdminPanel;
 use Carbon\Carbon;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -54,17 +49,6 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogoHeight('auto')
             ->renderHook(PanelsRenderHook::FOOTER, fn () => view('footer', ['Year' => Carbon::now()->format('Y')]))
             ->favicon(asset('favicon.svg'))
-            ->navigationGroups([
-                NavigationGroup::make()
-                    ->label('Forex')
-                    ->collapsed(false),
-                NavigationGroup::make()
-                    ->label('Daily Changes')
-                    ->collapsed(false),
-                NavigationGroup::make()
-                    ->label('Broker Statuses')
-                    ->collapsed(false),
-            ])
             ->sidebarFullyCollapsibleOnDesktop()
             ->middleware([
                 EncryptCookies::class,

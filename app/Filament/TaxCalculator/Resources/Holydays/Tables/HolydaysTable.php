@@ -1,0 +1,72 @@
+<?php
+
+namespace App\Filament\TaxCalculator\Resources\Holydays\Tables;
+
+use App\Enums\HolidayEnum;
+use Carbon\Carbon;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Support\Colors\Color;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+
+class HolydaysTable
+{
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('date')
+                    ->searchable()
+                    ->date()
+                    ->sortable(),
+                TextColumn::make('name')
+                    ->sortable(),
+                TextColumn::make('status')
+                    ->formatStateUsing(fn ($state) => $state->label())
+                    ->color(fn ($state) => ($state == HolidayEnum::EARLY_CLOSE) ? Color::Blue : Color::Red)
+                    ->badge(),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->defaultSort('date', 'asc')
+            ->filters([
+                Filter::make('only_future')
+                    ->label('Only future events')
+                    ->query(fn (Builder $query) => $query->where('date', '>=', Carbon::now()))
+                    ->default(),
+                Filter::make('date_range')
+                    ->schema([
+                        DatePicker::make('from')
+                            ->label('From date'),
+                        DatePicker::make('to')
+                            ->label('To date'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $from = $data['from'] ?? null;
+                        $to = $data['to'] ?? null;
+
+                        return $query
+                            ->when($from, fn (Builder $q, $date): Builder => $q->whereDate('date', '>=', $date)
+                            )
+                            ->when($to, fn (Builder $q, $date): Builder => $q->whereDate('date', '<=', $date)
+                            );
+                    }),
+            ])
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
+            ->toolbarActions([
+            ]);
+    }
+}

@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\UserRoleEnum;
 use Database\Factories\UserFactory;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -67,5 +68,14 @@ class User extends Authenticatable
     public function brokers(): HasMany
     {
         return $this->hasMany(BrokerAccount::class, 'user_id');
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        if ($this->role == UserRoleEnum::ADMIN) {
+            return in_array($panel->getId(), ['admin', 'taxCalculator']);
+        }
+
+        return $panel->getId() === 'taxCalculator';
     }
 }

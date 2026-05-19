@@ -98,6 +98,19 @@ Run `deploy.bat` or `deploy.sh` depending on your operating system.
 The script handles the full zero-downtime deployment:
 maintenance mode on → build → container swap → healthcheck → migrate → cache clear → maintenance mode off.
 
+## Application URLs
+
+By default, the application runs on:
+
+`http://localhost:8000`
+
+Available interfaces:
+
+- **Admin panel:** [http://localhost:8000/admin](http://localhost:8000/admin)
+- **User panel / Tax Calculator:** [http://localhost:8000/taxCalculator](http://localhost:8000/taxCalculator)
+- **Horizon dashboard:** [http://localhost:8000/horizon](http://localhost:8000/horizon)
+
+> The admin interface is available under `/admin`, while the regular user-facing tax calculator panel is available under `/taxCalculator`.
 ***
 
 ## Horizon Dashboard

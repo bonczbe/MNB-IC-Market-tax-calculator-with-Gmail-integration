@@ -19,30 +19,6 @@ class AdminOverView extends BaseWidget
     protected function getStats(): array
     {
         return [
-            Section::make('')->schema([
-                Action::make('clearCache')
-                    ->label('Clear All Caches')
-                    ->icon('heroicon-o-trash')
-                    ->color(Color::Green)
-                    ->action(function () {
-                        try {
-                            Cache::flush();
-                            Notification::make()
-                                ->title('Success')
-                                ->body('Cache cleared successfully.')
-                                ->success()
-                                ->persistent()
-                                ->send();
-                        } catch (\Exception $e) {
-                            Notification::make()
-                                ->title('Error')
-                                ->body('Something went wrong!')
-                                ->warning()
-                                ->persistent()
-                                ->send();
-                        }
-                    }),
-            ])->columnSpanFull(),
             Section::make([
                 Stat::make('APP_ENV', config('app.env'))
                     ->description('Active environment')

@@ -76,10 +76,10 @@ class AdminOverView extends BaseWidget
 
             Section::make('Profits')
                 ->schema([
-                    /*Todo: Implement calculations for all users 
-                    summary of profits, summary of profits on week, on year, on month 
+                    /*Todo: Implement calculations for all users
+                    summary of profits, summary of profits on week, on year, on month
                     and summary on deposits and withdraws, initial balances*/
-                    //Reminder: Need to implement stast of withdrawals and deposits on user dashboard too so it should be on a separate widget!
+                    // Reminder: Need to implement stast of withdrawals and deposits on user dashboard too so it should be on a separate widget!
                 ])
                 ->columns(1)
                 ->icon(Heroicon::CurrencyEuro)

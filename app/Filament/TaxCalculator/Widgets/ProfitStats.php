@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Widgets;
+namespace App\Filament\TaxCalculator\Widgets;
 
 use App\Services\TaxCalculatorService;
 use Carbon\Carbon;

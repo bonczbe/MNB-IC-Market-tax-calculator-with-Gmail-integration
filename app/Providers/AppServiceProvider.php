@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use BezhanSalleh\PanelSwitch\PanelSwitch;
 use Carbon\CarbonImmutable;
+use Filament\Support\Icons\Heroicon;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +27,20 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        PanelSwitch::configureUsing(function (PanelSwitch $panelSwitch) {
+            $panelSwitch
+                ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_AFTER)
+                ->simple()
+                ->icons([
+                    'admin' => Heroicon::User,
+                    'taxCalculator' => Heroicon::Calculator,
+
+                ])
+                ->labels([
+                    'admin' => 'Admin Panel',
+                    'taxCalculator' => 'Tax Calculator',
+                ]);
+        });
     }
 
     /**

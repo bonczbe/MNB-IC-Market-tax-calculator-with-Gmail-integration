@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Filament\TaxCalculator\Resources\AccountTransactions;
+
+use App\Filament\TaxCalculator\Resources\AccountTransactions\Pages\CreateAccountTransaction;
+use App\Filament\TaxCalculator\Resources\AccountTransactions\Pages\EditAccountTransaction;
+use App\Filament\TaxCalculator\Resources\AccountTransactions\Pages\ListAccountTransactions;
+use App\Filament\TaxCalculator\Resources\AccountTransactions\Schemas\AccountTransactionForm;
+use App\Filament\TaxCalculator\Resources\AccountTransactions\Tables\AccountTransactionsTable;
+use App\Models\AccountTransaction;
+use BackedEnum;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Table;
+use UnitEnum;
+
+class AccountTransactionResource extends Resource
+{
+    protected static ?string $model = AccountTransaction::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::ArrowsUpDown;
+
+    protected static ?string $recordTitleAttribute = 'AccountTransaction';
+
+    protected static ?int $navigationSort = 1;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Broker Statuses';
+
+    public static function form(Schema $schema): Schema
+    {
+        return AccountTransactionForm::configure($schema);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return AccountTransactionsTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListAccountTransactions::route('/'),
+            'create' => CreateAccountTransaction::route('/create'),
+            'edit' => EditAccountTransaction::route('/{record}/edit'),
+        ];
+    }
+}

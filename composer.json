@@ -7,6 +7,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "bezhansalleh/filament-panel-switch": "^3.1",
         "directorytree/imapengine": "^1.22",
         "filament/filament": "^5.0",
         "inertiajs/inertia-laravel": "^2.0",

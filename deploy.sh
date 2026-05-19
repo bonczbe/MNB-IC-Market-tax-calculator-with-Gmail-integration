@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+echo "=== Stashing local changes ==="
+git stash
+
 echo "=== Pulling latest changes ==="
 git pull origin main
 

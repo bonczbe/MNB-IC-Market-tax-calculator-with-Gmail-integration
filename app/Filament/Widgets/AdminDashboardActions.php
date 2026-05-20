@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -19,7 +20,7 @@ class AdminDashboardActions extends Widget implements HasActions, HasForms
 
     protected string $view = 'filament.widgets.admin-dashboard-actions';
 
-    protected int|string|array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 'full';
 
     public function clearCacheAction(): Action
     {
@@ -36,7 +37,7 @@ class AdminDashboardActions extends Widget implements HasActions, HasForms
                         ->body('Cache cleared successfully.')
                         ->success()
                         ->send();
-                } catch (\Throwable $e) {
+                } catch (Exception $e) {
                     Notification::make()
                         ->title('Error')
                         ->body($e->getMessage())

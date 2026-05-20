@@ -19,7 +19,7 @@ class AdminDashboardActions extends Widget implements HasActions, HasForms
 
     protected string $view = 'filament.widgets.admin-dashboard-actions';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public function clearCacheAction(): Action
     {

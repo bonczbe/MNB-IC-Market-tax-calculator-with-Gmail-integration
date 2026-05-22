@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Enums\CalculationIntervalEnum;
 use App\Repositories\BrokerAccountRepository;
 use App\Repositories\RateRepository;
 use App\Repositories\YearlyTaxCalculationRepository;
 use Carbon\Carbon;
 use Filament\Support\Colors\Color;
+use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
 
@@ -126,7 +128,7 @@ class TaxCalculatorService
             $previousCards[] =
             Stat::make("{$prevYear} Tax", $formattedResult)
                 ->description('Final settled tax')
-                ->descriptionIcon('heroicon-m-archive-box-check')
+                ->descriptionIcon(Heroicon::ArchiveBoxXMark)
                 ->color(Color::Gray);
         }
 
@@ -175,6 +177,30 @@ class TaxCalculatorService
         }
 
         return $allProfitInExchangedCurrency;
+    }
+
+    public function calculateCurrentNewProfit(Carbon $currentDate, $userId, CalculationIntervalEnum $interval)
+    {
+        $startOfWeek = null;
+        $endOfWeek = null;
+
+        switch ($interval){
+            case CalculationIntervalEnum::WEEK:
+                    $startOfWeek = $currentDate->copy()->startOfWeek();
+                    $endOfWeek = $currentDate->copy()->endOfWeek();
+                break;
+            case CalculationIntervalEnum::MONTH:
+                    $startOfWeek = $currentDate->copy()->startOfMonth();
+                    $endOfWeek = $currentDate->copy()->endOfMonth();
+                break;
+            case CalculationIntervalEnum::YEAR:
+                    $startOfWeek = $currentDate->copy()->startOfYear();
+                    $endOfWeek = $currentDate->copy()->endOfYear();
+                break;
+        };
+        
+
+        return $this->calculateNetProfitForDatesBetween($startOfWeek, $endOfWeek, $currentDate, $userId);
     }
 
     public function calculateCurrentWeekNetProfit(Carbon $currentDate, $userId)

@@ -23,7 +23,7 @@ class YearlyTaxCalculationRepository
             ->pluck('tax_year');
     }
 
-    public function getByDate(Carbon $date)
+    public function getByDate($date)
     {
         return YearlyTaxCalculation::query()
             ->where('tax_year', $date)

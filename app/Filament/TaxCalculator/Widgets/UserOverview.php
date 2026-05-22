@@ -73,14 +73,10 @@ class UserOverview extends BaseWidget
                         ->description('Trading currencies')
                         ->color(Color::Fuchsia)
                         ->icon(Heroicon::OutlinedGlobeAlt),
-                    Stat::make('Last Tax Year ( '.$currentDate->subYear()->format('Y').' )', $this->getLastTaxYear($userId, $currentDate))
-                        ->description('Most recent calculation')
-                        ->color(Color::Teal)
-                        ->icon(Heroicon::OutlinedCalendarDays),
                 ])
                 ->collapsed()
                 ->columnSpanFull()
-                ->columns(3),
+                ->columns(2),
         ];
     }
 
@@ -92,13 +88,5 @@ class UserOverview extends BaseWidget
     private function getActiveCurrencyCount(int $userId): int
     {
         return BrokerAccount::where('user_id', '=', $userId)->distinct()->pluck('broker_currency')->count();
-    }
-
-    private function getLastTaxYear(int $userId, Carbon $currentDate): string
-    {
-        return YearlyTaxCalculation::whereHas('broker', function ($query) use ($userId, $currentDate) {
-            return $query->where('user_id', $userId)->where('tax_year', $currentDate->subYear()->format('Y'));
-        }
-        )->sum('tax_amount');
     }
 }

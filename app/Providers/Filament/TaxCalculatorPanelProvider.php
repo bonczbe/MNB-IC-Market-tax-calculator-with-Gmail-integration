@@ -43,7 +43,7 @@ class TaxCalculatorPanelProvider extends PanelProvider
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/TaxCalculator/Widgets'), for: 'App\Filament\TaxCalculator\Widgets')
+            // ->discoverWidgets(in: app_path('Filament/TaxCalculator/Widgets'), for: 'App\Filament\TaxCalculator\Widgets')
             ->widgets([
             ])
             ->navigationGroups([

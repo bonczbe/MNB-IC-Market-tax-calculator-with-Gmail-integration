@@ -41,6 +41,7 @@ class AdminOverView extends BaseWidget
                         ->icon(Heroicon::OutlinedBugAnt),
                 ])
                 ->collapsible()
+                ->collapsed(true)
                 ->icon(Heroicon::Server)
                 ->columns(4)
                 ->columnSpanFull(),

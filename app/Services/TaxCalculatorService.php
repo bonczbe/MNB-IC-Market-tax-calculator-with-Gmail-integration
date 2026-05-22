@@ -185,6 +185,14 @@ class TaxCalculatorService
         return $this->calculateNetProfitForDatesBetween($startOfWeek, $endOfWeek, $currentDate, $userId);
     }
 
+    public function calculateCurrentMonthNetProfit(Carbon $currentDate, $userId)
+    {
+        $startOfWeek = $currentDate->copy()->startOfMonth();
+        $endOfWeek = $currentDate->copy()->endOfMonth();
+
+        return $this->calculateNetProfitForDatesBetween($startOfWeek, $endOfWeek, $currentDate, $userId);
+    }
+
     public function calculateGrossProfitOfYear(Carbon $currentDate, int $userId)
     {
         ['startOfYear' => $startOfYear, 'brokers' => $brokers, 'rates' => $ratesOfTheYear] = $this->getYearContext($currentDate, $userId);

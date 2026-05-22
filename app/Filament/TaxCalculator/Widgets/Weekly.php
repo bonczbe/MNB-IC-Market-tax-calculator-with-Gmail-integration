@@ -18,7 +18,7 @@ class Weekly extends ChartWidget
 
     protected bool $isCollapsible = true;
 
-    protected int|string|array $columnSpan = 'full';
+    protected int|string|array $columnSpan = '1';
 
     protected function getData(): array
     {

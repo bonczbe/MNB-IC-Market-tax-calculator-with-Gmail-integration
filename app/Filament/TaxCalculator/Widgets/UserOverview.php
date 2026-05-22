@@ -2,9 +2,9 @@
 
 namespace App\Filament\TaxCalculator\Widgets;
 
+use App\Enums\CalculationIntervalEnum;
 use App\Models\BrokerAccount;
 use App\Models\User;
-use App\Models\YearlyTaxCalculation;
 use App\Services\TaxCalculatorService;
 use Carbon\Carbon;
 use Filament\Schemas\Components\Section;
@@ -32,7 +32,7 @@ class UserOverview extends BaseWidget
                     Stat::make(
                         'Week Profit',
                         Cache::remember('profitForTheWeek'.auth()->user()->id.'w_'.$currentDate->format('W'), Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
-                            return $taxService->calculateCurrentWeekNetProfit($currentDate, auth()->user()->id);
+                            return $taxService->calculateCurrentNetProfit($currentDate, auth()->user()->id, CalculationIntervalEnum::WEEK);
                         })
                     )
                         ->columnSpan(1)
@@ -42,7 +42,7 @@ class UserOverview extends BaseWidget
                     Stat::make(
                         "{$currentDate->format('M')} Profit",
                         Cache::remember('profitForTheMonth'.auth()->user()->id.'w_'.$currentDate->format('W'), Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
-                            return $taxService->calculateCurrentMonthNetProfit($currentDate, auth()->user()->id);
+                            return $taxService->calculateCurrentNetProfit($currentDate, auth()->user()->id, CalculationIntervalEnum::MONTH);
                         })
                     )
                         ->description('After-tax profit this moth')
@@ -51,7 +51,7 @@ class UserOverview extends BaseWidget
                     Stat::make(
                         $currentDate->format('Y').' Profit',
                         Cache::remember('profitForTheYear'.auth()->user()->id.'w_'.$currentDate->format('W'), Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
-                            return $taxService->calculateCurrentYearNetProfit($currentDate, auth()->user()->id);
+                            return $taxService->calculateCurrentNetProfit($currentDate, auth()->user()->id, CalculationIntervalEnum::YEAR);
                         })
                     )
                         ->description('After-tax profit this year')

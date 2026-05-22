@@ -179,42 +179,25 @@ class TaxCalculatorService
         return $allProfitInExchangedCurrency;
     }
 
-    public function calculateCurrentNewProfit(Carbon $currentDate, $userId, CalculationIntervalEnum $interval)
+    public function calculateCurrentNetProfit(Carbon $currentDate, $userId, CalculationIntervalEnum $interval)
     {
         $startOfWeek = null;
         $endOfWeek = null;
 
-        switch ($interval){
+        switch ($interval) {
             case CalculationIntervalEnum::WEEK:
-                    $startOfWeek = $currentDate->copy()->startOfWeek();
-                    $endOfWeek = $currentDate->copy()->endOfWeek();
+                $startOfWeek = $currentDate->copy()->startOfWeek();
+                $endOfWeek = $currentDate->copy()->endOfWeek();
                 break;
             case CalculationIntervalEnum::MONTH:
-                    $startOfWeek = $currentDate->copy()->startOfMonth();
-                    $endOfWeek = $currentDate->copy()->endOfMonth();
+                $startOfWeek = $currentDate->copy()->startOfMonth();
+                $endOfWeek = $currentDate->copy()->endOfMonth();
                 break;
             case CalculationIntervalEnum::YEAR:
-                    $startOfWeek = $currentDate->copy()->startOfYear();
-                    $endOfWeek = $currentDate->copy()->endOfYear();
+                $startOfWeek = $currentDate->copy()->startOfYear();
+                $endOfWeek = $currentDate->copy()->endOfYear();
                 break;
-        };
-        
-
-        return $this->calculateNetProfitForDatesBetween($startOfWeek, $endOfWeek, $currentDate, $userId);
-    }
-
-    public function calculateCurrentWeekNetProfit(Carbon $currentDate, $userId)
-    {
-        $startOfWeek = $currentDate->copy()->startOfWeek();
-        $endOfWeek = $currentDate->copy()->endOfWeek();
-
-        return $this->calculateNetProfitForDatesBetween($startOfWeek, $endOfWeek, $currentDate, $userId);
-    }
-
-    public function calculateCurrentMonthNetProfit(Carbon $currentDate, $userId)
-    {
-        $startOfWeek = $currentDate->copy()->startOfMonth();
-        $endOfWeek = $currentDate->copy()->endOfMonth();
+        }
 
         return $this->calculateNetProfitForDatesBetween($startOfWeek, $endOfWeek, $currentDate, $userId);
     }
@@ -226,14 +209,6 @@ class TaxCalculatorService
         $tax = $this->calculateTotalTaxForBrokers($brokers, $ratesOfTheYear, $startOfYear, 1);
 
         return $this->formatMoney($tax);
-    }
-
-    public function calculateCurrentYearNetProfit(Carbon $currentDate, int $userId)
-    {
-        [$startOfYear, $endOfYear] = $this->generateStartEndOfYear($currentDate);
-
-        return $this->calculateNetProfitForDatesBetween($startOfYear, $endOfYear, $currentDate, $userId);
-
     }
 
     private function calculateNetProfitForDatesBetween(Carbon $start, Carbon $end, Carbon $currentDate, $userId)

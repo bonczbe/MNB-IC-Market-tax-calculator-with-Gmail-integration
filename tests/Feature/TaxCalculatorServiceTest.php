@@ -139,7 +139,7 @@ class TaxCalculatorServiceTest extends TestCase
         ]);
 
         // 74000 * (1 - 0.15) = 62900
-        $result = $this->service->calculateCurrentYearNetProfit(Carbon::create(2024, 6, 15), $this->user->id);
+        $result = $this->service->calculateCurrentNetProfit(Carbon::create(2024, 6, 15), $this->user->id, CalculationIntervalEnum::YEAR);
 
         $this->assertStringContainsString('62,900', $result);
         $this->assertStringEndsWith('HUF', $result);

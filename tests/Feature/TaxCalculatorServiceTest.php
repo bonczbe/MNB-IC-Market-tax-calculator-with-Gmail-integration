@@ -3,10 +3,10 @@
 namespace Tests\Feature;
 
 use App\Enums\AccountTransactionTypeEnum;
+use App\Enums\CalculationIntervalEnum;
 use App\Models\AccountTransaction;
 use App\Models\BrokerAccount;
 use App\Models\DailyStatus;
-use App\Enums\CalculationIntervalEnum;
 use App\Models\Rate;
 use App\Models\User;
 use App\Models\YearlyTaxCalculation;

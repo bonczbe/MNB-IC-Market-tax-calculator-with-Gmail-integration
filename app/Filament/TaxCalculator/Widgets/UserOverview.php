@@ -31,7 +31,7 @@ class UserOverview extends BaseWidget
         $profitForMoth = Cache::remember('profitForTheMonth'.auth()->user()->id.'w_'.$currentDate->format('W'), Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
             return $taxService->calculateCurrentNetProfit($currentDate, auth()->user()->id, CalculationIntervalEnum::MONTH);
         });
-        
+
         $profitForYear = Cache::remember('profitForTheYear'.auth()->user()->id.'w_'.$currentDate->format('W'), Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
             return $taxService->calculateCurrentNetProfit($currentDate, auth()->user()->id, CalculationIntervalEnum::YEAR);
         });

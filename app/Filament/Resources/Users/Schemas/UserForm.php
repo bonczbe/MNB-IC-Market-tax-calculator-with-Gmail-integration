@@ -11,6 +11,7 @@ use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Operation;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -29,6 +30,7 @@ class UserForm
                 TextInput::make('password')
                     ->password()
                     ->disabled()
+                    ->visibleOn(Operation::Create)
                     ->suffixAction(Action::make('generatePassword')
                         ->disabled()
                         ->icon('heroicon-m-arrow-path')

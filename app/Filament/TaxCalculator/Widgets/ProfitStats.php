@@ -43,34 +43,38 @@ class ProfitStats extends BaseWidget
     {
         $taxService = app(TaxCalculatorService::class);
 
+        $profit = Cache::remember('calculatecurrentDate'.auth()->user()->id, Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
+            return $taxService->calculateAllBrokerAccountTaxForActualYear($currentDate, auth()->user()->id);
+        });
+
         return
             Stat::make(
                 "{$currentDate->copy()->format('Y')} Tax Due",
-                Cache::remember('calculatecurrentDate'.auth()->user()->id, Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
-                    return $taxService->calculateAllBrokerAccountTaxForActualYear($currentDate, auth()->user()->id);
-                })
+                $profit
             )
                 ->columnSpan(1)
                 ->description('Estimated tax this year')
                 ->descriptionIcon('heroicon-m-receipt-percent')
-                ->color(Color::Amber);
+                ->color(($profit < 0) ? Color::Red : (($profit > 0) ? Color::Green : Color::Amber));
     }
 
     private function calculateCurrentYearNetProfit($currentDate)
     {
         $taxService = app(TaxCalculatorService::class);
 
+        $profit = Cache::remember('profitForYear'.auth()->user()->id, Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
+            return $taxService->calculateCurrentNetProfit($currentDate, auth()->user()->id, CalculationIntervalEnum::YEAR);
+        });
+
         return
             Stat::make(
                 "{$currentDate->format('Y')} Net Profit",
-                Cache::remember('profitForYear'.auth()->user()->id, Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
-                    return $taxService->calculateCurrentNetProfit($currentDate, auth()->user()->id, CalculationIntervalEnum::YEAR);
-                })
+                $profit
             )
                 ->columnSpan(1)
                 ->description('After-tax profit this year')
                 ->descriptionIcon('heroicon-m-banknotes')
-                ->color('success');
+                ->color(($profit < 0) ? Color::Red : (($profit > 0) ? Color::Green : Color::Amber));
     }
 
     /*
@@ -80,15 +84,17 @@ class ProfitStats extends BaseWidget
     {
         $taxService = app(TaxCalculatorService::class);
 
+        $profit = Cache::remember('grossProfitOfYear'.auth()->user()->id, Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
+            return $taxService->calculateGrossProfitOfYear($currentDate, auth()->user()->id);
+        });
+
         return
                     Stat::make(
                         "{$currentDate->format('Y')} Gross Profit",
-                        Cache::remember('grossProfitOfYear'.auth()->user()->id, Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
-                            return $taxService->calculateGrossProfitOfYear($currentDate, auth()->user()->id);
-                        })
+                        $profit
                     )
                         ->description('Before tax deductions')
                         ->descriptionIcon('heroicon-m-arrow-trending-up')
-                        ->color(Color::Amber);
+                        ->color(($profit < 0) ? Color::Red : (($profit > 0) ? Color::Green : Color::Amber));
     }
 }

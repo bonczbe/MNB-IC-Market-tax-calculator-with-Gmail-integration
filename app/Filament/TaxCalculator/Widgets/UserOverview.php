@@ -24,6 +24,18 @@ class UserOverview extends BaseWidget
         $taxService = app(TaxCalculatorService::class);
         $userId = auth()->id();
 
+        $netProfit = Cache::remember('profitForTheWeek'.auth()->user()->id.'w_'.$currentDate->format('W'), Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
+            return $taxService->calculateCurrentNetProfit($currentDate, auth()->user()->id, CalculationIntervalEnum::WEEK);
+        });
+
+        $profitForMoth = Cache::remember('profitForTheMonth'.auth()->user()->id.'w_'.$currentDate->format('W'), Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
+            return $taxService->calculateCurrentNetProfit($currentDate, auth()->user()->id, CalculationIntervalEnum::MONTH);
+        });
+        
+        $profitForYear = Cache::remember('profitForTheYear'.auth()->user()->id.'w_'.$currentDate->format('W'), Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
+            return $taxService->calculateCurrentNetProfit($currentDate, auth()->user()->id, CalculationIntervalEnum::YEAR);
+        });
+
         return [
             Section::make('Financial Overview')
                 ->description('Your current financial snapshot')
@@ -31,32 +43,26 @@ class UserOverview extends BaseWidget
                 ->schema([
                     Stat::make(
                         'Week Profit',
-                        Cache::remember('profitForTheWeek'.auth()->user()->id.'w_'.$currentDate->format('W'), Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
-                            return $taxService->calculateCurrentNetProfit($currentDate, auth()->user()->id, CalculationIntervalEnum::WEEK);
-                        })
+                        $netProfit
                     )
                         ->columnSpan(1)
                         ->description('After-tax profit this week')
                         ->descriptionIcon('heroicon-m-calendar-days')
-                        ->color(Color::Sky),
+                        ->color(($netProfit < 0) ? Color::Red : (($netProfit > 0) ? Color::Green : Color::Amber)),
                     Stat::make(
                         "{$currentDate->format('M')} Profit",
-                        Cache::remember('profitForTheMonth'.auth()->user()->id.'w_'.$currentDate->format('W'), Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
-                            return $taxService->calculateCurrentNetProfit($currentDate, auth()->user()->id, CalculationIntervalEnum::MONTH);
-                        })
+                        $profitForMoth
                     )
                         ->description('After-tax profit this moth')
                         ->descriptionIcon(Heroicon::OutlinedCalendarDateRange)
-                        ->color(Color::Sky),
+                        ->color(($profitForMoth < 0) ? Color::Red : (($profitForMoth > 0) ? Color::Green : Color::Amber)),
                     Stat::make(
                         $currentDate->format('Y').' Profit',
-                        Cache::remember('profitForTheYear'.auth()->user()->id.'w_'.$currentDate->format('W'), Carbon::now()->endOfDay()->subMinute(1), function () use ($taxService, $currentDate) {
-                            return $taxService->calculateCurrentNetProfit($currentDate, auth()->user()->id, CalculationIntervalEnum::YEAR);
-                        })
+                        $profitForYear
                     )
                         ->description('After-tax profit this year')
                         ->descriptionIcon('heroicon-m-calendar-days')
-                        ->color(Color::Sky),
+                        ->color(($profitForYear < 0) ? Color::Red : (($profitForYear > 0) ? Color::Green : Color::Amber)),
                 ])
                 ->collapsible()
                 ->columnSpanFull()

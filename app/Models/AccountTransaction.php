@@ -64,5 +64,9 @@ class AccountTransaction extends Model
         static::updated(function (AccountTransaction $trans) {
             $trans->resetCaches();
         });
+
+        static::deleting(function (AccountTransaction $trans) {
+            $trans->resetCaches();
+        });
     }
 }

@@ -70,6 +70,8 @@ class BrokerAccount extends Model
             Cache::forget("profitForTheWeek{$userId}w_{$currentDate->copy()->format('W')}");
             Cache::forget("grossProfitOfYear{$userId}");
             Cache::forget("profitForYear{$userId}");
+            Cache::forget("profitForMonth{$userId}");
+            Cache::forget("profitForWeek{$userId}");
         }
     }
 

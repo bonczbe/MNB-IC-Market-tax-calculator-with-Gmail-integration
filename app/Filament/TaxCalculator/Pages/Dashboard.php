@@ -2,6 +2,7 @@
 
 namespace App\Filament\TaxCalculator\Pages;
 
+use App\Filament\TaxCalculator\Widgets\AccountActivityOverview;
 use App\Filament\TaxCalculator\Widgets\PrevProfitStats;
 use App\Filament\TaxCalculator\Widgets\ProfitStats;
 use App\Filament\TaxCalculator\Widgets\UserOverview;
@@ -16,6 +17,7 @@ class Dashboard extends BaseDashboard
         return [
             ProfitStats::class,
             UserOverview::class,
+            AccountActivityOverview::class,
             Weekly::class,
             Yearly::class,
             PrevProfitStats::class,

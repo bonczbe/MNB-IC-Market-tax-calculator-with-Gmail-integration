@@ -5,9 +5,7 @@ namespace App\Filament\TaxCalculator\Widgets;
 use App\Enums\CalculationIntervalEnum;
 use App\Services\TaxCalculatorService;
 use Carbon\Carbon;
-use Filament\Schemas\Components\Section;
 use Filament\Support\Colors\Color;
-use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Cache;
@@ -16,6 +14,8 @@ class ProfitStats extends BaseWidget
 {
     protected int|string|array $columnSpan = 'full';
 
+    protected ?string $heading = 'Tax Stats Overview';
+
     protected function getStats(): array
     {
 
@@ -23,16 +23,9 @@ class ProfitStats extends BaseWidget
         $cards = [];
 
         $cards = [
-            Section::make('Tax Stats')
-                ->icon(Heroicon::OutlinedBookOpen)
-                ->schema([
-                    $this->calculateGrossProfitOfYear($currentDate),
-                    $this->calculateCurrentYearNetProfit($currentDate),
-                    $this->calculatecurrentYearTax($currentDate),
-                ])
-                ->collapsible()
-                ->columnSpanFull()
-                ->columns(3),
+            $this->calculateGrossProfitOfYear($currentDate),
+            $this->calculateCurrentYearNetProfit($currentDate),
+            $this->calculatecurrentYearTax($currentDate),
         ];
 
         return $cards;

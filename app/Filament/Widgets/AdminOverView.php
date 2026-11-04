@@ -27,7 +27,7 @@ class AdminOverView extends Widget implements HasSchemas
 
     public function content(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->schema([
             Section::make('Config Settings')
                 ->schema([
                     Stat::make('Environment', ucfirst(config('app.env')))

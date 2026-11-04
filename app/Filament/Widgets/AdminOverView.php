@@ -9,16 +9,25 @@ use App\Models\User;
 use App\Models\YearlyTaxCalculation;
 use Carbon\Carbon;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Filament\Widgets\Widget;
 use Illuminate\Support\Facades\Cache;
 
-class AdminOverView extends BaseWidget
+class AdminOverView extends Widget implements HasSchemas
 {
-    protected function getStats(): array
+    use InteractsWithSchemas;
+
+    protected string $view = 'filament.widgets.admin-over-view';
+
+    protected int|string|array $columnSpan = 'full';
+
+    public function content(Schema $schema): Schema
     {
-        return [
+        return $schema->components([
             Section::make('Config Settings')
                 ->schema([
                     Stat::make('Environment', ucfirst(config('app.env')))
@@ -87,7 +96,7 @@ class AdminOverView extends BaseWidget
                 ->icon(Heroicon::DocumentPlus)
                 ->collapsible()
                 ->columnSpanFull(),
-        ];
+        ]);
     }
 
     private function getLastStatus(string $modelClass): string

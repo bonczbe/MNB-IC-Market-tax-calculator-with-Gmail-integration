@@ -78,7 +78,6 @@ class AdminOverView extends Widget implements HasSchemas
                         ->color($this->getLastStatus(YearlyTaxCalculation::class) === 'Not calculated' ? 'danger' : 'success')
                         ->icon(Heroicon::OutlinedCalculator),
                 ])
-                ->columns(2)
                 ->icon(Heroicon::Calendar)
                 ->columns(2)
                 ->collapsible()

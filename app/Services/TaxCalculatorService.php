@@ -74,7 +74,7 @@ class TaxCalculatorService
 
             $tax = ceil($allProfitInExchangedCurrency * config('tax.volume'));
 
-            $unusedLoss = 0;//($grossProfit < 0 && $allProfitInExchangedCurrency < 0) ? $grossProfit : 0; Meg kell nézni ez a nav felé jelenthető-e
+            $unusedLoss = 0; // ($grossProfit < 0 && $allProfitInExchangedCurrency < 0) ? $grossProfit : 0; Meg kell nézni ez a nav felé jelenthető-e
 
             $upsertData = [
                 'broker_account_id' => $broker->id,

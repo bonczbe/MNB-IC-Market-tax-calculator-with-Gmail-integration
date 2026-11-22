@@ -20,6 +20,8 @@ class Yearly extends ChartWidget
 
     protected int|string|array $columnSpan = '1';
 
+    protected ?string $pollingInterval = '60s';
+
     protected function getData(): array
     {
         $activeYear = $this->filter['year'] ?? 'current_year';

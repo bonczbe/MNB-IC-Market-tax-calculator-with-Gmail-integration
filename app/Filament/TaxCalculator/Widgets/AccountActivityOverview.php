@@ -15,6 +15,8 @@ class AccountActivityOverview extends BaseWidget
 
     protected ?string $heading = 'Account Activity Overview';
 
+    protected ?string $pollingInterval = '60s';
+
     protected function getStats(): array
     {
         $userId = auth()->id();

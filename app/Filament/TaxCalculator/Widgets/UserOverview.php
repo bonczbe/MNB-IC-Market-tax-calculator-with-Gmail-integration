@@ -17,6 +17,8 @@ class UserOverview extends BaseWidget
 
     protected ?string $heading = 'User Overview';
 
+    protected ?string $pollingInterval = '60s';
+
     protected function getStats(): array
     {
         $currentDate = Carbon::now();

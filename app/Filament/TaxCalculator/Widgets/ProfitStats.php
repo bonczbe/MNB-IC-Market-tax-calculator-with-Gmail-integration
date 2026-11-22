@@ -16,6 +16,8 @@ class ProfitStats extends BaseWidget
 
     protected ?string $heading = 'Tax Stats Overview';
 
+    protected ?string $pollingInterval = '60s';
+
     protected function getStats(): array
     {
 

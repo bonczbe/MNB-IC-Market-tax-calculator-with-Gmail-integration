@@ -8,7 +8,6 @@ use Filament\Widgets\StatsOverviewWidget;
 
 class PrevProfitStats extends StatsOverviewWidget
 {
-
     protected ?string $pollingInterval = '60s';
 
     protected function getColumns(): int

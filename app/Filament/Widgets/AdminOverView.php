@@ -60,21 +60,25 @@ class AdminOverView extends Widget implements HasSchemas
                     // Data Fetch Status
                     Stat::make('Holidays', $this->getLastStatus(Holyday::class))
                         ->description('Last holiday fetch')
+                        ->poll('60s')
                         ->color($this->getLastStatus(Holyday::class) === 'Not fetched' ? 'danger' : 'success')
                         ->icon(Heroicon::OutlinedCalendarDays),
 
                     Stat::make('Forex Events', $this->getLastStatus(ForexEvent::class))
                         ->description('Last event fetch')
+                        ->poll('60s')
                         ->color($this->getLastStatus(ForexEvent::class) === 'Not fetched' ? 'danger' : 'success')
                         ->icon(Heroicon::OutlinedChartBar),
 
                     Stat::make('Exchange Rates', $this->getLastStatus(Rate::class))
                         ->description('Last rate fetch')
+                        ->poll('60s')
                         ->color($this->getLastStatus(Rate::class) === 'Not fetched' ? 'danger' : 'success')
                         ->icon(Heroicon::OutlinedCurrencyDollar),
 
                     Stat::make('Tax Calculation', $this->getLastStatus(YearlyTaxCalculation::class))
                         ->description('Last tax calculation')
+                        ->poll('60s')
                         ->color($this->getLastStatus(YearlyTaxCalculation::class) === 'Not calculated' ? 'danger' : 'success')
                         ->icon(Heroicon::OutlinedCalculator),
                 ])

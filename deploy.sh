@@ -8,10 +8,10 @@ echo "=== Pulling latest changes ==="
 git pull origin main
 
 echo "=== Maintenance mode ON ==="
-if docker inspect --format='{{.State.Running}}' dailytax_app 2>/dev/null | grep -qx true; then
+if docker inspect --format='{{.State.Health.Status}}' dailytax_app 2>/dev/null | grep -qx healthy; then
     docker exec dailytax_app php artisan down --refresh=60 --retry=10
 else
-    echo "App container is not running; skipping maintenance mode."
+    echo "App container is missing or unhealthy; skipping maintenance mode."
 fi
 
 echo "=== Starting database and Redis ==="

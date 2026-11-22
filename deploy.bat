@@ -6,7 +6,17 @@ echo === Pulling latest changes ===
 git pull origin main
 
 echo === Maintenance mode ON ===
-docker exec dailytax_app php artisan down --refresh=60 --retry=10
+set "APP_HEALTH="
+for /f "tokens=*" %%i in ('docker inspect --format="{{.State.Health.Status}}" dailytax_app 2^>nul') do set "APP_HEALTH=%%i"
+if /i "%APP_HEALTH%"=="healthy" (
+    docker exec dailytax_app php artisan down --refresh=60 --retry=10
+    if errorlevel 1 exit /b 1
+) else (
+    echo App container is missing or unhealthy; skipping maintenance mode.
+)
+
+echo === Starting database and Redis ===
+docker-compose up -d db redis
 
 echo === Building new image ===
 docker-compose build app horizon scheduler

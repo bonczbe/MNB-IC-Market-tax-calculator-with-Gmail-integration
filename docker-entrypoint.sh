@@ -2,6 +2,7 @@
 set -e
 
 echo "Running composer install..."
+rm -f bootstrap/cache/packages.php bootstrap/cache/services.php
 composer install --no-dev --optimize-autoloader
 echo "Running npm install..."
 npm install

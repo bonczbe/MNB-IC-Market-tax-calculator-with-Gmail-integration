@@ -8,7 +8,14 @@ echo "=== Pulling latest changes ==="
 git pull origin main
 
 echo "=== Maintenance mode ON ==="
-docker exec dailytax_app php artisan down --refresh=60 --retry=10
+if docker inspect --format='{{.State.Running}}' dailytax_app 2>/dev/null | grep -qx true; then
+    docker exec dailytax_app php artisan down --refresh=60 --retry=10
+else
+    echo "App container is not running; skipping maintenance mode."
+fi
+
+echo "=== Starting database and Redis ==="
+docker compose up -d db redis
 
 echo "=== Building new image ==="
 docker compose build app horizon scheduler

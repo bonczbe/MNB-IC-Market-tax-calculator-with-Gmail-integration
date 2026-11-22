@@ -249,7 +249,7 @@ class TaxCalculatorServiceTest extends TestCase
         $this->assertEquals(-10000, $record->loss_carried_forward);
     }
 
-    public function test_calculate_all_broker_account_tax_for_year_stores_unused_loss(): void
+    public function test_calculate_all_broker_account_tax_for_year_keeps_unused_loss_at_zero_for_negative_profit(): void
     {
         DailyStatus::factory()->create([
             'broker_account_id' => $this->broker->id,
@@ -270,7 +270,8 @@ class TaxCalculatorServiceTest extends TestCase
 
         $this->assertDatabaseHas('yearly_tax_calculations', [
             'broker_account_id' => $this->broker->id,
-            'unused_loss' => -74000,
+            'gross_profit' => -74000,
+            'unused_loss' => 0,
         ]);
     }
 
